@@ -13,10 +13,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.border.EmptyBorder;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainFrame extends JFrame {
 
@@ -31,11 +34,12 @@ public class MainFrame extends JFrame {
 	private JPanel cardPanel;
 
 	// menus
-	private JPanel logoMenuPanel, homeMenuPanel, checkMenuPanel, rentBuyMenuPanel, powerBankStorageMenuPanel,
-			listMenuPanel, historyMenuPanel, notificationMenuPanel, userMenuPanel;
+	private JPanel logoMenuPanel;
+
+	private JPanel[] menuPanels;
 
 	// cards (app pages)
-	private JPanel homePanel;
+	private JPanel homePanel, checkPanel, rentBuyPanel, storagePanel, listPanel, historyPanel, notificationPanel;
 
 	// colors
 	private static final Color BACKGROUND_COLOR = Color.decode("#F8FAFC");
@@ -81,7 +85,6 @@ public class MainFrame extends JFrame {
 		menuSelectPanel = new JPanel();
 		menuSelectPanel.setLayout(new BoxLayout(menuSelectPanel, BoxLayout.Y_AXIS));
 		menuSelectPanel.setBackground(MENU_COLOR);
-		// TODO: add menus
 		createMenus();
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
@@ -89,17 +92,11 @@ public class MainFrame extends JFrame {
 		// Card Panel
 		cardPanel = new JPanel(new CardLayout());
 		cardPanel.setBackground(BACKGROUND_COLOR);
-		// TODO: add cards
-		createHomeCard();
+		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-
-		// Split
-		/*
-		 * splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, menuPanel,
-		 * cardPanel); splitPane.setResizeWeight(0.2); mainPanel.add(splitPane);
-		 */
+		changeCard(0, "HomeCard");
 	}
-	
+
 	private void createLogo() {
 		// logo
 		logoMenuPanel = new JPanel();
@@ -115,46 +112,51 @@ public class MainFrame extends JFrame {
 		logoMenuPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		menuPanel.add(logoMenuPanel, BorderLayout.NORTH);
 	}
-	
-	private void createMenuButton(JPanel panel, String iconPath, String iconDescription, String menuStr, int margin) {
-		panel = new JPanel(new BorderLayout());
-		panel.setBackground(MENU_COLOR);
+
+	private void createMenuButton(int panelIndex, String iconPath, String iconDescription, String menuStr, String card,
+			int margin) {
+
+		menuPanels[panelIndex] = new JPanel(new BorderLayout());
+		menuPanels[panelIndex].setBackground(MENU_COLOR);
+
+		// menu icon
 		ImageIcon menuIcon = createImageIcon(iconPath, iconDescription);
 		JLabel iconLabel = new JLabel(menuIcon);
-		panel.add(iconLabel, BorderLayout.WEST);
+		menuPanels[panelIndex].add(iconLabel, BorderLayout.WEST);
+
+		// menu text
 		JLabel label = new JLabel(menuStr);
 		label.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		label.setForeground(Color.WHITE);
 		label.setAlignmentX(LEFT_ALIGNMENT);
-		panel.add(label, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createEmptyBorder(margin, 20, margin, 20));
-		menuSelectPanel.add(panel);
+		menuPanels[panelIndex].add(label, BorderLayout.CENTER);
+
+		// margin
+		menuPanels[panelIndex].setBorder(BorderFactory.createEmptyBorder(margin, 20, margin, 20));
+
+		// change card when clicked
+		menuPanels[panelIndex].addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				changeCard(panelIndex, card);
+			}
+		});
+
+		menuSelectPanel.add(menuPanels[panelIndex]);
 	}
-	
+
 	private void createMenus() {
 
-		// home
-		createMenuButton(homeMenuPanel, "icons/home_icon.png", "Home Icon", "หน้าหลัก", 8);
-		createMenuButton(checkMenuPanel, "icons/home_icon.png", "Home Icon", "ตรวจสอบ Power Bank", 8);
-		createMenuButton(rentBuyMenuPanel, "icons/home_icon.png", "Home Icon", "เช่า/ซื้อ Power Bank", 8);
-		createMenuButton(powerBankStorageMenuPanel, "icons/home_icon.png", "Home Icon", "ฝาก Power Bank", 8);
-		createMenuButton(listMenuPanel, "icons/home_icon.png", "Home Icon", "รายการของฉัน", 8);
-		createMenuButton(historyMenuPanel, "icons/home_icon.png", "Home Icon", "ประวัติการใช้งาน", 8);
-		createMenuButton(notificationMenuPanel, "icons/home_icon.png", "Home Icon", "แจ้งเตือน", 8);
-		createMenuButton(userMenuPanel, "icons/home_icon.png", "Home Icon", "ผู้ใช้", 8);
-		/*
-		homeMenuPanel = new JPanel();
-		homeMenuPanel.setBackground(MENU_COLOR);
-		ImageIcon homeIcon = createImageIcon("icons/home_icon.png", "Home Icon");
-		JLabel homeIconLabel = new JLabel(homeIcon);
-		homeMenuPanel.add(homeIconLabel);
-		JLabel homeLabel = new JLabel("หน้าหลัก");
-		homeLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		homeLabel.setForeground(Color.WHITE);
-		homeMenuPanel.add(homeLabel);
-		homeMenuPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-		menuSelectPanel.add(homeMenuPanel);
-		*/
+		menuPanels = new JPanel[8];
+
+		createMenuButton(0, "icons/home_icon.png", "Home Icon", "หน้าหลัก", "HomeCard", 8);
+		createMenuButton(1, "icons/home_icon.png", "Home Icon", "ตรวจสอบ Power Bank", "CheckCard", 8);
+		createMenuButton(2, "icons/home_icon.png", "Home Icon", "เช่า/ซื้อ Power Bank", "RentBuyCard", 8);
+		createMenuButton(3, "icons/home_icon.png", "Home Icon", "ฝาก Power Bank", "StorageCard", 8);
+		createMenuButton(4, "icons/home_icon.png", "Home Icon", "รายการของฉัน", "ListCard", 8);
+		createMenuButton(5, "icons/home_icon.png", "Home Icon", "ประวัติการใช้งาน", "HistoryCard", 8);
+		createMenuButton(6, "icons/home_icon.png", "Home Icon", "แจ้งเตือน", "NotificationCard", 8);
+		createMenuButton(7, "icons/home_icon.png", "Home Icon", "ผู้ใช้", "HomeCard", 8);
 
 	}
 
@@ -182,11 +184,87 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	private void createCardScreen() {
+		createHomeCard();
+		createCheckCard();
+		createRentBuyCard();
+		createStorageCard();
+		createListCard();
+		createHistoryCard();
+		createNotificationCard();
+	}
+
 	private void createHomeCard() {
 		homePanel = new JPanel();
+		homePanel.setBackground(BACKGROUND_COLOR);
 		JLabel homeLabel = new JLabel("This is home page");
 		homePanel.add(homeLabel);
-		cardPanel.add(homePanel);
+		cardPanel.add(homePanel, "HomeCard");
+	}
+
+	private void createCheckCard() {
+		checkPanel = new JPanel();
+		checkPanel.setBackground(BACKGROUND_COLOR);
+		JLabel checkLabel = new JLabel("This is check page");
+		checkPanel.add(checkLabel);
+		cardPanel.add(checkPanel, "CheckCard");
+	}
+
+	private void createRentBuyCard() {
+		rentBuyPanel = new JPanel();
+		rentBuyPanel.setBackground(BACKGROUND_COLOR);
+		JLabel rentBuyLabel = new JLabel("This is rent buy page");
+		rentBuyPanel.add(rentBuyLabel);
+		cardPanel.add(rentBuyPanel, "RentBuyCard");
+	}
+
+	private void createStorageCard() {
+		storagePanel = new JPanel();
+		storagePanel.setBackground(BACKGROUND_COLOR);
+		JLabel storageLabel = new JLabel("This is storage page");
+		storagePanel.add(storageLabel);
+		cardPanel.add(storagePanel, "StorageCard");
+	}
+
+	private void createListCard() {
+		listPanel = new JPanel();
+		listPanel.setBackground(BACKGROUND_COLOR);
+		JLabel listLabel = new JLabel("This is list page");
+		listPanel.add(listLabel);
+		cardPanel.add(listPanel, "ListCard");
+	}
+
+	private void createHistoryCard() {
+		historyPanel = new JPanel();
+		historyPanel.setBackground(BACKGROUND_COLOR);
+		JLabel historyLabel = new JLabel("This is history page");
+		historyPanel.add(historyLabel);
+		cardPanel.add(historyPanel, "HistoryCard");
+	}
+
+	private void createNotificationCard() {
+		notificationPanel = new JPanel();
+		notificationPanel.setBackground(BACKGROUND_COLOR);
+		JLabel notificationLabel = new JLabel("This is notification page");
+		notificationPanel.add(notificationLabel);
+		cardPanel.add(notificationPanel, "NotificationCard");
+	}
+
+	private void changeCard(int selectedMenuIndex, String cardToChange) {
+		// change other menus color
+		for (int i = 0; i < menuPanels.length; i++) {
+			if (i != selectedMenuIndex)
+				menuPanels[i].setBackground(MENU_COLOR);
+		}
+
+		// change selected menu color
+		JPanel selectedMenu = menuPanels[selectedMenuIndex];
+		if (selectedMenu != null)
+			selectedMenu.setBackground(MAIN_COLOR);
+
+		// change page
+		CardLayout card = (CardLayout) cardPanel.getLayout();
+		card.show(cardPanel, cardToChange);
 	}
 
 }
