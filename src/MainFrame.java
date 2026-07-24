@@ -23,6 +23,11 @@ import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -219,6 +224,7 @@ public class MainFrame extends JFrame {
 		topPanel.add(aboutPanel, BorderLayout.WEST);
 		JLabel appTitleLabel = new JLabel(APP_NAME);
 		appTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+		appTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 		aboutPanel.add(appTitleLabel);
 		JLabel aboutLabel1 = new JLabel("โปรแกรมนี้คือโปรแกรมสำหรับตรวจสอบ Power Bank ก่อนนำขึ้นเครื่องตามข้อกำหนด IATA");
 		aboutLabel1.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -231,6 +237,7 @@ public class MainFrame extends JFrame {
 		JLabel aboutLabel3 = new JLabel("และยังมีบริการรับฝาก Power Bank ก่อนขึ้นเครื่อง");
 		aboutLabel3.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		aboutLabel3.setForeground(DETAIL_FONT_COLOR);
+		aboutLabel3.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 		aboutPanel.add(aboutLabel3);
 		JLabel noteLabel1 = new JLabel("หมายเหตุ: โปรแกรมนี้ถูกจัดทำขึ้นสำหรับการเรียนรู้รายวิชา Database System Concepts");
 		noteLabel1.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -250,15 +257,18 @@ public class MainFrame extends JFrame {
 		ImageIcon notiImageIcon = createImageIcon("icons/noti_icon_32.png", "Notification Icon");
 		JLabel notiIconLabel = new JLabel(notiImageIcon);
 		notiIconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15));
+		notiIconLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				changeCard(6, 6);
+			}
+		});
 		notiAndDateTimePanel.add(notiIconLabel);
 		
 		// Date And Time
 		JPanel dateAndTimePanel = new JPanel();
 		dateAndTimePanel.setBackground(BACKGROUND_COLOR);
-		Border lineBorder = BorderFactory.createLineBorder(DETAIL_FONT_COLOR, 1);
-		Border paddingBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-		Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
-		dateAndTimePanel.setBorder(compoundBorder);
+		dateAndTimePanel.setBorder(createPaddingBorder(DETAIL_FONT_COLOR, 5));
 		dateAndTimePanel.setLayout(new BoxLayout(dateAndTimePanel, BoxLayout.Y_AXIS));
 		notiAndDateTimePanel.add(dateAndTimePanel);
 		JLabel dateLabel = new JLabel("24 กรกฎาคม 2569");
@@ -285,9 +295,136 @@ public class MainFrame extends JFrame {
 		timer.start();
 		
 		// Center Panel (Pages Navigation + Status)
-		JPanel centerPanel = new JPanel();
+		JPanel centerPanel = new JPanel(new GridBagLayout());
 		centerPanel.setBackground(BACKGROUND_COLOR);
 		homePanel.add(centerPanel, BorderLayout.CENTER);
+		
+		// Power Bank Check
+		JPanel powerBankCheckPanel = new JPanel();
+		powerBankCheckPanel.setLayout(new BoxLayout(powerBankCheckPanel, BoxLayout.Y_AXIS));
+		powerBankCheckPanel.setBackground(Color.decode("#ECF3FE"));
+		powerBankCheckPanel.setBorder(createPaddingBorder(new Color(202, 207, 217), 15));
+		GridBagConstraints checkConstraints = new GridBagConstraints();
+		checkConstraints.gridx = 0;
+		checkConstraints.gridy = 0;
+		centerPanel.add(powerBankCheckPanel, checkConstraints);
+		
+		JLabel checkTitleLabel = new JLabel("ตรวจสอบ Power Bank");
+		checkTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+		checkTitleLabel.setForeground(Color.decode("#4E5986"));
+		checkTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		powerBankCheckPanel.add(checkTitleLabel);
+		
+		JLabel checkDetailLabel1 = new JLabel("ตรวจสอบว่า Power Bank ของคุณ");
+		checkDetailLabel1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		checkDetailLabel1.setForeground(new Color(92, 105, 156));
+		powerBankCheckPanel.add(checkDetailLabel1);
+		
+		JLabel checkDetailLabel2 = new JLabel("สามารถนำขึ้นเครื่องได้หรือไม่");
+		checkDetailLabel2.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		checkDetailLabel2.setForeground(new Color(92, 105, 156));
+		checkDetailLabel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+		powerBankCheckPanel.add(checkDetailLabel2);
+		
+		JButton checkButton = new JButton("ตรวจสอบเลย");
+		checkButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		checkButton.setBackground(Color.decode("#0A5DF5"));
+		checkButton.setForeground(Color.WHITE);
+		checkButton.setFocusPainted(false);
+		checkButton.setMargin(new Insets(10, 10, 10, 10));
+		checkButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeCard(1, 1);
+			}
+			
+		});
+		powerBankCheckPanel.add(checkButton);
+		
+		// Rent Buy
+		JPanel rentBuyPanel = new JPanel();
+		rentBuyPanel.setLayout(new BoxLayout(rentBuyPanel, BoxLayout.Y_AXIS));
+		rentBuyPanel.setBackground(Color.decode("#EFF8F5"));
+		rentBuyPanel.setBorder(createPaddingBorder(new Color(176, 184, 181), 15));
+		GridBagConstraints rentBuyConstraints = new GridBagConstraints();
+		rentBuyConstraints.gridx = 1;
+		rentBuyConstraints.gridy = 0;
+		rentBuyConstraints.insets = new Insets(0, 15, 0, 0);
+		centerPanel.add(rentBuyPanel, rentBuyConstraints);
+		
+		JLabel rentBuyTitleLabel = new JLabel("เช่า / ซื้อ Power Bank");
+		rentBuyTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+		rentBuyTitleLabel.setForeground(Color.decode("#3B6045"));
+		rentBuyTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		rentBuyPanel.add(rentBuyTitleLabel);
+		
+		JLabel rentBuyDetailLabel1 = new JLabel("เลือกเช่า Power Bank");
+		rentBuyDetailLabel1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		rentBuyDetailLabel1.setForeground(Color.decode("#7A8688"));
+		rentBuyPanel.add(rentBuyDetailLabel1);
+		
+		JLabel rentBuyDetailLabel2 = new JLabel("ที่ได้มาตรฐานการบิน");
+		rentBuyDetailLabel2.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		rentBuyDetailLabel2.setForeground(Color.decode("#7A8688"));
+		rentBuyDetailLabel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+		rentBuyPanel.add(rentBuyDetailLabel2);
+		
+		JButton rentBuyButton = new JButton("เลือก Power Bank");
+		rentBuyButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		rentBuyButton.setBackground(Color.decode("#3B6045"));
+		rentBuyButton.setForeground(Color.WHITE);
+		rentBuyButton.setFocusPainted(false);
+		rentBuyButton.setMargin(new Insets(10, 10, 10, 10));
+		rentBuyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeCard(2, 2);
+			}
+			
+		});
+		rentBuyPanel.add(rentBuyButton);
+		
+		// Storage
+		JPanel storagePanel = new JPanel();
+		storagePanel.setLayout(new BoxLayout(storagePanel, BoxLayout.Y_AXIS));
+		storagePanel.setBackground(Color.decode("#FFDDB0"));
+		storagePanel.setBorder(createPaddingBorder(new Color(219, 191, 154), 15));
+		GridBagConstraints storageConstraints = new GridBagConstraints();
+		storageConstraints.gridx = 2;
+		storageConstraints.gridy = 0;
+		storageConstraints.insets = new Insets(0, 15, 0, 0);
+		centerPanel.add(storagePanel, storageConstraints);
+		
+		JLabel storageTitleLabel = new JLabel("ฝาก Power Bank");
+		storageTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+		storageTitleLabel.setForeground(new Color(158, 90, 0));
+		storageTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		storagePanel.add(storageTitleLabel);
+		
+		JLabel storageDetailLabel1 = new JLabel("ฝาก Power Bank ไว้ก่อน");
+		storageDetailLabel1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		storageDetailLabel1.setForeground(Color.decode("#7A8688"));
+		storagePanel.add(storageDetailLabel1);
+		
+		JLabel storageDetailLabel2 = new JLabel("แล้วกลับมารับ");
+		storageDetailLabel2.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		storageDetailLabel2.setForeground(Color.decode("#7A8688"));
+		storageDetailLabel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+		storagePanel.add(storageDetailLabel2);
+		
+		JButton storageButton = new JButton("ฝาก Power Bank");
+		storageButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		storageButton.setBackground(new Color(158, 90, 0));
+		storageButton.setForeground(Color.WHITE);
+		storageButton.setFocusPainted(false);
+		storageButton.setMargin(new Insets(10, 10, 10, 10));
+		storageButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeCard(3, 3);
+			}
+		});
+		storagePanel.add(storageButton);
 		
 		cardPanel.add(homePanel, cardNames[0]);
 	}
@@ -355,6 +492,13 @@ public class MainFrame extends JFrame {
 		// change page
 		CardLayout card = (CardLayout) cardPanel.getLayout();
 		card.show(cardPanel, cardNames[cardIndex]);
+	}
+	
+	private Border createPaddingBorder(Color color, int padding) {
+		Border lineBorder = BorderFactory.createLineBorder(color, 1);
+		Border paddingBorder = BorderFactory.createEmptyBorder(padding, padding, padding, padding);
+		Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
+		return compoundBorder;
 	}
 
 }
