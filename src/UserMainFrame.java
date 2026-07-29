@@ -1,11 +1,14 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -529,6 +532,53 @@ public class UserMainFrame extends JFrame {
 			}
 		});
 		currentStorageTextPanel.add(storageDetailButton);
+		
+		// Bottom (link to IATA)
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+		bottomPanel.setBackground(BACKGROUND_COLOR);
+		bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 50, 0));
+		homePanel.add(bottomPanel, BorderLayout.SOUTH);
+		
+		// Title
+		JLabel bottomTitleLabel = new JLabel("แหล่งอ้างอิง");
+		bottomTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 21));
+		bottomTitleLabel.setForeground(Color.BLACK);
+		bottomTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
+		bottomPanel.add(bottomTitleLabel);
+		
+		// Detail (link to IATA)
+		JPanel detailPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		detailPanel.setBackground(BACKGROUND_COLOR);
+		detailPanel.setAlignmentX(LEFT_ALIGNMENT);
+		bottomPanel.add(detailPanel);
+		
+		JLabel seeMoreLabel = new JLabel("สามารถศึกษาเพิ่มเติมได้ที่ ");
+		seeMoreLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		seeMoreLabel.setForeground(Color.BLACK);
+		detailPanel.add(seeMoreLabel);
+		
+		JLabel linkLabel = new JLabel("<html><a href=''><u>IATA</u></a></html>");
+		linkLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
+		linkLabel.setForeground(Color.BLUE);
+		
+		linkLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		linkLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().browse(new URI("https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf"));
+					}
+				}
+				catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		
+		detailPanel.add(linkLabel);
 
 		cardPanel.add(homePanel, cardNames[0]);
 	}
