@@ -139,6 +139,7 @@ public class UserMainFrame extends JFrame {
 		// menu icon
 		ImageIcon menuIcon = createImageIcon(iconPath, iconDescription);
 		JLabel iconLabel = new JLabel(menuIcon);
+		iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 		menuPanels[panelIndex].add(iconLabel, BorderLayout.WEST);
 
 		// menu text
@@ -167,13 +168,13 @@ public class UserMainFrame extends JFrame {
 		menuPanels = new JPanel[8];
 
 		createMenuButton(0, "icons/home_icon.png", "Home Icon", "หน้าหลัก", 0, 8);
-		createMenuButton(1, "icons/home_icon.png", "Home Icon", "ตรวจสอบ Power Bank", 1, 8);
-		createMenuButton(2, "icons/home_icon.png", "Home Icon", "เช่า/ซื้อ Power Bank", 2, 8);
-		createMenuButton(3, "icons/home_icon.png", "Home Icon", "ฝาก Power Bank", 3, 8);
-		createMenuButton(4, "icons/home_icon.png", "Home Icon", "รายการของฉัน", 4, 8);
-		createMenuButton(5, "icons/home_icon.png", "Home Icon", "ประวัติการใช้งาน", 5, 8);
-		createMenuButton(6, "icons/home_icon.png", "Home Icon", "แจ้งเตือน", 6, 8);
-		createMenuButton(7, "icons/home_icon.png", "Home Icon", "ผู้ใช้", 0, 8);
+		createMenuButton(1, "icons/check_icon.png", "Check Icon", "ตรวจสอบ Power Bank", 1, 8);
+		createMenuButton(2, "icons/purchase_icon.png", "Purchase Icon", "เช่า/ซื้อ Power Bank", 2, 8);
+		createMenuButton(3, "icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 3, 8);
+		createMenuButton(4, "icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
+		createMenuButton(5, "icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
+		createMenuButton(6, "icons/noti_white_icon.png", "Notification Icon", "แจ้งเตือน", 6, 8);
+		createMenuButton(7, "icons/user_icon.png", "User Icon", "ผู้ใช้", 0, 8);
 
 	}
 
@@ -447,7 +448,7 @@ public class UserMainFrame extends JFrame {
 		currentRentPanelConstraints.insets = new Insets(15, 0, 0, 0);
 		centerPanel.add(currentRentPanel, currentRentPanelConstraints);
 
-		ImageIcon currentRentImageIcon = createImageIcon("icons/noti_icon.png", "Currnet Rent Icon");
+		ImageIcon currentRentImageIcon = createImageIcon("icons/purchase_black_icon.png", "Currnet Rent Icon");
 		JLabel currentRentIconLabel = new JLabel(currentRentImageIcon);
 		currentRentPanel.add(currentRentIconLabel);
 
@@ -496,7 +497,7 @@ public class UserMainFrame extends JFrame {
 		currentStoragePanelConstraints.insets = new Insets(15, 0, 0, 0);
 		centerPanel.add(currentStoragePanel, currentStoragePanelConstraints);
 
-		ImageIcon currentStorageImageIcon = createImageIcon("icons/noti_icon.png", "Currnet Storage Icon");
+		ImageIcon currentStorageImageIcon = createImageIcon("icons/storage_black_icon.png", "Currnet Storage Icon");
 		JLabel currentStorageIconLabel = new JLabel(currentStorageImageIcon);
 		currentStoragePanel.add(currentStorageIconLabel);
 
@@ -590,6 +591,7 @@ public class UserMainFrame extends JFrame {
 		noBgButton.setBackground(null);
 		noBgButton.setFocusPainted(false);
 		noBgButton.setBorder(null);
+		noBgButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		return noBgButton;
 	}
 
