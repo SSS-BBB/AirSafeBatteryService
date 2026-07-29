@@ -3,29 +3,38 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.Format;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Formatter;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.NumberFormatter;
+
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -111,7 +120,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.setBackground(BACKGROUND_COLOR);
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-		changeCard(0, 0);
+		changeCard(1, 1);
 	}
 
 	private void createLogo() {
@@ -597,10 +606,81 @@ public class UserMainFrame extends JFrame {
 
 	private void createCheckCard() {
 		checkPanel = new JPanel();
+		checkPanel.setLayout(new BoxLayout(checkPanel, BoxLayout.Y_AXIS));
 		checkPanel.setBackground(BACKGROUND_COLOR);
-		JLabel checkLabel = new JLabel("This is check page");
-		checkPanel.add(checkLabel);
+		
+		JLabel checkTitleLabel = new JLabel("ตรวจสอบ Power Bank");
+		checkTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+		checkTitleLabel.setBorder(BorderFactory.createEmptyBorder(20, 25, 30, 0));
+		checkPanel.add(checkTitleLabel);
+		
+		JPanel infoPanel = new JPanel();
+		infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+		infoPanel.setBackground(BACKGROUND_COLOR);
+		infoPanel.setBorder(createPaddingBorder(Color.BLACK, 1, new Insets(25, 25, 25, 25), new Insets(20, 25, 30, 0)));
+		checkPanel.add(infoPanel);
+		
+		JLabel infoTitleLabel = new JLabel("กรอกข้อมูล Power Bank ของคุณ");
+		infoTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 21));
+		infoTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+		infoPanel.add(infoTitleLabel);
+		
+		// Capacity
+		JLabel capacityTitleLabel = new JLabel("ความจุ (mAh)");
+		capacityTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		capacityTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+		infoPanel.add(capacityTitleLabel);
+		
+		JTextField capacityTextField = createAppTextField();
+		infoPanel.add(capacityTextField);
+		
+		// Voltage
+		JLabel voltageTitleLabel = new JLabel("แรงดันไฟฟ้า (V)");
+		voltageTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		voltageTitleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 8, 0));
+		infoPanel.add(voltageTitleLabel);
+		
+		JTextField voltageTextField = createAppTextField();
+		infoPanel.add(voltageTextField);
+		
+		// Or
+		JLabel alternativeLabel = new JLabel("หรือ กรอก Wh โดยตรง");
+		alternativeLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		alternativeLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+		infoPanel.add(alternativeLabel);
+		
+		// Energy
+		JLabel energyTitleLabel = new JLabel("พลังงาน (Wh)");
+		energyTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		energyTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+		infoPanel.add(energyTitleLabel);
+		
+		JTextField energyTextField = createAppTextField();
+		infoPanel.add(energyTextField);
+		infoPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+		
+		// Check Button
+		JButton checkButton = new JButton("ตรวจสอบ");
+		checkButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+		checkButton.setBackground(Color.BLUE);
+		checkButton.setForeground(Color.WHITE);
+		checkButton.setFocusPainted(false);
+		checkButton.setMaximumSize(new Dimension(350, 50));
+		checkButton.setPreferredSize(new Dimension(350, 50));
+		checkButton.setAlignmentX(LEFT_ALIGNMENT);
+		infoPanel.add(checkButton);
+		
 		cardPanel.add(checkPanel, cardNames[1]);
+	}
+	
+	private JTextField createAppTextField() {
+		JTextField textField = new JTextField();
+		textField.setBackground(BACKGROUND_COLOR);
+		textField.setPreferredSize(new Dimension(350, 35));
+		textField.setMaximumSize(new Dimension(350, 35));
+		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textField.setAlignmentX(LEFT_ALIGNMENT);
+		return textField;
 	}
 
 	private void createRentBuyCard() {
@@ -659,12 +739,25 @@ public class UserMainFrame extends JFrame {
 		CardLayout card = (CardLayout) cardPanel.getLayout();
 		card.show(cardPanel, cardNames[cardIndex]);
 	}
-
-	private Border createPaddingBorder(Color color, int padding) {
-		Border lineBorder = BorderFactory.createLineBorder(color, 1);
-		Border paddingBorder = BorderFactory.createEmptyBorder(padding, padding, padding, padding);
+	
+	private Border createPaddingBorder(Color color, int thickness, Insets paddings, Insets margins) {
+		Border marginBorder = BorderFactory.createEmptyBorder(margins.top, margins.left, margins.bottom, margins.right);
+		
+		Border lineBorder = BorderFactory.createLineBorder(color, thickness);
+		Border paddingBorder = BorderFactory.createEmptyBorder(paddings.top, paddings.left, paddings.bottom, paddings.right);
 		Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
-		return compoundBorder;
+		
+		Border compoundBorder2 = BorderFactory.createCompoundBorder(marginBorder, compoundBorder);
+		
+		return compoundBorder2;
+	}
+	
+	private Border createPaddingBorder(Color color, Insets paddings) {
+		return createPaddingBorder(color, 1, paddings, new Insets(0, 0, 0, 0));
+	}
+	
+	private Border createPaddingBorder(Color color, int padding) {
+		return createPaddingBorder(color, 1, new Insets(padding, padding, padding, padding), new Insets(0, 0, 0, 0));
 	}
 
 }
