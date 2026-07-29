@@ -31,7 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MainFrame extends JFrame {
+public class UserMainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final String APP_NAME = "AirSafe Battery Service";
@@ -69,7 +69,7 @@ public class MainFrame extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainFrame frame = new MainFrame();
+					UserMainFrame frame = new UserMainFrame();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -81,7 +81,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainFrame() {
+	public UserMainFrame() {
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(APP_WIDTH, APP_HEIGHT);
