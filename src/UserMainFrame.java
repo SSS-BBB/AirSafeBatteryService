@@ -38,6 +38,7 @@ import javax.swing.text.NumberFormatter;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,10 +62,11 @@ public class UserMainFrame extends JFrame {
 
 	private JPanel[] menuPanels;
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentBuyCard", "StorageCard", "ListCard", "HistoryCard",
-			"NotificationCard" };
+			"NotificationCard", "CheckStatusCard" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel, rentBuyPanel, storagePanel, listPanel, historyPanel, notificationPanel;
+	private JPanel homePanel, checkPanel, rentBuyPanel, storagePanel, listPanel, historyPanel, notificationPanel,
+			checkStatusPanel;
 
 	// colors
 	private static final Color BACKGROUND_COLOR = Color.decode("#F8FAFC");
@@ -120,7 +122,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.setBackground(BACKGROUND_COLOR);
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-		changeCard(1, 1);
+		changeCard(1, 7);
 	}
 
 	private void createLogo() {
@@ -219,6 +221,7 @@ public class UserMainFrame extends JFrame {
 		createListCard();
 		createHistoryCard();
 		createNotificationCard();
+		createCheckStatusCard();
 	}
 
 	private void createHomeCard() {
@@ -492,7 +495,7 @@ public class UserMainFrame extends JFrame {
 				changeCard(4, 4);
 			}
 		});
-		
+
 		currentRentTextPanel.add(rentDetailButton);
 
 		// Current Storage List
@@ -542,52 +545,52 @@ public class UserMainFrame extends JFrame {
 			}
 		});
 		currentStorageTextPanel.add(storageDetailButton);
-		
+
 		// Bottom (link to IATA)
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
 		bottomPanel.setBackground(BACKGROUND_COLOR);
 		bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 50, 0));
 		homePanel.add(bottomPanel, BorderLayout.SOUTH);
-		
+
 		// Title
 		JLabel bottomTitleLabel = new JLabel("แหล่งอ้างอิง");
 		bottomTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 21));
 		bottomTitleLabel.setForeground(Color.BLACK);
 		bottomTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
 		bottomPanel.add(bottomTitleLabel);
-		
+
 		// Detail (link to IATA)
 		JPanel detailPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		detailPanel.setBackground(BACKGROUND_COLOR);
 		detailPanel.setAlignmentX(LEFT_ALIGNMENT);
 		bottomPanel.add(detailPanel);
-		
+
 		JLabel seeMoreLabel = new JLabel("สามารถศึกษาเพิ่มเติมได้ที่ ");
 		seeMoreLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		seeMoreLabel.setForeground(Color.BLACK);
 		detailPanel.add(seeMoreLabel);
-		
+
 		JLabel linkLabel = new JLabel("<html><a href=''><u>IATA</u></a></html>");
 		linkLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
 		linkLabel.setForeground(Color.BLUE);
-		
+
 		linkLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
+
 		linkLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
 					if (Desktop.isDesktopSupported()) {
-						Desktop.getDesktop().browse(new URI("https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf"));
+						Desktop.getDesktop().browse(new URI(
+								"https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf"));
 					}
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 		});
-		
+
 		detailPanel.add(linkLabel);
 
 		cardPanel.add(homePanel, cardNames[0]);
@@ -608,57 +611,57 @@ public class UserMainFrame extends JFrame {
 		checkPanel = new JPanel();
 		checkPanel.setLayout(new BoxLayout(checkPanel, BoxLayout.Y_AXIS));
 		checkPanel.setBackground(BACKGROUND_COLOR);
-		
+
 		JLabel checkTitleLabel = new JLabel("ตรวจสอบ Power Bank");
 		checkTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
 		checkTitleLabel.setBorder(BorderFactory.createEmptyBorder(20, 25, 30, 0));
 		checkPanel.add(checkTitleLabel);
-		
+
 		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 		infoPanel.setBackground(BACKGROUND_COLOR);
 		infoPanel.setBorder(createPaddingBorder(Color.BLACK, 1, new Insets(25, 25, 25, 25), new Insets(20, 25, 30, 0)));
 		checkPanel.add(infoPanel);
-		
+
 		JLabel infoTitleLabel = new JLabel("กรอกข้อมูล Power Bank ของคุณ");
 		infoTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 21));
 		infoTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 		infoPanel.add(infoTitleLabel);
-		
+
 		// Capacity
 		JLabel capacityTitleLabel = new JLabel("ความจุ (mAh)");
 		capacityTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		capacityTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
 		infoPanel.add(capacityTitleLabel);
-		
+
 		JTextField capacityTextField = createAppTextField();
 		infoPanel.add(capacityTextField);
-		
+
 		// Voltage
 		JLabel voltageTitleLabel = new JLabel("แรงดันไฟฟ้า (V)");
 		voltageTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		voltageTitleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 8, 0));
 		infoPanel.add(voltageTitleLabel);
-		
+
 		JTextField voltageTextField = createAppTextField();
 		infoPanel.add(voltageTextField);
-		
+
 		// Or
 		JLabel alternativeLabel = new JLabel("หรือ กรอก Wh โดยตรง");
 		alternativeLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		alternativeLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 		infoPanel.add(alternativeLabel);
-		
+
 		// Energy
 		JLabel energyTitleLabel = new JLabel("พลังงาน (Wh)");
 		energyTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		energyTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
 		infoPanel.add(energyTitleLabel);
-		
+
 		JTextField energyTextField = createAppTextField();
 		infoPanel.add(energyTextField);
 		infoPanel.add(Box.createRigidArea(new Dimension(0, 25)));
-		
+
 		// Check Button
 		JButton checkButton = new JButton("ตรวจสอบ");
 		checkButton.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -669,10 +672,10 @@ public class UserMainFrame extends JFrame {
 		checkButton.setPreferredSize(new Dimension(350, 50));
 		checkButton.setAlignmentX(LEFT_ALIGNMENT);
 		infoPanel.add(checkButton);
-		
+
 		cardPanel.add(checkPanel, cardNames[1]);
 	}
-	
+
 	private JTextField createAppTextField() {
 		JTextField textField = new JTextField();
 		textField.setBackground(BACKGROUND_COLOR);
@@ -723,39 +726,123 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(notificationPanel, cardNames[6]);
 	}
 
-	private void changeCard(int selectedMenuIndex, int cardIndex) {
-		// change other menus color
-		for (int i = 0; i < menuPanels.length; i++) {
-			if (i != selectedMenuIndex)
-				menuPanels[i].setBackground(MENU_COLOR);
+	private void createCheckStatusCard() {
+		checkStatusPanel = new JPanel(new GridBagLayout());
+		checkStatusPanel.setBackground(BACKGROUND_COLOR);
+		cardPanel.add(checkStatusPanel, cardNames[7]);
+
+		Color borderColor = new Color(166, 173, 168);
+
+		// TODO: get wh from the database
+
+		JPanel statusPanel = createStatusPanel(74, borderColor, true);
+		GridBagConstraints statusC = new GridBagConstraints();
+		statusC.gridx = 0;
+		statusC.gridy = 0;
+		statusC.anchor = GridBagConstraints.WEST;
+		checkStatusPanel.add(statusPanel, statusC);
+
+	}
+
+	private JPanel createStatusPanel(int wh, Color borderColor, boolean approve) {
+		
+		String statusTitle = "สามารถนำขึ้นเครื่องได้";
+		String statusDetail = "Power Bank ของคุณเป็นไปตามกฎระเบียบ";
+		String statusImagePath = "icons/check_green_icon_128.png";
+		Color backgroundColor = new Color(201, 242, 212);
+		Color statusTextColor = new Color(0, 100, 0);
+
+		if (!approve) {
+			statusTitle = "ไม่สามารถนำขึ้นเครื่องได้";
+			statusDetail = "Power Bank ของคุณไม่เป็นไปตามกฎระเบียบ";
+			statusImagePath = "icons/cancel_red_icon_128.png";
+			backgroundColor = new Color(247, 188, 188);
+			statusTextColor = new Color(176, 4, 4);
 		}
 
-		// change selected menu color
-		JPanel selectedMenu = menuPanels[selectedMenuIndex];
-		if (selectedMenu != null)
-			selectedMenu.setBackground(MAIN_COLOR);
+		JPanel statusPanel = new JPanel();
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+		statusPanel.setBackground(backgroundColor);
+		statusPanel.setBorder(createPaddingBorder(borderColor, 15));
 
-		// change page
-		CardLayout card = (CardLayout) cardPanel.getLayout();
-		card.show(cardPanel, cardNames[cardIndex]);
+		// status icon
+		ImageIcon statusImageIcon = createImageIcon(statusImagePath, "Status Icon");
+		JLabel statusIconLabel = new JLabel(statusImageIcon);
+		statusIconLabel.setAlignmentX(CENTER_ALIGNMENT);
+		statusIconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		statusPanel.add(statusIconLabel);
+
+		// status label
+		JLabel statusLabelTitle = new JLabel(statusTitle);
+		statusLabelTitle.setFont(new Font("Tahoma", Font.BOLD, 32));
+		statusLabelTitle.setForeground(statusTextColor);
+		statusLabelTitle.setAlignmentX(CENTER_ALIGNMENT);
+		statusLabelTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+		statusPanel.add(statusLabelTitle);
+
+		JLabel statusLabelDetail = new JLabel(statusDetail);
+		statusLabelDetail.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		statusLabelDetail.setForeground(Color.DARK_GRAY);
+		statusLabelDetail.setAlignmentX(CENTER_ALIGNMENT);
+		statusLabelDetail.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		statusPanel.add(statusLabelDetail);
+
+		// wh label
+		JLabel whLabel = new JLabel("พลังงาน: " + String.valueOf(wh) + " Wh");
+		whLabel.setFont(new Font("Tahoma", Font.BOLD, 26));
+		whLabel.setForeground(statusTextColor);
+		whLabel.setAlignmentX(CENTER_ALIGNMENT);
+		whLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
+		statusPanel.add(whLabel);
+
+		return statusPanel;
 	}
-	
+
+	private void changeCard(int selectedMenuIndex, int cardIndex) {
+		// check menu index out of bounds
+		if (selectedMenuIndex < 0 || selectedMenuIndex >= menuPanels.length) {
+			System.err.println(
+					"Selected Menu Index out of bounds, unable to color the menu " + String.valueOf(selectedMenuIndex));
+		} else {
+			// change other menus color
+			for (int i = 0; i < menuPanels.length; i++) {
+				if (i != selectedMenuIndex)
+					menuPanels[i].setBackground(MENU_COLOR);
+			}
+
+			// change selected menu color
+			JPanel selectedMenu = menuPanels[selectedMenuIndex];
+			if (selectedMenu != null)
+				selectedMenu.setBackground(MAIN_COLOR);
+		}
+
+		// check card index out of bounds
+		if (cardIndex < 0 || cardIndex >= cardNames.length) {
+			System.err.println("Card Index out of bounds, unable to change to page " + String.valueOf(cardIndex));
+		} else {
+			// change page
+			CardLayout card = (CardLayout) cardPanel.getLayout();
+			card.show(cardPanel, cardNames[cardIndex]);
+		}
+	}
+
 	private Border createPaddingBorder(Color color, int thickness, Insets paddings, Insets margins) {
 		Border marginBorder = BorderFactory.createEmptyBorder(margins.top, margins.left, margins.bottom, margins.right);
-		
+
 		Border lineBorder = BorderFactory.createLineBorder(color, thickness);
-		Border paddingBorder = BorderFactory.createEmptyBorder(paddings.top, paddings.left, paddings.bottom, paddings.right);
+		Border paddingBorder = BorderFactory.createEmptyBorder(paddings.top, paddings.left, paddings.bottom,
+				paddings.right);
 		Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
-		
+
 		Border compoundBorder2 = BorderFactory.createCompoundBorder(marginBorder, compoundBorder);
-		
+
 		return compoundBorder2;
 	}
-	
+
 	private Border createPaddingBorder(Color color, Insets paddings) {
 		return createPaddingBorder(color, 1, paddings, new Insets(0, 0, 0, 0));
 	}
-	
+
 	private Border createPaddingBorder(Color color, int padding) {
 		return createPaddingBorder(color, 1, new Insets(padding, padding, padding, padding), new Insets(0, 0, 0, 0));
 	}
