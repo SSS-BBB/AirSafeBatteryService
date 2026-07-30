@@ -727,10 +727,23 @@ public class UserMainFrame extends JFrame {
 	}
 
 	private void createCheckStatusCard() {
-		checkStatusPanel = new JPanel(new GridBagLayout());
-		checkStatusPanel.setBackground(BACKGROUND_COLOR);
+		
+		checkStatusPanel = new JPanel(new BorderLayout());
+		checkStatusPanel.setBackground(BACKGROUND_COLOR);		
 		cardPanel.add(checkStatusPanel, cardNames[7]);
-
+		
+		// North (Status Title)
+		JLabel checkStatusTitleLabel = new JLabel("ผลการตรวจสอบ");
+		checkStatusTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 28));
+		checkStatusTitleLabel.setForeground(Color.BLACK);
+		checkStatusTitleLabel.setBorder(BorderFactory.createEmptyBorder(25, 25, 0, 0));
+		checkStatusPanel.add(checkStatusTitleLabel, BorderLayout.NORTH);
+		
+		// Center (Status Content)
+		JPanel statusContentPanel = new JPanel(new GridBagLayout());
+		statusContentPanel.setBackground(BACKGROUND_COLOR);
+		checkStatusPanel.add(statusContentPanel, BorderLayout.CENTER);
+		
 		Color borderColor = new Color(166, 173, 168);
 
 		// TODO: get wh from the database
@@ -739,12 +752,103 @@ public class UserMainFrame extends JFrame {
 		GridBagConstraints statusC = new GridBagConstraints();
 		statusC.gridx = 0;
 		statusC.gridy = 0;
-		statusC.anchor = GridBagConstraints.WEST;
-		checkStatusPanel.add(statusPanel, statusC);
-
+		statusC.insets = new Insets(25, 25, 0, 0);
+		statusContentPanel.add(statusPanel, statusC);
+		
+		JPanel detailStatusPanel = createDetailStatusPanel(borderColor);
+		GridBagConstraints detailC = new GridBagConstraints();
+		detailC.gridx = 1;
+		detailC.gridy = 0;
+		detailC.anchor = GridBagConstraints.NORTHWEST;
+		detailC.fill = GridBagConstraints.VERTICAL;
+		detailC.insets = new Insets(25, 25, 0, 0);
+		statusContentPanel.add(detailStatusPanel, detailC);
+		
+		JPanel fillerPanel = new JPanel();
+		fillerPanel.setOpaque(false);
+		GridBagConstraints filler = new GridBagConstraints();
+		filler.gridx = 0;
+		filler.gridy = 2;
+		filler.gridwidth = 2;
+		filler.weightx = 1.0;
+		filler.weighty = 1.0;
+		filler.fill = GridBagConstraints.BOTH;
+		statusContentPanel.add(fillerPanel, filler);
+		
+		
+	}
+	
+	private JPanel createDetailStatusPanel(Color borderColor) {
+		// TODO: get data from database
+		double capacity = 20000;
+		double voltage = 3.7;
+		double wh = 74;
+		double maximumWh = 100;
+		
+		JPanel detailPanel = new JPanel();
+		detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
+		detailPanel.setBackground(BACKGROUND_COLOR);
+		detailPanel.setBorder(createPaddingBorder(borderColor, 15));
+		
+		// Detail Title
+		JLabel detailTitle = new JLabel("รายละเอียด");
+		detailTitle.setFont(new Font("Tahoma", Font.BOLD, 18));
+		detailTitle.setForeground(new Color(36, 160, 237));
+		detailTitle.setAlignmentX(LEFT_ALIGNMENT);
+		detailTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		detailPanel.add(detailTitle);
+		
+		// Detail Content
+		JPanel capacityPanel = createDetailContent("ความจุ", capacity, "mAh");
+		detailPanel.add(capacityPanel);
+		
+		JPanel voltagePanel = createDetailContent("แรงดันไฟฟ้า", voltage, "V");
+		detailPanel.add(voltagePanel);
+		
+		JPanel whPanel = createDetailContent("พลังงาน", wh, "Wh");
+		detailPanel.add(whPanel);
+		
+		JPanel maximumPanel = createDetailContent("เกณฑ์พลังงานไม่เกิน", maximumWh, "Wh");
+		detailPanel.add(maximumPanel);
+		
+		detailPanel.add(Box.createVerticalGlue());
+		
+		return detailPanel;
+	}
+	
+	private JPanel createDetailContent(String valueName, double value, String unit) {
+		JPanel contentPanel = new JPanel(new GridBagLayout());
+		contentPanel.setBackground(BACKGROUND_COLOR);
+		contentPanel.setAlignmentX(LEFT_ALIGNMENT);
+		
+		JLabel valueNameLabel = new JLabel(valueName + " ");
+		valueNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		valueNameLabel.setForeground(Color.BLACK);
+		
+		GridBagConstraints valueNameGBC = new GridBagConstraints();
+		valueNameGBC.gridx = 0;
+		valueNameGBC.gridy = 0;
+		valueNameGBC.ipadx = 100;
+		valueNameGBC.weightx = 1;
+		valueNameGBC.anchor = GridBagConstraints.WEST;
+		contentPanel.add(valueNameLabel, valueNameGBC);
+		
+		JLabel valueLabel = new JLabel(String.valueOf(value) + " " + unit);
+		valueLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		valueLabel.setForeground(Color.BLACK);
+		
+		GridBagConstraints valueGBC = new GridBagConstraints();
+		valueGBC.gridx = 1;
+		valueGBC.gridy = 0;
+		valueGBC.weightx = 0;
+		valueGBC.anchor = GridBagConstraints.EAST;
+		valueGBC.insets = new Insets(0, 0, 5, 0);
+		contentPanel.add(valueLabel, valueGBC);
+		
+		return contentPanel;
 	}
 
-	private JPanel createStatusPanel(int wh, Color borderColor, boolean approve) {
+	private JPanel createStatusPanel(double wh, Color borderColor, boolean approve) {
 		
 		String statusTitle = "สามารถนำขึ้นเครื่องได้";
 		String statusDetail = "Power Bank ของคุณเป็นไปตามกฎระเบียบ";
