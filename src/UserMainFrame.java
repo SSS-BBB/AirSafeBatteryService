@@ -739,6 +739,17 @@ public class UserMainFrame extends JFrame {
 		checkStatusTitleLabel.setBorder(BorderFactory.createEmptyBorder(25, 25, 0, 0));
 		checkStatusPanel.add(checkStatusTitleLabel, BorderLayout.NORTH);
 		
+		// Line-Start and Line-End Empty Space
+		JPanel fillStart = new JPanel();
+		fillStart.add(Box.createRigidArea(new Dimension(0, 0)));
+		fillStart.setOpaque(false);
+		checkStatusPanel.add(fillStart, BorderLayout.LINE_START);
+		
+		JPanel fillEnd = new JPanel();
+		fillEnd.add(Box.createRigidArea(new Dimension(20, 0)));
+		fillEnd.setOpaque(false);
+		checkStatusPanel.add(fillEnd, BorderLayout.LINE_END);
+		
 		// Center (Status Content)
 		JPanel statusContentPanel = new JPanel(new GridBagLayout());
 		statusContentPanel.setBackground(BACKGROUND_COLOR);
@@ -747,11 +758,12 @@ public class UserMainFrame extends JFrame {
 		Color borderColor = new Color(166, 173, 168);
 
 		// TODO: get wh from the database
-
+		
 		JPanel statusPanel = createStatusPanel(74, borderColor, true);
 		GridBagConstraints statusC = new GridBagConstraints();
 		statusC.gridx = 0;
 		statusC.gridy = 0;
+		statusC.fill = GridBagConstraints.HORIZONTAL;
 		statusC.insets = new Insets(25, 25, 0, 0);
 		statusContentPanel.add(statusPanel, statusC);
 		
@@ -760,9 +772,20 @@ public class UserMainFrame extends JFrame {
 		detailC.gridx = 1;
 		detailC.gridy = 0;
 		detailC.anchor = GridBagConstraints.NORTHWEST;
-		detailC.fill = GridBagConstraints.VERTICAL;
+		detailC.fill = GridBagConstraints.BOTH;
 		detailC.insets = new Insets(25, 25, 0, 0);
 		statusContentPanel.add(detailStatusPanel, detailC);
+		
+		JPanel ruleStatusPanel = createRuleStatusPanel(borderColor);
+		GridBagConstraints ruleGBC = new GridBagConstraints();
+		ruleGBC.gridx = 0;
+		ruleGBC.gridy = 1;
+		ruleGBC.gridwidth = 2;
+		ruleGBC.weightx = 0;
+		ruleGBC.anchor = GridBagConstraints.WEST;
+		ruleGBC.fill = GridBagConstraints.HORIZONTAL;
+		ruleGBC.insets = new Insets(25, 25, 0, 0);
+		statusContentPanel.add(ruleStatusPanel, ruleGBC);
 		
 		JPanel fillerPanel = new JPanel();
 		fillerPanel.setOpaque(false);
@@ -775,7 +798,61 @@ public class UserMainFrame extends JFrame {
 		filler.fill = GridBagConstraints.BOTH;
 		statusContentPanel.add(fillerPanel, filler);
 		
+		// SOUTH (buttons)
+		JPanel southPanel = new JPanel(new BorderLayout());
+		southPanel.setBackground(BACKGROUND_COLOR);
+		checkStatusPanel.add(southPanel, BorderLayout.SOUTH);
 		
+		// Check-again button
+		JButton checkAgainButton = new JButton("ตรวจสอบอีกครั้ง");
+		checkAgainButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+		southPanel.add(checkAgainButton, BorderLayout.WEST);
+		
+		// Finish button
+		JButton finishButton = new JButton("เสร็จสิ้น");
+		finishButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+		southPanel.add(finishButton, BorderLayout.EAST);
+	}
+	
+	private JPanel createRuleStatusPanel(Color borderColor) {
+		JPanel ruleStatusPanel = new JPanel();
+		ruleStatusPanel.setLayout(new BoxLayout(ruleStatusPanel, BoxLayout.Y_AXIS));
+		ruleStatusPanel.setBackground(BACKGROUND_COLOR);
+		ruleStatusPanel.setBorder(createPaddingBorder(borderColor, 15));
+		
+		// Rule Title
+		JLabel ruleTitleLabel = new JLabel("กฎระเบียบทั่วไปในการนำ Power Bank ขึ้นเครื่อง");
+		ruleTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 21));
+		ruleTitleLabel.setForeground(Color.BLACK);
+		ruleTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
+		ruleTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+		ruleStatusPanel.add(ruleTitleLabel);
+		
+		// Rule 1
+		JLabel rule1 = new JLabel("- ความจุไม่เกิน 100 Wh สามารถนำขึ้นเครื่องได้โดยไม่ต้องขออนุญาต");
+		rule1.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		rule1.setForeground(Color.BLACK);
+		rule1.setAlignmentX(LEFT_ALIGNMENT);
+		rule1.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		ruleStatusPanel.add(rule1);
+		
+		// Rule 2
+		JLabel rule2 = new JLabel("- จะต้องถือเป็นสัมภาระขึ้นเครื่องเท่านั้น");
+		rule2.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		rule2.setForeground(Color.BLACK);
+		rule2.setAlignmentX(LEFT_ALIGNMENT);
+		rule2.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		ruleStatusPanel.add(rule2);
+		
+		// Rule 3
+		JLabel rule3 = new JLabel("- สามารถพกพาได้สูงสุดไม่เกิน 2 เครื่อง");
+		rule3.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		rule3.setForeground(Color.BLACK);
+		rule3.setAlignmentX(LEFT_ALIGNMENT);
+		rule3.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		ruleStatusPanel.add(rule3);
+		
+		return ruleStatusPanel;
 	}
 	
 	private JPanel createDetailStatusPanel(Color borderColor) {
