@@ -221,7 +221,7 @@ public class UserMainFrame extends JFrame {
 		createListCard();
 		createHistoryCard();
 		createNotificationCard();
-		createCheckStatusCard();
+		createCheckStatusCard(false);
 	}
 
 	private void createHomeCard() {
@@ -671,6 +671,22 @@ public class UserMainFrame extends JFrame {
 		checkButton.setMaximumSize(new Dimension(350, 50));
 		checkButton.setPreferredSize(new Dimension(350, 50));
 		checkButton.setAlignmentX(LEFT_ALIGNMENT);
+		checkButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		checkButton.addActionListener(e -> {
+			// TODO: check conditions from database
+			
+			double wh = Double.parseDouble(energyTextField.getText());
+			
+			if (wh > 100) {
+				createCheckStatusCard(false);
+			}
+			
+			else {
+				createCheckStatusCard(true);
+			}
+			
+			changeCard(1, 7);
+		});
 		infoPanel.add(checkButton);
 
 		cardPanel.add(checkPanel, cardNames[1]);
@@ -726,7 +742,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(notificationPanel, cardNames[6]);
 	}
 
-	private void createCheckStatusCard() {
+	private void createCheckStatusCard(boolean approveStatus) {
 		
 		checkStatusPanel = new JPanel(new BorderLayout());
 		checkStatusPanel.setBackground(BACKGROUND_COLOR);		
@@ -759,7 +775,7 @@ public class UserMainFrame extends JFrame {
 
 		// TODO: get wh from the database
 		
-		JPanel statusPanel = createStatusPanel(74, borderColor, true);
+		JPanel statusPanel = createStatusPanel(74, borderColor, approveStatus);
 		GridBagConstraints statusC = new GridBagConstraints();
 		statusC.gridx = 0;
 		statusC.gridy = 0;
@@ -801,16 +817,36 @@ public class UserMainFrame extends JFrame {
 		// SOUTH (buttons)
 		JPanel southPanel = new JPanel(new BorderLayout());
 		southPanel.setBackground(BACKGROUND_COLOR);
+		southPanel.setBorder(BorderFactory.createEmptyBorder(0, 25, 25, 25));
 		checkStatusPanel.add(southPanel, BorderLayout.SOUTH);
 		
+		Dimension buttonSize = new Dimension(220, 50);
 		// Check-again button
 		JButton checkAgainButton = new JButton("ตรวจสอบอีกครั้ง");
 		checkAgainButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+		checkAgainButton.setPreferredSize(buttonSize);
+		checkAgainButton.setFocusPainted(false);
+		checkAgainButton.setBackground(Color.WHITE);
+		checkAgainButton.setForeground(Color.BLUE);
+		checkAgainButton.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+		checkAgainButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		checkAgainButton.addActionListener(e -> {
+			changeCard(1, 1);
+		});
 		southPanel.add(checkAgainButton, BorderLayout.WEST);
 		
 		// Finish button
 		JButton finishButton = new JButton("เสร็จสิ้น");
 		finishButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+		finishButton.setPreferredSize(buttonSize);
+		finishButton.setFocusPainted(false);
+		finishButton.setBackground(Color.BLUE);
+		finishButton.setForeground(Color.WHITE);
+		finishButton.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+		finishButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		finishButton.addActionListener(e -> {
+			changeCard(0, 0);
+		});
 		southPanel.add(finishButton, BorderLayout.EAST);
 	}
 	
