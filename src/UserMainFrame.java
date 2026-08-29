@@ -56,6 +56,9 @@ public class UserMainFrame extends JFrame {
 	private JPanel menuPanel;
 	private JPanel menuSelectPanel;
 	private JPanel cardPanel;
+	
+	JPanel statusPanel;
+	JLabel statusIconLabel, statusLabelTitle, statusLabelDetail, whLabel;
 
 	// menus
 	private JPanel logoMenuPanel;
@@ -122,7 +125,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.setBackground(BACKGROUND_COLOR);
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-		changeCard(1, 7);
+		changeCard(0, 0);
 	}
 
 	private void createLogo() {
@@ -678,11 +681,11 @@ public class UserMainFrame extends JFrame {
 			double wh = Double.parseDouble(energyTextField.getText());
 			
 			if (wh > 100) {
-				createCheckStatusCard(false);
+				updateStatusPanel(wh, false);
 			}
 			
 			else {
-				createCheckStatusCard(true);
+				updateStatusPanel(wh, true);
 			}
 			
 			changeCard(1, 7);
@@ -775,7 +778,7 @@ public class UserMainFrame extends JFrame {
 
 		// TODO: get wh from the database
 		
-		JPanel statusPanel = createStatusPanel(74, borderColor, approveStatus);
+		createStatusPanel(borderColor);
 		GridBagConstraints statusC = new GridBagConstraints();
 		statusC.gridx = 0;
 		statusC.gridy = 0;
@@ -960,8 +963,43 @@ public class UserMainFrame extends JFrame {
 		
 		return contentPanel;
 	}
-
-	private JPanel createStatusPanel(double wh, Color borderColor, boolean approve) {
+	
+	private void createStatusPanel(Color borderColor) {
+		
+		statusPanel = new JPanel();
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+		statusPanel.setBorder(createPaddingBorder(borderColor, 15));
+		
+		statusIconLabel = new JLabel();
+		statusIconLabel.setAlignmentX(CENTER_ALIGNMENT);
+		statusIconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		statusPanel.add(statusIconLabel);
+		
+		
+		statusLabelTitle = new JLabel();
+		statusLabelTitle.setFont(new Font("Tahoma", Font.BOLD, 32));
+		statusLabelTitle.setAlignmentX(CENTER_ALIGNMENT);
+		statusLabelTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+		statusPanel.add(statusLabelTitle);
+		
+		statusLabelDetail = new JLabel();
+		statusLabelDetail.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		statusLabelDetail.setForeground(Color.DARK_GRAY);
+		statusLabelDetail.setAlignmentX(CENTER_ALIGNMENT);
+		statusLabelDetail.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		statusPanel.add(statusLabelDetail);
+		
+		whLabel = new JLabel();
+		whLabel.setFont(new Font("Tahoma", Font.BOLD, 26));
+		whLabel.setAlignmentX(CENTER_ALIGNMENT);
+		whLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
+		statusPanel.add(whLabel);
+		
+		
+		
+	}
+	
+	private void updateStatusPanel(double wh, boolean approve) {
 		
 		String statusTitle = "สามารถนำขึ้นเครื่องได้";
 		String statusDetail = "Power Bank ของคุณเป็นไปตามกฎระเบียบ";
@@ -976,43 +1014,25 @@ public class UserMainFrame extends JFrame {
 			backgroundColor = new Color(247, 188, 188);
 			statusTextColor = new Color(176, 4, 4);
 		}
-
-		JPanel statusPanel = new JPanel();
-		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+		
 		statusPanel.setBackground(backgroundColor);
-		statusPanel.setBorder(createPaddingBorder(borderColor, 15));
-
+		
 		// status icon
 		ImageIcon statusImageIcon = createImageIcon(statusImagePath, "Status Icon");
-		JLabel statusIconLabel = new JLabel(statusImageIcon);
-		statusIconLabel.setAlignmentX(CENTER_ALIGNMENT);
-		statusIconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-		statusPanel.add(statusIconLabel);
+		
+		statusIconLabel.setIcon(statusImageIcon);
+		
 
 		// status label
-		JLabel statusLabelTitle = new JLabel(statusTitle);
-		statusLabelTitle.setFont(new Font("Tahoma", Font.BOLD, 32));
+		statusLabelTitle.setText(statusTitle);
 		statusLabelTitle.setForeground(statusTextColor);
-		statusLabelTitle.setAlignmentX(CENTER_ALIGNMENT);
-		statusLabelTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
-		statusPanel.add(statusLabelTitle);
+		
 
-		JLabel statusLabelDetail = new JLabel(statusDetail);
-		statusLabelDetail.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		statusLabelDetail.setForeground(Color.DARK_GRAY);
-		statusLabelDetail.setAlignmentX(CENTER_ALIGNMENT);
-		statusLabelDetail.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-		statusPanel.add(statusLabelDetail);
-
+		statusLabelDetail.setText(statusDetail);
+		
 		// wh label
-		JLabel whLabel = new JLabel("พลังงาน: " + String.valueOf(wh) + " Wh");
-		whLabel.setFont(new Font("Tahoma", Font.BOLD, 26));
+		whLabel.setText("พลังงาน: " + String.valueOf(wh) + " Wh");
 		whLabel.setForeground(statusTextColor);
-		whLabel.setAlignmentX(CENTER_ALIGNMENT);
-		whLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
-		statusPanel.add(whLabel);
-
-		return statusPanel;
 	}
 
 	private void changeCard(int selectedMenuIndex, int cardIndex) {
