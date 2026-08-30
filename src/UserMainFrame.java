@@ -64,11 +64,11 @@ public class UserMainFrame extends JFrame {
 	private JPanel logoMenuPanel;
 
 	private JPanel[] menuPanels;
-	private String[] cardNames = { "HomeCard", "CheckCard", "RentBuyCard", "StorageCard", "ListCard", "HistoryCard",
+	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", "StorageCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel, rentBuyPanel, storagePanel, listPanel, historyPanel, notificationPanel,
+	private JPanel homePanel, checkPanel, rentPanel, storagePanel, listPanel, historyPanel, notificationPanel,
 			checkStatusPanel;
 
 	// colors
@@ -183,7 +183,7 @@ public class UserMainFrame extends JFrame {
 
 		createMenuButton(0, "icons/home_icon.png", "Home Icon", "หน้าหลัก", 0, 8);
 		createMenuButton(1, "icons/check_icon.png", "Check Icon", "ตรวจสอบ Power Bank", 1, 8);
-		createMenuButton(2, "icons/purchase_icon.png", "Purchase Icon", "เช่า/ซื้อ Power Bank", 2, 8);
+		createMenuButton(2, "icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8);
 		createMenuButton(3, "icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 3, 8);
 		createMenuButton(4, "icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
 		createMenuButton(5, "icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
@@ -219,7 +219,7 @@ public class UserMainFrame extends JFrame {
 	private void createCardScreen() {
 		createHomeCard();
 		createCheckCard();
-		createRentBuyCard();
+		createRentCard();
 		createStorageCard();
 		createListCard();
 		createHistoryCard();
@@ -705,12 +705,12 @@ public class UserMainFrame extends JFrame {
 		return textField;
 	}
 
-	private void createRentBuyCard() {
-		rentBuyPanel = new JPanel();
-		rentBuyPanel.setBackground(BACKGROUND_COLOR);
-		JLabel rentBuyLabel = new JLabel("This is rent buy page");
-		rentBuyPanel.add(rentBuyLabel);
-		cardPanel.add(rentBuyPanel, cardNames[2]);
+	private void createRentCard() {
+		rentPanel = new JPanel();
+		rentPanel.setBackground(BACKGROUND_COLOR);
+		JLabel rentBuyLabel = new JLabel("This is rent page");
+		rentPanel.add(rentBuyLabel);
+		cardPanel.add(rentPanel, cardNames[2]);
 	}
 
 	private void createStorageCard() {
