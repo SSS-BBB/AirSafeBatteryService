@@ -1,7 +1,9 @@
 package Utils;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
@@ -12,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 public class Utils {
@@ -70,5 +73,15 @@ public class Utils {
 		noBgButton.setBorder(null);
 		noBgButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		return noBgButton;
+	}
+	
+	public static JTextField createAppTextField(Color backgroundColor) {
+		JTextField textField = new JTextField();
+		textField.setBackground(backgroundColor);
+		textField.setPreferredSize(new Dimension(350, 35));
+		textField.setMaximumSize(new Dimension(350, 35));
+		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
+		return textField;
 	}
 }
