@@ -1,3 +1,4 @@
+package UserApp;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -44,6 +45,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import Utils.Utils;
 
 public class UserMainFrame extends JFrame {
 
@@ -132,7 +135,7 @@ public class UserMainFrame extends JFrame {
 		// logo
 		logoMenuPanel = new JPanel();
 		logoMenuPanel.setBackground(MENU_COLOR);
-		ImageIcon logoIcon = createImageIcon("icons/airplane_icon.png", "Airplane Icon");
+		ImageIcon logoIcon = Utils.createImageIcon("/icons/airplane_icon.png", "Airplane Icon");
 		JLabel logoIconLabel = new JLabel(logoIcon);
 		logoMenuPanel.add(logoIconLabel);
 		// TODO: fix app name label
@@ -151,7 +154,7 @@ public class UserMainFrame extends JFrame {
 		menuPanels[panelIndex].setBackground(MENU_COLOR);
 
 		// menu icon
-		ImageIcon menuIcon = createImageIcon(iconPath, iconDescription);
+		ImageIcon menuIcon = Utils.createImageIcon(iconPath, iconDescription);
 		JLabel iconLabel = new JLabel(menuIcon);
 		iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 		menuPanels[panelIndex].add(iconLabel, BorderLayout.WEST);
@@ -181,40 +184,18 @@ public class UserMainFrame extends JFrame {
 
 		menuPanels = new JPanel[8];
 
-		createMenuButton(0, "icons/home_icon.png", "Home Icon", "หน้าหลัก", 0, 8);
-		createMenuButton(1, "icons/check_icon.png", "Check Icon", "ตรวจสอบ Power Bank", 1, 8);
-		createMenuButton(2, "icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8);
-		createMenuButton(3, "icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 3, 8);
-		createMenuButton(4, "icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
-		createMenuButton(5, "icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
-		createMenuButton(6, "icons/noti_white_icon.png", "Notification Icon", "แจ้งเตือน", 6, 8);
-		createMenuButton(7, "icons/user_icon.png", "User Icon", "ผู้ใช้", 0, 8);
+		createMenuButton(0, "/icons/home_icon.png", "Home Icon", "หน้าหลัก", 0, 8);
+		createMenuButton(1, "/icons/check_icon.png", "Check Icon", "ตรวจสอบ Power Bank", 1, 8);
+		createMenuButton(2, "/icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8);
+		createMenuButton(3, "/icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 3, 8);
+		createMenuButton(4, "/icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
+		createMenuButton(5, "/icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
+		createMenuButton(6, "/icons/noti_white_icon.png", "Notification Icon", "แจ้งเตือน", 6, 8);
+		createMenuButton(7, "/icons/user_icon.png", "User Icon", "ผู้ใช้", 0, 8);
 
 	}
 
-	private ImageIcon createImageIcon(String path, String description) {
-		InputStream inputStream = getClass().getResourceAsStream(path);
-
-		if (inputStream == null) {
-			System.err.println("Couldn't find file: " + path);
-			return null;
-		}
-
-		BufferedImage bufferedImage;
-		try {
-			bufferedImage = ImageIO.read(inputStream);
-			if (bufferedImage == null) {
-				System.err.println("Couldn't decide the image from: " + path);
-				return null;
-			}
-
-			return new ImageIcon(bufferedImage, description);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+	
 
 	private void createCardScreen() {
 		createHomeCard();
@@ -276,7 +257,7 @@ public class UserMainFrame extends JFrame {
 		notiAndDateTimePanel.setBackground(BACKGROUND_COLOR);
 		notiAndDateTimePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		topPanel.add(notiAndDateTimePanel, BorderLayout.EAST);
-		ImageIcon notiImageIcon = createImageIcon("icons/noti_icon_32.png", "Notification Icon");
+		ImageIcon notiImageIcon = Utils.createImageIcon("/icons/noti_icon_32.png", "Notification Icon");
 		JLabel notiIconLabel = new JLabel(notiImageIcon);
 		notiIconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15));
 		notiIconLabel.addMouseListener(new MouseAdapter() {
@@ -374,7 +355,7 @@ public class UserMainFrame extends JFrame {
 		rentBuyConstraints.insets = new Insets(0, 15, 0, 0);
 		centerPanel.add(rentBuyPanel, rentBuyConstraints);
 
-		JLabel rentBuyTitleLabel = new JLabel("เช่า / ซื้อ Power Bank");
+		JLabel rentBuyTitleLabel = new JLabel("เช่า Power Bank");
 		rentBuyTitleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
 		rentBuyTitleLabel.setForeground(Color.decode("#3B6045"));
 		rentBuyTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
@@ -463,7 +444,7 @@ public class UserMainFrame extends JFrame {
 		currentRentPanelConstraints.insets = new Insets(15, 0, 0, 0);
 		centerPanel.add(currentRentPanel, currentRentPanelConstraints);
 
-		ImageIcon currentRentImageIcon = createImageIcon("icons/purchase_black_icon.png", "Currnet Rent Icon");
+		ImageIcon currentRentImageIcon = Utils.createImageIcon("/icons/purchase_black_icon.png", "Currnet Rent Icon");
 		JLabel currentRentIconLabel = new JLabel(currentRentImageIcon);
 		currentRentPanel.add(currentRentIconLabel);
 
@@ -512,7 +493,7 @@ public class UserMainFrame extends JFrame {
 		currentStoragePanelConstraints.insets = new Insets(15, 0, 0, 0);
 		centerPanel.add(currentStoragePanel, currentStoragePanelConstraints);
 
-		ImageIcon currentStorageImageIcon = createImageIcon("icons/storage_black_icon.png", "Currnet Storage Icon");
+		ImageIcon currentStorageImageIcon = Utils.createImageIcon("/icons/storage_black_icon.png", "Currnet Storage Icon");
 		JLabel currentStorageIconLabel = new JLabel(currentStorageImageIcon);
 		currentStoragePanel.add(currentStorageIconLabel);
 
@@ -1003,14 +984,14 @@ public class UserMainFrame extends JFrame {
 		
 		String statusTitle = "สามารถนำขึ้นเครื่องได้";
 		String statusDetail = "Power Bank ของคุณเป็นไปตามกฎระเบียบ";
-		String statusImagePath = "icons/check_green_icon_128.png";
+		String statusImagePath = "/icons/check_green_icon_128.png";
 		Color backgroundColor = new Color(201, 242, 212);
 		Color statusTextColor = new Color(0, 100, 0);
 
 		if (!approve) {
 			statusTitle = "ไม่สามารถนำขึ้นเครื่องได้";
 			statusDetail = "Power Bank ของคุณไม่เป็นไปตามกฎระเบียบ";
-			statusImagePath = "icons/cancel_red_icon_128.png";
+			statusImagePath = "/icons/cancel_red_icon_128.png";
 			backgroundColor = new Color(247, 188, 188);
 			statusTextColor = new Color(176, 4, 4);
 		}
@@ -1018,7 +999,7 @@ public class UserMainFrame extends JFrame {
 		statusPanel.setBackground(backgroundColor);
 		
 		// status icon
-		ImageIcon statusImageIcon = createImageIcon(statusImagePath, "Status Icon");
+		ImageIcon statusImageIcon = Utils.createImageIcon(statusImagePath, "Status Icon");
 		
 		statusIconLabel.setIcon(statusImageIcon);
 		
