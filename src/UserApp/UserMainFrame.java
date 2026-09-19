@@ -36,6 +36,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
+import Database.JDBCConnector;
+
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -124,6 +126,9 @@ public class UserMainFrame extends JFrame {
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
 		changeCard(0, 0);
+		
+		// Test SQL Connection
+		JDBCConnector.connect();
 	}
 
 	private void createLogo() {
