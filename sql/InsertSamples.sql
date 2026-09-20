@@ -12,9 +12,10 @@ VALUES
 ('XYZ123GHI0', NOW(), 200.00, 'ABCDE67890'),
 ('OXP987KXR5', NOW(), 180.00, 'VWXYZ12345');
 
-SELECT * FROM USER;
+INSERT INTO POWERBANKRULE
+VALUES
+('RULE000001', 2, 100, false, true, 'https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf');
 
-SELECT * FROM TRANSACTION;
-
+SELECT * FROM POWERBANKRULE;
 
 
