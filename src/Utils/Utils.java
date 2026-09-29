@@ -5,17 +5,28 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.metal.MetalComboBoxUI;
 
 public class Utils {
 	public static ImageIcon createImageIcon(String path, String description) {
@@ -83,5 +94,70 @@ public class Utils {
 		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		return textField;
+	}
+	
+	public static <T> JComboBox<T> createAppDropdown(T[] dropDownList, Color backgroundColor, Color menuColor) {
+		JComboBox<T> dropDown = new JComboBox<T>(dropDownList);
+		dropDown.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		// Drop down style
+		dropDown.setBackground(backgroundColor);
+		dropDown.setForeground(Color.BLACK);
+		dropDown.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		
+		// Selected item style
+		dropDown.setRenderer(new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(
+					JList<?> list, Object value, int index,
+					boolean isSelected, boolean cellHasFocus) {
+				JLabel label = (JLabel) super.getListCellRendererComponent
+						(list, value, index, isSelected, cellHasFocus);
+				
+				
+				
+				label.setBackground(
+						isSelected ? menuColor : backgroundColor
+				);
+				
+				label.setForeground(
+						isSelected ? backgroundColor : Color.BLACK
+				);
+				
+				label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+				
+				return label;
+			}
+		});
+		
+		
+		dropDown.setUI(new MetalComboBoxUI() {
+
+			@Override
+			public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
+				g.setColor(backgroundColor);
+				g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+			}
+			
+			
+			@Override
+			protected JButton createArrowButton() {
+				JButton button = super.createArrowButton();
+				
+				button.setBackground(backgroundColor);
+				button.setForeground(Color.BLACK);
+				button.setBorderPainted(false);
+				button.setFocusPainted(false);
+				button.setContentAreaFilled(false);
+				button.setOpaque(true);
+	
+				return button;
+			}
+			
+		});
+		
+		
+
+		return dropDown;
 	}
 }

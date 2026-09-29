@@ -12,10 +12,13 @@ import java.sql.Statement;
 import java.util.Properties;
 
 public class JDBCConnector {
-
+	
+	private static Connection connection;
+	
 	public static void connect() {
 		// You need to create your own config file and your own local sql server before connecting to MySQL
 		
+		// Get Database properties
 		Properties properties = new Properties();
 		try {
 			InputStream input = new FileInputStream("config/config.properties");
@@ -24,11 +27,14 @@ public class JDBCConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
+		// Connect the database
 		try {
-			Connection connection = DriverManager.getConnection(properties.getProperty("db.url"),
+			connection = DriverManager.getConnection(properties.getProperty("db.url"),
 					properties.getProperty("db.username"), properties.getProperty("db.password"));
-
+			
+			// Get query result test
+			/*
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery("SELECT * FROM USER");
 
@@ -38,9 +44,12 @@ public class JDBCConnector {
 				String email = resultSet.getString("email");
 				System.out.println(firstName + " " + lastName + " " + email);
 			}
+			*/
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 
 	}
 }

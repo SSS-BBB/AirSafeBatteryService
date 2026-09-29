@@ -32,8 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.NumberFormatter;
 
 import Database.JDBCConnector;
@@ -100,6 +102,15 @@ public class UserMainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public UserMainFrame() {
+		// Change Default UI Color
+		try {
+			UIManager.put("ComboBox.selectionBackground", new ColorUIResource(BACKGROUND_COLOR));			
+			// UIManager.put("Button.select", new ColorUIResource(BACKGROUND_COLOR));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(APP_WIDTH, APP_HEIGHT);
@@ -125,9 +136,9 @@ public class UserMainFrame extends JFrame {
 		cardPanel.setBackground(BACKGROUND_COLOR);
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-		changeCard(0, 0);
+		changeCard(2, 2);
 		
-		// Test SQL Connection
+		// SQL Connection
 		JDBCConnector.connect();
 	}
 
@@ -199,10 +210,12 @@ public class UserMainFrame extends JFrame {
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
+		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
+		cardPanel.add(rentPanel, cardNames[2]);
 	}
 
 	
