@@ -38,6 +38,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.NumberFormatter;
 
+import Database.InsertSample;
 import Database.JDBCConnector;
 
 import java.awt.Font;
@@ -140,6 +141,9 @@ public class UserMainFrame extends JFrame {
 		
 		// SQL Connection
 		JDBCConnector.connect();
+		
+		// Insert Sample Data
+		// InsertSample.insertPowerBank();
 	}
 
 	private void createLogo() {
