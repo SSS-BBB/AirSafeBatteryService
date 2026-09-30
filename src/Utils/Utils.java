@@ -83,17 +83,44 @@ public class Utils {
 		noBgButton.setFocusPainted(false);
 		noBgButton.setBorder(null);
 		noBgButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		noBgButton.setOpaque(true);
+		noBgButton.setContentAreaFilled(false);
+		
 		return noBgButton;
 	}
 	
-	public static JTextField createAppTextField(Color backgroundColor) {
-		JTextField textField = new JTextField();
+	public static JButton createBorderButton(String text, Color borderColor, Color textColor, int fontSize) {
+		JButton button = new JButton(text);
+		button.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		button.setBackground(null);
+		button.setFocusPainted(false);
+		button.setForeground(textColor);
+		button.setBorder(Utils.createPaddingBorder(borderColor, 5));
+		
+		return button;
+	}
+	
+	public static JTextField createAppTextField(Color backgroundColor, int size) {
+		JTextField textField = new JTextField(size);
 		textField.setBackground(backgroundColor);
-		textField.setPreferredSize(new Dimension(350, 35));
-		textField.setMaximumSize(new Dimension(350, 35));
 		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		return textField;
+	}
+	
+	public static JTextField createAppTextField(Color backgroundColor, Dimension size) {
+		JTextField textField = new JTextField();
+		textField.setBackground(backgroundColor);
+		textField.setPreferredSize(size);
+		textField.setMaximumSize(size);
+		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
+		return textField;
+	}
+	
+	public static JTextField createAppTextField(Color backgroundColor) {
+		return createAppTextField(backgroundColor, new Dimension(350, 35));
 	}
 	
 	public static <T> JComboBox<T> createAppDropdown(T[] dropDownList, Color backgroundColor, Color menuColor) {
