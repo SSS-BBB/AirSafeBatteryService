@@ -6,9 +6,11 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -52,6 +54,31 @@ public class Utils {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static ImageIcon scaleImageKeepRatio(BufferedImage image, int maxWidth, int maxHeight) {
+		if (image == null || maxWidth < 0 || maxHeight < 0) {
+			System.err.println("Invalid parameters. Unable to scale the image while keeping the ratio.");
+			return null;
+		}
+		
+		int originalWidth = image.getWidth();
+		int originalHeight = image.getHeight();
+		
+		double scaledWidth = maxWidth;
+		double scaledHeight = maxHeight;
+		
+		if (maxHeight <= (maxWidth * originalHeight) / originalWidth) {
+			// change width
+			scaledWidth = (double) ((originalWidth / (originalHeight * 1.0)) * maxHeight);
+		}
+		else {
+			// change height
+			scaledWidth = (double) ((originalHeight / (originalWidth * 1.0)) * maxWidth);
+		}
+		
+		Image scaledImage = image.getScaledInstance((int) scaledWidth, (int) scaledHeight, Image.SCALE_SMOOTH);
+		return new ImageIcon(scaledImage);
 	}
 	
 	public static Border createPaddingBorder(Color color, int thickness, Insets paddings, Insets margins) {

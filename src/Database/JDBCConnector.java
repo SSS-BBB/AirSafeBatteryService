@@ -1,25 +1,33 @@
 package Database;
 
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+
+import Struct.ForRentPowerBank;
+
 public class JDBCConnector {
-	
+
 	private static Connection connection;
-	private static Statement statement;
-	
+
 	public static void connect() {
-		// You need to create your own config file and your own local sql server before connecting to MySQL
-		
+		// You need to create your own config file and your own local sql server before
+		// connecting to MySQL
+
 		// Get Database properties
 		Properties properties = new Properties();
 		try {
@@ -29,52 +37,216 @@ public class JDBCConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Connect the database
 		try {
 			connection = DriverManager.getConnection(properties.getProperty("db.url"),
 					properties.getProperty("db.username"), properties.getProperty("db.password"));
-			statement = connection.createStatement();
-			
+
 			// Get query result test
 			/*
-			
-			ResultSet resultSet = statement.executeQuery("SELECT * FROM USER");
+			 * Statement statement = connection.createStatement(); ResultSet resultSet =
+			 * statement.executeQuery("SELECT * FROM USER");
+			 * 
+			 * while (resultSet.next()) { String firstName =
+			 * resultSet.getString("first_name"); String lastName =
+			 * resultSet.getString("last_name"); String email =
+			 * resultSet.getString("email"); System.out.println(firstName + " " + lastName +
+			 * " " + email); }
+			 * 
+			 * try { connection.close(); } catch (SQLException e) { e.printStackTrace(); }
+			 */
 
-			while (resultSet.next()) {
-				String firstName = resultSet.getString("first_name");
-				String lastName = resultSet.getString("last_name");
-				String email = resultSet.getString("email");
-				System.out.println(firstName + " " + lastName + " " + email);
-			}
-			*/
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
 
 	}
+
+	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
+		return getForRentPowerBank("", -1, -1, -1, -1, -1, -1, "", "", "", "", false);
+	}
+
+	public static ArrayList<ForRentPowerBank> getForRentPowerBank(String filterAddress, double minPrice,
+			double maxPrice, double minCap, double maxCap, double minWeight, double maxWeight, String filterBrand,
+			String filterInput, String filterOutput, String orderBy, boolean asc) {
+		connect();
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to insert into for rent power bank table.");
+			return null;
+		}
+
+		String query = "SELECT * FROM FORRENTPOWERBANK NATURAL JOIN POWERBANK";
+
+		try {
+			PreparedStatement ps = connection.prepareStatement(query);
+
+			ResultSet resultSet = ps.executeQuery();
+
+			ArrayList<ForRentPowerBank> forRentPowerBankList = new ArrayList<ForRentPowerBank>();
+
+			while (resultSet.next()) {
+				ForRentPowerBank powerBank = new ForRentPowerBank();
+				// Power bank attributes
+				powerBank.brand = resultSet.getString("brand");
+				powerBank.name = resultSet.getString("name");
+				powerBank.model = resultSet.getString("model");
+				powerBank.capacity = resultSet.getDouble("capacity");
+				powerBank.wh = resultSet.getDouble("wh");
+				powerBank.width = resultSet.getDouble("width");
+				powerBank.length = resultSet.getDouble("length");
+				powerBank.height = resultSet.getDouble("height");
+				powerBank.weight = resultSet.getDouble("weight");
+
+				// For rent attributes
+				powerBank.address = resultSet.getString("address");
+				powerBank.lockerNumber = resultSet.getInt("locker_number");
+				powerBank.maxDuration = resultSet.getInt("max_duration");
+				powerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
+				powerBank.pricePerDay = resultSet.getDouble("price_per_day");
+
+				// Image
+				try {
+					powerBank.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
+				} catch (IOException e) {
+					powerBank.image = null;
+					e.printStackTrace();
+				}
+
+				forRentPowerBankList.add(powerBank);
+			}
+
+			return forRentPowerBankList;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static ImageIcon byteArrayToImageIcon(byte[] byteArray) {
+		if (byteArray == null || byteArray.length == 0)
+			return null;
+
+		try {
+			BufferedImage image = ImageIO.read(new ByteArrayInputStream(byteArray));
+			if (image == null)
+				return null;
+
+			return new ImageIcon(image);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
-	public static boolean insertIntoPowerbank(String brand, String name, String model,
-			double capacity, double wh, double width, double length, double height, double weight,
-			String imagePath) {
+	private static void closeConnection() {
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to close connection.");
+			return;
+		}
 		
+		try {
+			connection.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
+			double width, double length, double height, double weight, String imagePath, String[] inputArray,
+			String[] outputArray) {
+		boolean insertPowerBankStatus = insertIntoPowerbank(brand, name, model, capacity, wh, width, length, height,
+				weight, imagePath);
 		
-		if (connection == null)
-		{
+		if (!insertPowerBankStatus) return false;
+		
+		// Insert Input
+		connect();
+		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into for rent power bank table.");
 			return false;
 		}
-		
-		String query = "INSERT INTO POWERBANK VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		InputStream inputStream = JDBCConnector.class.getResourceAsStream(imagePath);
-		
-		if (inputStream == null) {
-			System.err.println("Couldn't find " + imagePath + ". Unable to insert " + "(" + brand + "," + name + "," + model + ")" + " to PowerBank table.");
-			return false;
+		String query = "INSERT INTO POWERBANKINPUT VALUES (?, ?, ?, ?)";
+		for(String input : inputArray) {
+			query = "INSERT INTO POWERBANKINPUT VALUES (?, ?, ?, ?)";
+			try (PreparedStatement ps = connection.prepareStatement(query)) {
+				ps.setString(1, input);
+				ps.setString(2, brand);
+				ps.setString(3, name);
+				ps.setString(4, model);
+				
+				boolean success = ps.executeUpdate() > 0;
+				
+				if (!success) {
+					System.err.println(
+							"Unable to insert input " + input + " to " + "(" + brand + "," + name + "," + model + ")");
+					closeConnection();
+					return false;
+				}
+			} 
+			catch (SQLException e) {
+				e.printStackTrace();
+				closeConnection();
+				return false;
+			}
 		}
 		
+		// Insert Output
+		query = "INSERT INTO POWERBANKOUTPUT VALUES (?, ?, ?, ?)";
+		for(String output : outputArray) {
+			query = "INSERT INTO POWERBANKOUTPUT VALUES (?, ?, ?, ?)";
+			try (PreparedStatement ps = connection.prepareStatement(query)) {
+				ps.setString(1, output);
+				ps.setString(2, brand);
+				ps.setString(3, name);
+				ps.setString(4, model);
+				
+				boolean success = ps.executeUpdate() > 0;
+				
+				if (!success) {
+					System.err.println(
+							"Unable to insert output " + output + " to " + "(" + brand + "," + name + "," + model + ")");
+					closeConnection();
+					return false;
+				}
+			} 
+			catch (SQLException e) {
+				e.printStackTrace();
+				closeConnection();
+				return false;
+			}
+		}
+		
+		// Successful insert
+		closeConnection();
+		return true;
+	}
+
+	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
+			double width, double length, double height, double weight, String imagePath) {
+
+		connect();
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to insert into for rent power bank table.");
+			return false;
+		}
+
+		String query = "INSERT INTO POWERBANK VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		InputStream inputStream = JDBCConnector.class.getResourceAsStream(imagePath);
+
+		if (inputStream == null) {
+			System.err.println("Couldn't find " + imagePath + ". Unable to insert " + "(" + brand + "," + name + ","
+					+ model + ")" + " to PowerBank table.");
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, brand);
 			ps.setString(2, name);
@@ -86,23 +258,35 @@ public class JDBCConnector {
 			ps.setDouble(8, height);
 			ps.setDouble(9, weight);
 			ps.setBlob(10, inputStream);
-			
+
 			boolean sucess = ps.executeUpdate() > 0;
-			
+
 			if (sucess) {
-				System.out.println("(" + brand + "," + name + "," + model + ") inserted to PowerBank table sucessfully!");
+				System.out
+						.println("(" + brand + "," + name + "," + model + ") inserted to PowerBank table sucessfully!");
+			} else {
+				System.err.println(
+						"Unable to insert " + "(" + brand + "," + name + "," + model + ")" + " to PowerBank table.");
 			}
-			else {
-				System.err.println("Unable to insert " + "(" + brand + "," + name + "," + model + ")" + " to PowerBank table.");
+
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-			
+
 			return sucess;
-			
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
+			try {
+				connection.close();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+
 			return false;
 		}
-		
+
 	}
 }

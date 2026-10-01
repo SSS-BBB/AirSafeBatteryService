@@ -18,6 +18,7 @@ VALUES
 
 SELECT * FROM POWERBANK;
 
+
 INSERT INTO FORRENTPOWERBANK VALUES
 ('ALPHA', '20,000 mAh White', 'B20PD', 'สนามบินสุวรรณภูมิ', 1, 50, 100, 20),
 ('Blue Box', '10000 mAh built-in Lightning/Type-C PD22.5W Cream (CCC)', 'EP-I109', 'สนามบินสุวรรณภูมิ', 2, 20, 50, 14),
@@ -28,6 +29,17 @@ INSERT INTO FORRENTPOWERBANK VALUES
 ('Blue Box', '10000 mAh built-in Lightning/Type-C PD22.5W Cream (CCC)', 'EP-I109', 'สนามบินดอนเมือง', 2, 20, 50, 14),
 ('Ugreen', '20000 mAh 130W Two-way Fast Charing Black', '35524B', 'สนามบินดอนเมือง', 4, 50, 100, 25);
 
-SELECT * FROM FORRENTPOWERBANK;
+
+INSERT INTO FORRENTPOWERBANK VALUES
+('REMAX', '10000mAh Black', 'RPP-37', 'สนามบินสุวรรณภูมิ', 1, 50, 100, 20),
+('REMAX', '10000mAh Gray', 'WP-117', 'สนามบินสุวรรณภูมิ', 2, 55, 110, 25),
+('REMAX', '20000mAh Gray', 'CP-17', 'สนามบินดอนเมือง', 1, 60, 120, 15);
+
+SELECT * FROM POWERBANK;
+
+SELECT * FROM POWERBANKINPUT;
+SELECT * FROM POWERBANKOUTPUT;
+
+SELECT * FROM FORRENTPOWERBANK NATURAL JOIN POWERBANK;
 
 

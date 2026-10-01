@@ -112,6 +112,12 @@ public class UserMainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		
+		// SQL Connection
+		JDBCConnector.connect();
+				
+		// Insert Sample Data
+		// InsertSample.insertPowerBank();
+		
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(APP_WIDTH, APP_HEIGHT);
@@ -138,12 +144,6 @@ public class UserMainFrame extends JFrame {
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
 		changeCard(2, 2);
-		
-		// SQL Connection
-		JDBCConnector.connect();
-		
-		// Insert Sample Data
-		// InsertSample.insertPowerBank();
 	}
 
 	private void createLogo() {
