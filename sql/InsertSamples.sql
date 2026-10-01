@@ -18,4 +18,16 @@ VALUES
 
 SELECT * FROM POWERBANK;
 
+INSERT INTO FORRENTPOWERBANK VALUES
+('ALPHA', '20,000 mAh White', 'B20PD', 'สนามบินสุวรรณภูมิ', 1, 50, 100, 20),
+('Blue Box', '10000 mAh built-in Lightning/Type-C PD22.5W Cream (CCC)', 'EP-I109', 'สนามบินสุวรรณภูมิ', 2, 20, 50, 14),
+('Blue Box', '20000 mAh built-in Lightning/Type-C cable PD22.5W Cream', 'EPI209', 'สนามบินสุวรรณภูมิ', 3, 60, 150, 30),
+('QPLUS', '15000 mAh LED Display with 2-in-1 Cable White', 'W1501C', 'สนามบินสุวรรณภูมิ', 4, 55, 120, 25),
+('Ugreen', '20000 mAh 130W Two-way Fast Charing Black', '35524B', 'สนามบินสุวรรณภูมิ', 5, 50, 100, 25),
+('ALPHA', '20,000 mAh White', 'B20PD', 'สนามบินดอนเมือง', 1, 50, 100, 20),
+('Blue Box', '10000 mAh built-in Lightning/Type-C PD22.5W Cream (CCC)', 'EP-I109', 'สนามบินดอนเมือง', 2, 20, 50, 14),
+('Ugreen', '20000 mAh 130W Two-way Fast Charing Black', '35524B', 'สนามบินดอนเมือง', 4, 50, 100, 25);
+
+SELECT * FROM FORRENTPOWERBANK;
+
 
