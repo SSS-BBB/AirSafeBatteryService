@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import CustomGUI.CustomScrollPane;
 import Database.JDBCConnector;
 import Struct.ForRentPowerBank;
 import UserApp.UserMainFrame;
@@ -34,7 +35,7 @@ import Utils.Utils;
 public class UserRent extends JPanel {
 
 	private UserMainFrame mainFrame;
-	private Color backgroundColor, menuColor;
+	private Color backgroundColor, menuColor, mainColor;
 
 	private JPanel filterPanel, powerbankPanel;
 	private JComboBox<String> addressDropdown, brandDropdown, inputDropdown, 
@@ -44,12 +45,13 @@ public class UserRent extends JPanel {
 	
 	private ArrayList<ForRentPowerBank> forRentPowerBankList;
 
-	public UserRent(UserMainFrame mainFrame, Color backgroundColor, Color menuColor) {
+	public UserRent(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
 		super();
 
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;
+		this.mainColor = mainColor;
 		
 		forRentPowerBankList = JDBCConnector.getForRentPowerBank();
 		
@@ -87,7 +89,7 @@ public class UserRent extends JPanel {
 		topPanel.add(filterWrapperPanel);
 
 		createPowerbankPanel();
-		JScrollPane powerbankScrollPane = new JScrollPane(powerbankPanel);
+		CustomScrollPane powerbankScrollPane = new CustomScrollPane(powerbankPanel, menuColor, backgroundColor);
 		this.add(powerbankScrollPane, BorderLayout.CENTER);
 	}
 	
@@ -176,12 +178,8 @@ public class UserRent extends JPanel {
 		powerbankPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		powerbankPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
-		powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(0)));
-		powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(1)));
-		powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(2)));
-		powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(0)));
-		powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(1)));
-		powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(2)));
+		for (int i = 0; i < forRentPowerBankList.size(); i++)
+			powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(i)));
 	}
 
 	private void createFilterPanel() {
@@ -214,7 +212,7 @@ public class UserRent extends JPanel {
 
 		// TODO: get address from database
 		String[] addressList = { "สนามบินสุวรรณภูมิ", "สนามบินดอนเมือง" };
-		addressDropdown = Utils.createAppDropdown(addressList, backgroundColor, menuColor);
+		addressDropdown = Utils.createAppDropdown(addressList, backgroundColor, mainColor);
 		addressDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		addressFilterPanel.add(addressDropdown);
 
@@ -328,7 +326,7 @@ public class UserRent extends JPanel {
 
 		// TODO: get for rent power bank brand from database
 		String[] brandList = { "Asafjpaf", "Bsafasfg", "Csafsfa", "Dsaf", "Efsaf" };
-		brandDropdown = Utils.createAppDropdown(brandList, backgroundColor, menuColor);
+		brandDropdown = Utils.createAppDropdown(brandList, backgroundColor, mainColor);
 		brandDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		brandFilterPanel.add(brandDropdown);
 
@@ -347,7 +345,7 @@ public class UserRent extends JPanel {
 
 		// TODO: get power bank input type from database
 		String[] inputList = { "Type-C", "Lighting" };
-		inputDropdown = Utils.createAppDropdown(inputList, backgroundColor, menuColor);
+		inputDropdown = Utils.createAppDropdown(inputList, backgroundColor, mainColor);
 		inputDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		inputFilterPanel.add(inputDropdown);
 
@@ -366,7 +364,7 @@ public class UserRent extends JPanel {
 
 		// TODO: get power bank output type from database
 		String[] outputList = { "Type-C", "Lighting" };
-		outputDropdown = Utils.createAppDropdown(outputList, backgroundColor, menuColor);
+		outputDropdown = Utils.createAppDropdown(outputList, backgroundColor, mainColor);
 		outputDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		outputFilterPanel.add(outputDropdown);
 
@@ -385,7 +383,7 @@ public class UserRent extends JPanel {
 		orderbyPanel.add(orderbyLabel);
 
 		String[] orderList = { "ราคา", "ความจุ", "น้ำหนัก" };
-		orderbyDropdown = Utils.createAppDropdown(orderList, backgroundColor, menuColor);
+		orderbyDropdown = Utils.createAppDropdown(orderList, backgroundColor, mainColor);
 		orderbyDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		orderbyPanel.add(orderbyDropdown);
 		
@@ -405,7 +403,7 @@ public class UserRent extends JPanel {
 		ordertypePanel.add(descButton);
 		
 		ascButton.addActionListener(e -> {
-			ascButton.setBackground(menuColor);
+			ascButton.setBackground(mainColor);
 			descButton.setBackground(null);
 			
 			ascButton.setForeground(Color.WHITE);
@@ -415,7 +413,7 @@ public class UserRent extends JPanel {
 		});
 		
 		descButton.addActionListener(e -> {
-			descButton.setBackground(menuColor);
+			descButton.setBackground(mainColor);
 			ascButton.setBackground(null);
 			
 			descButton.setForeground(Color.WHITE);

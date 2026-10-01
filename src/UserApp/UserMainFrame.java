@@ -214,7 +214,7 @@ public class UserMainFrame extends JFrame {
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
-		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR);
+		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
