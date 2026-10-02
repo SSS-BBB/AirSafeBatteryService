@@ -68,11 +68,13 @@ public class UserMainFrame extends JFrame {
 
 	private JPanel[] menuPanels;
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", "StorageCard", "ListCard", "HistoryCard",
-			"NotificationCard", "CheckStatusCard" };
+			"NotificationCard", "CheckStatusCard", "ForRentDetail", "ForRentPayment" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel, rentPanel, storagePanel, listPanel, historyPanel, notificationPanel,
 			checkStatusPanel;
+	
+	private UserForRentDetail forRentDetailPanel;
 
 	// colors
 	private static final Color BACKGROUND_COLOR = Color.decode("#F8FAFC");
@@ -113,7 +115,7 @@ public class UserMainFrame extends JFrame {
 		}
 		
 		// SQL Connection
-		JDBCConnector.connect();
+		// JDBCConnector.connect();
 				
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
@@ -214,12 +216,14 @@ public class UserMainFrame extends JFrame {
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
-		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR);
+		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
 		cardPanel.add(rentPanel, cardNames[2]);
+		cardPanel.add(forRentDetailPanel, cardNames[8]);
 	}
 
 	

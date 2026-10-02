@@ -1,5 +1,6 @@
 package Utils;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -22,9 +24,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicComboBoxUI;
@@ -150,6 +156,35 @@ public class Utils {
 		return createAppTextField(backgroundColor, new Dimension(350, 35));
 	}
 	
+	public static JButton createIconButton(ImageIcon icon) {
+		if (icon == null) {
+			System.err.println("Null icon. Unable to create an icon button.");
+			return new JButton("No Icon");
+		}
+		
+		JButton button = new JButton(icon);
+		button.setBackground(null);
+		button.setBorderPainted(false);
+		button.setFocusPainted(false);
+		button.setContentAreaFilled(false);
+		button.setOpaque(true);
+		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return button;
+	}
+	
+	public static JButton createNoBackgroundButton(String text, Color fontColor, int fontSize) {
+		JButton button = new JButton(text);
+		button.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		button.setBackground(null);
+		button.setForeground(fontColor);
+		button.setBorderPainted(false);
+		button.setFocusPainted(false);
+		button.setContentAreaFilled(false);
+		button.setOpaque(true);
+		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return button;
+	}
+	
 	public static <T> JComboBox<T> createAppDropdown(T[] dropDownList, Color backgroundColor, Color menuColor) {
 		JComboBox<T> dropDown = new JComboBox<T>(dropDownList);
 		dropDown.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -213,5 +248,39 @@ public class Utils {
 		
 
 		return dropDown;
+	}
+	
+	public static boolean isDatePast(Calendar date) {
+		Calendar today = Calendar.getInstance();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		
+		date.set(Calendar.HOUR_OF_DAY, 0);
+		date.set(Calendar.MINUTE, 0);
+		date.set(Calendar.SECOND, 0);
+		date.set(Calendar.MILLISECOND, 0);
+		
+		return date.before(today);
+	}
+	
+	public static void showDialog(JFrame frame, String title, String detail) {
+		JDialog dialog = new JDialog(frame, title, true);
+		dialog.setBackground(Color.WHITE);
+		dialog.setSize(500, 150);
+		
+		JPanel wrapperPanel = new JPanel(new BorderLayout());
+		wrapperPanel.setBackground(Color.WHITE);
+		dialog.add(wrapperPanel);
+		
+		JLabel detailLabel = new JLabel(detail, SwingConstants.CENTER);
+		detailLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		detailLabel.setForeground(Color.BLACK);
+		detailLabel.setBackground(Color.WHITE);
+		wrapperPanel.add(detailLabel, BorderLayout.CENTER);
+		
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
 	}
 }

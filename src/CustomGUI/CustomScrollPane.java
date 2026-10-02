@@ -22,11 +22,42 @@ public class CustomScrollPane extends JScrollPane {
 		setBorder(null);
 		
 		setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
-		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
 		JScrollBar verticalBar = getVerticalScrollBar();
 		verticalBar.setBorder(null);
 		verticalBar.setUI(new BasicScrollBarUI() {
+			
+			@Override
+			protected void configureScrollBarColors() {
+				thumbColor = scrollThumbColor;
+				trackColor = scrollTrackColor;
+			}
+			
+			@Override
+			protected JButton createDecreaseButton(int orientation) {
+				return createNullButton();
+			}
+			
+			@Override
+			protected JButton createIncreaseButton(int orientation) {
+				return createNullButton();
+			}
+			
+			private JButton createNullButton() {
+				// to remove increase and decrease button of the scroll bar
+				JButton nullButton = new JButton();
+				nullButton.setPreferredSize(new Dimension(0, 0));
+				nullButton.setMinimumSize(new Dimension(0, 0));
+				nullButton.setMaximumSize(new Dimension(0, 0));
+				return nullButton;
+			}
+			
+		});
+		
+		JScrollBar horizontalBar = getHorizontalScrollBar();
+		horizontalBar.setBorder(null);
+		horizontalBar.setUI(new BasicScrollBarUI() {
 			
 			@Override
 			protected void configureScrollBarColors() {

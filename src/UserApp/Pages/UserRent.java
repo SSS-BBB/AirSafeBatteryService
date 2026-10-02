@@ -38,23 +38,26 @@ public class UserRent extends JPanel {
 	private Color backgroundColor, menuColor, mainColor;
 
 	private JPanel filterPanel, powerbankPanel;
-	private JComboBox<String> addressDropdown, brandDropdown, inputDropdown, 
-			outputDropdown, orderbyDropdown;
+	private JComboBox<String> addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown;
 	private JTextField minPriceTextField, maxPriceTextField, minCapTextField, maxCapTextField, minWeightTextField,
 			maxWeightTextField;
-	
+
 	private ArrayList<ForRentPowerBank> forRentPowerBankList;
 
-	public UserRent(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
+	private UserForRentDetail detailPage;
+
+	public UserRent(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor,
+			UserForRentDetail detailPage) {
 		super();
 
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
-		
+		this.detailPage = detailPage;
+
 		forRentPowerBankList = JDBCConnector.getForRentPowerBank();
-		
+
 		if (forRentPowerBankList == null) {
 			forRentPowerBankList = new ArrayList<ForRentPowerBank>();
 		}
@@ -66,7 +69,7 @@ public class UserRent extends JPanel {
 		// this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setLayout(new BorderLayout());
 		this.setBackground(backgroundColor);
-		
+
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 		topPanel.setBackground(backgroundColor);
@@ -92,73 +95,99 @@ public class UserRent extends JPanel {
 		CustomScrollPane powerbankScrollPane = new CustomScrollPane(powerbankPanel, menuColor, backgroundColor);
 		this.add(powerbankScrollPane, BorderLayout.CENTER);
 	}
-	
+
 	private JPanel createPowerbankDisplayPanel(ForRentPowerBank powerBank) {
 		if (powerBank == null) {
 			System.err.println("Null powerbank. Unable to create this powerbank display");
 			return null;
 		}
-		
+
 		JPanel wrapperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		wrapperPanel.setBackground(backgroundColor);
-		
+
 		int margin = 5;
+		int fontSize = 14;
 		float componentAlignment = CENTER_ALIGNMENT;
-		
+
 		JPanel displayPanel = new JPanel();
 		displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
 		displayPanel.setBorder(Utils.createPaddingBorder(Color.BLACK, 8));
 		displayPanel.setBackground(backgroundColor);
 		displayPanel.setMaximumSize(displayPanel.getPreferredSize());
 		wrapperPanel.add(displayPanel);
-		
+
 		ImageIcon scaledPowerBankImage = Utils.scaleImageKeepRatio(powerBank.image, 120, 120);
 		JLabel powerBankImageLabel = new JLabel(scaledPowerBankImage);
 		powerBankImageLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(powerBankImageLabel);
-		
+
 		JLabel brandLabel = new JLabel(powerBank.brand);
-		brandLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		brandLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + 2));
 		brandLabel.setBorder(BorderFactory.createEmptyBorder(margin, 0, margin, 0));
 		brandLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(brandLabel);
-		
+
 		JLabel nameLabel = new JLabel(powerBank.name);
-		nameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		nameLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + 2));
 		nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		nameLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(nameLabel);
-		
+
 		JLabel modelLabel = new JLabel(powerBank.model);
-		modelLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		modelLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + 2));
 		modelLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		modelLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(modelLabel);
-		
+
 		String whAndCapacity = String.valueOf(powerBank.wh) + " Wh / " + String.valueOf(powerBank.capacity) + " mAh";
 		JLabel whAndCapacityLabel = new JLabel(whAndCapacity);
-		whAndCapacityLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		whAndCapacityLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		whAndCapacityLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		whAndCapacityLabel.setAlignmentX(componentAlignment);
 		whAndCapacityLabel.setForeground(Color.GRAY);
 		displayPanel.add(whAndCapacityLabel);
+
+		String sizeAndWeight = String.valueOf(powerBank.width) + "x" + String.valueOf(powerBank.length) + "x"
+				+ String.valueOf(powerBank.height) + " cm" + " " + String.valueOf(powerBank.weight) + " kg";
+		JLabel sizeAndWeightLabel = new JLabel(sizeAndWeight);
+		sizeAndWeightLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		sizeAndWeightLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
+		sizeAndWeightLabel.setAlignmentX(componentAlignment);
+		sizeAndWeightLabel.setForeground(Color.GRAY);
+		displayPanel.add(sizeAndWeightLabel);
+		
 		
 		String locker = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
 		JLabel lockerLabel = new JLabel(locker);
-		lockerLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lockerLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		lockerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		lockerLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(lockerLabel);
-		
+
 		String rentPrice = String.valueOf(powerBank.pricePerDay) + " บาท/วัน";
 		JLabel rentPriceLabel = new JLabel(rentPrice);
-		rentPriceLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		rentPriceLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		rentPriceLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		rentPriceLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(rentPriceLabel);
-		
+
+		String maxRentDay = "เช่าได้สูงสุด " + String.valueOf(powerBank.maxDuration) + " วัน";
+		JLabel maxRentDayLabel = new JLabel(maxRentDay);
+		maxRentDayLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		maxRentDayLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
+		maxRentDayLabel.setAlignmentX(componentAlignment);
+		displayPanel.add(maxRentDayLabel);
+
+		String lateFee = "ค่าปรับส่งคืนสาย " + String.valueOf(powerBank.lateFeePerDay) + " บาท/วัน";
+		JLabel lateFeeLabel = new JLabel(lateFee);
+		lateFeeLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		lateFeeLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
+		lateFeeLabel.setAlignmentX(componentAlignment);
+		lateFeeLabel.setForeground(new Color(255, 95, 21)); // Warning Color
+		displayPanel.add(lateFeeLabel);
+
 		JButton rentButton = new JButton("เช่า");
-		rentButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+		rentButton.setFont(new Font("Tahoma", Font.BOLD, fontSize));
 		rentButton.setBackground(Color.GREEN);
 		rentButton.setForeground(Color.WHITE);
 		rentButton.setFocusPainted(false);
@@ -167,17 +196,29 @@ public class UserRent extends JPanel {
 		rentButton.setPreferredSize(new Dimension(100, 25));
 		rentButton.setAlignmentX(componentAlignment);
 		rentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+		rentButton.addActionListener(e -> {
+			// set data
+			detailPage.powerBank = powerBank;
+			
+			// create page
+			detailPage.createForRentDetailPage();
+
+			// change page
+			mainFrame.changeCard(2, 8);
+		});
+
 		displayPanel.add(rentButton);
-		
+
 		return wrapperPanel;
 	}
-	
+
 	private void createPowerbankPanel() {
 		powerbankPanel = new JPanel(new GridLayout(0, 4, 5, 5));
 		powerbankPanel.setBackground(backgroundColor);
 		powerbankPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		powerbankPanel.setAlignmentX(LEFT_ALIGNMENT);
-		
+
 		for (int i = 0; i < forRentPowerBankList.size(); i++)
 			powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(i)));
 	}
@@ -386,7 +427,7 @@ public class UserRent extends JPanel {
 		orderbyDropdown = Utils.createAppDropdown(orderList, backgroundColor, mainColor);
 		orderbyDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		orderbyPanel.add(orderbyDropdown);
-		
+
 		// Order type
 		JPanel ordertypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		ordertypePanel.setBackground(backgroundColor);
@@ -395,40 +436,40 @@ public class UserRent extends JPanel {
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
 		filterPanel.add(ordertypePanel, gbc);
-		
+
 		JButton ascButton = Utils.createBorderButton("น้อยไปมาก", Color.BLACK, Color.BLACK, 16);
 		ordertypePanel.add(ascButton);
-		
+
 		JButton descButton = Utils.createBorderButton("มากไปน้อย", Color.BLACK, Color.BLACK, 16);
 		ordertypePanel.add(descButton);
-		
+
 		ascButton.addActionListener(e -> {
 			ascButton.setBackground(mainColor);
 			descButton.setBackground(null);
-			
+
 			ascButton.setForeground(Color.WHITE);
 			descButton.setForeground(Color.BLACK);
-			
+
 			// TODO: order power banks
 		});
-		
+
 		descButton.addActionListener(e -> {
 			descButton.setBackground(mainColor);
 			ascButton.setBackground(null);
-			
+
 			descButton.setForeground(Color.WHITE);
 			ascButton.setForeground(Color.BLACK);
-			
+
 			// TODO: order power banks
 		});
-		
+
 		// Clear Filter
 		JButton clearFilterButton = Utils.createNoBackgroundButton("ล้าง filter", new Color(36, 160, 237));
 		clearFilterButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		gbc.gridx = 2;
 		gbc.gridy = 3;
 		filterPanel.add(clearFilterButton, gbc);
-		
+
 		clearFilterButton.addActionListener(e -> {
 			// clear input
 			minPriceTextField.setText("");
@@ -437,10 +478,10 @@ public class UserRent extends JPanel {
 			maxCapTextField.setText("");
 			minWeightTextField.setText("");
 			maxWeightTextField.setText("");
-			
+
 			ascButton.setBackground(null);
 			descButton.setBackground(null);
-			
+
 			ascButton.setForeground(Color.BLACK);
 			descButton.setForeground(Color.BLACK);
 		});
