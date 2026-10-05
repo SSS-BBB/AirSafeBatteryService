@@ -66,13 +66,49 @@ public class JDBCConnector {
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
 		return getForRentPowerBank("", -1, -1, -1, -1, -1, -1, "", "", "", "", false);
 	}
-
+	
+	public static ArrayList<String> getPowerBankChargerType(String brand, String name, String model, boolean isInput) {
+		try {
+			if (connection.isClosed()) connect();
+		} 
+		catch (SQLException e) {	
+			e.printStackTrace();
+		}
+		
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to get data from input table.");
+			return null;
+		}
+		
+		ArrayList<String> chargerType = new ArrayList<String>();
+		String inOrOut = (isInput) ? "INPUT" : "OUTPUT";
+		String query = "SELECT * FROM POWERBANK" + inOrOut + " WHERE Brand = ? AND Name = ? AND Model = ?";
+		try {
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, brand);
+			ps.setString(2, name);
+			ps.setString(3, model);
+			
+			ResultSet resultSet = ps.executeQuery();
+			
+			while (resultSet.next()) {
+				chargerType.add(resultSet.getString(1));
+			}
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return chargerType;
+		
+	}
+	
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank(String filterAddress, double minPrice,
 			double maxPrice, double minCap, double maxCap, double minWeight, double maxWeight, String filterBrand,
 			String filterInput, String filterOutput, String orderBy, boolean asc) {
 		connect();
 		if (connection == null) {
-			System.err.println("Database is not connected, unable to insert into for rent power bank table.");
+			System.err.println("Database is not connected, unable to get data from for rent power bank table.");
 			return null;
 		}
 
@@ -88,15 +124,15 @@ public class JDBCConnector {
 			while (resultSet.next()) {
 				ForRentPowerBank powerBank = new ForRentPowerBank();
 				// Power bank attributes
-				powerBank.brand = resultSet.getString("brand");
-				powerBank.name = resultSet.getString("name");
-				powerBank.model = resultSet.getString("model");
-				powerBank.capacity = resultSet.getDouble("capacity");
-				powerBank.wh = resultSet.getDouble("wh");
-				powerBank.width = resultSet.getDouble("width");
-				powerBank.length = resultSet.getDouble("length");
-				powerBank.height = resultSet.getDouble("height");
-				powerBank.weight = resultSet.getDouble("weight");
+				powerBank.deviceInfo.brand = resultSet.getString("brand");
+				powerBank.deviceInfo.name = resultSet.getString("name");
+				powerBank.deviceInfo.model = resultSet.getString("model");
+				powerBank.deviceInfo.capacity = resultSet.getDouble("capacity");
+				powerBank.deviceInfo.wh = resultSet.getDouble("wh");
+				powerBank.deviceInfo.width = resultSet.getDouble("width");
+				powerBank.deviceInfo.length = resultSet.getDouble("length");
+				powerBank.deviceInfo.height = resultSet.getDouble("height");
+				powerBank.deviceInfo.weight = resultSet.getDouble("weight");
 
 				// For rent attributes
 				powerBank.address = resultSet.getString("address");
@@ -107,12 +143,17 @@ public class JDBCConnector {
 
 				// Image
 				try {
-					powerBank.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
+					powerBank.deviceInfo.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
 				} catch (IOException e) {
-					powerBank.image = null;
+					powerBank.deviceInfo.image = null;
 					e.printStackTrace();
 				}
-
+				
+				// Input
+				powerBank.deviceInfo.input = getPowerBankChargerType(powerBank.deviceInfo.brand, powerBank.deviceInfo.name, powerBank.deviceInfo.model, true);
+				// Output
+				powerBank.deviceInfo.output = getPowerBankChargerType(powerBank.deviceInfo.brand, powerBank.deviceInfo.name, powerBank.deviceInfo.model, false);
+				
 				forRentPowerBankList.add(powerBank);
 			}
 

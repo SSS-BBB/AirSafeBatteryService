@@ -14,6 +14,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.imageio.ImageIO;
@@ -85,6 +87,24 @@ public class Utils {
 		
 		Image scaledImage = image.getScaledInstance((int) scaledWidth, (int) scaledHeight, Image.SCALE_SMOOTH);
 		return new ImageIcon(scaledImage);
+	}
+	
+	public static String insertArrayListToString(ArrayList<String> list, String start, String delimiter) {
+		if (list == null) {
+			System.err.println("Null List. Unable to insert array list to string.");
+			return "";
+		}
+		
+		String result = start;
+		
+		for (int i = 0; i < list.size() - 1; i++) {
+			result += list.get(i) + delimiter;
+		}
+		
+		// insert last string in the list without delimiter
+		result += list.get(list.size() - 1);
+		
+		return result;
 	}
 	
 	public static Border createPaddingBorder(Color color, int thickness, Insets paddings, Insets margins) {
@@ -186,6 +206,11 @@ public class Utils {
 	}
 	
 	public static <T> JComboBox<T> createAppDropdown(T[] dropDownList, Color backgroundColor, Color menuColor) {
+		// Drop down with default size
+		return createAppDropdown(dropDownList, backgroundColor, menuColor, new Dimension(0, 0));
+	}
+	
+	public static <T> JComboBox<T> createAppDropdown(T[] dropDownList, Color backgroundColor, Color menuColor, Dimension size) {
 		JComboBox<T> dropDown = new JComboBox<T>(dropDownList);
 		dropDown.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
@@ -193,6 +218,9 @@ public class Utils {
 		dropDown.setBackground(backgroundColor);
 		dropDown.setForeground(Color.BLACK);
 		dropDown.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		
+		if (size.width > 0 && size.height > 0)
+			dropDown.setPreferredSize(size);
 		
 		// Selected item style
 		dropDown.setRenderer(new DefaultListCellRenderer() {
@@ -265,10 +293,24 @@ public class Utils {
 		return date.before(today);
 	}
 	
+	public static int countDays(Calendar c1, Calendar c2) {
+		c1.set(Calendar.HOUR_OF_DAY, 0);
+		c1.set(Calendar.MINUTE, 0);
+		c1.set(Calendar.SECOND, 0);
+		c1.set(Calendar.MILLISECOND, 0);
+		
+		c2.set(Calendar.HOUR_OF_DAY, 0);
+		c2.set(Calendar.MINUTE, 0);
+		c2.set(Calendar.SECOND, 0);
+		c2.set(Calendar.MILLISECOND, 0);
+		
+		return (int) ChronoUnit.DAYS.between(c1.toInstant(), c2.toInstant());
+	}
+	
 	public static void showDialog(JFrame frame, String title, String detail) {
 		JDialog dialog = new JDialog(frame, title, true);
 		dialog.setBackground(Color.WHITE);
-		dialog.setSize(500, 150);
+		dialog.setSize(800, 150);
 		
 		JPanel wrapperPanel = new JPanel(new BorderLayout());
 		wrapperPanel.setBackground(Color.WHITE);

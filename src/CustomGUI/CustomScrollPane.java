@@ -24,8 +24,12 @@ public class CustomScrollPane extends JScrollPane {
 		setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
 		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
+		int barSize = 10;
+		
 		JScrollBar verticalBar = getVerticalScrollBar();
 		verticalBar.setBorder(null);
+		verticalBar.setPreferredSize(new Dimension(barSize, 0));
+		
 		verticalBar.setUI(new BasicScrollBarUI() {
 			
 			@Override
@@ -57,6 +61,8 @@ public class CustomScrollPane extends JScrollPane {
 		
 		JScrollBar horizontalBar = getHorizontalScrollBar();
 		horizontalBar.setBorder(null);
+		horizontalBar.setPreferredSize(new Dimension(0, barSize));
+		
 		horizontalBar.setUI(new BasicScrollBarUI() {
 			
 			@Override

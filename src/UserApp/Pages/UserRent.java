@@ -116,30 +116,30 @@ public class UserRent extends JPanel {
 		displayPanel.setMaximumSize(displayPanel.getPreferredSize());
 		wrapperPanel.add(displayPanel);
 
-		ImageIcon scaledPowerBankImage = Utils.scaleImageKeepRatio(powerBank.image, 120, 120);
+		ImageIcon scaledPowerBankImage = Utils.scaleImageKeepRatio(powerBank.deviceInfo.image, 120, 120);
 		JLabel powerBankImageLabel = new JLabel(scaledPowerBankImage);
 		powerBankImageLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(powerBankImageLabel);
 
-		JLabel brandLabel = new JLabel(powerBank.brand);
+		JLabel brandLabel = new JLabel(powerBank.deviceInfo.brand);
 		brandLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + 2));
 		brandLabel.setBorder(BorderFactory.createEmptyBorder(margin, 0, margin, 0));
 		brandLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(brandLabel);
 
-		JLabel nameLabel = new JLabel(powerBank.name);
+		JLabel nameLabel = new JLabel(powerBank.deviceInfo.name);
 		nameLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + 2));
 		nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		nameLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(nameLabel);
 
-		JLabel modelLabel = new JLabel(powerBank.model);
+		JLabel modelLabel = new JLabel(powerBank.deviceInfo.model);
 		modelLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + 2));
 		modelLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		modelLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(modelLabel);
 
-		String whAndCapacity = String.valueOf(powerBank.wh) + " Wh / " + String.valueOf(powerBank.capacity) + " mAh";
+		String whAndCapacity = String.valueOf(powerBank.deviceInfo.wh) + " Wh / " + String.valueOf(powerBank.deviceInfo.capacity) + " mAh";
 		JLabel whAndCapacityLabel = new JLabel(whAndCapacity);
 		whAndCapacityLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		whAndCapacityLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
@@ -147,8 +147,8 @@ public class UserRent extends JPanel {
 		whAndCapacityLabel.setForeground(Color.GRAY);
 		displayPanel.add(whAndCapacityLabel);
 
-		String sizeAndWeight = String.valueOf(powerBank.width) + "x" + String.valueOf(powerBank.length) + "x"
-				+ String.valueOf(powerBank.height) + " cm" + " " + String.valueOf(powerBank.weight) + " kg";
+		String sizeAndWeight = String.valueOf(powerBank.deviceInfo.width) + "x" + String.valueOf(powerBank.deviceInfo.length) + "x"
+				+ String.valueOf(powerBank.deviceInfo.height) + " cm" + " " + String.valueOf(powerBank.deviceInfo.weight) + " kg";
 		JLabel sizeAndWeightLabel = new JLabel(sizeAndWeight);
 		sizeAndWeightLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		sizeAndWeightLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
@@ -201,8 +201,8 @@ public class UserRent extends JPanel {
 			// set data
 			detailPage.powerBank = powerBank;
 			
-			// create page
-			detailPage.createForRentDetailPage();
+			// update page
+			detailPage.updateForRentDetailPage();
 
 			// change page
 			mainFrame.changeCard(2, 8);
