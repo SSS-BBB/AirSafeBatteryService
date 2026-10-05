@@ -38,7 +38,8 @@ INSERT INTO FORRENTPOWERBANK VALUES
 ('REMAX', '20000mAh Gray', 'CP-17', 'สนามบินดอนเมือง', 1, 60, 120, 15),
 ('Aukey', 'Black Basix Mini', 'PB-N83S', 'สนามบินดอนเมือง', 2, 60, 110, 30),
 ('Mofit', 'Mofit Power Bank', 'M11PD', 'สนามบินดอนเมือง', 3, 60, 100, 25),
-('Xiaomi', '10000 MAH (Integrated Cable)', 'P15ZM', 'สนามบินดอนเมือง', 5, 50, 80, 10)
+('Xiaomi', '10000 MAH (Integrated Cable)', 'P15ZM', 'สนามบินดอนเมือง', 5, 50, 80, 10),
+('Anker', 'NANO POWER BANK', 'A1638H11', 'สนามบินดอนเมือง', 8, 45, 110, 28)
 ;
 
 SELECT * FROM POWERBANK;
