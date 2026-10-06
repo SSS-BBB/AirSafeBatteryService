@@ -307,16 +307,16 @@ public class UserRent extends JPanel {
 
 		JLabel capToLabel = new JLabel("ถึง");
 		capToLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		capToLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+		capToLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 		capToLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		capacityFilterPanel.add(capToLabel);
 
 		maxCapTextField = Utils.createAppTextField(backgroundColor, textFieldSize);
 		capacityFilterPanel.add(maxCapTextField);
 
-		JLabel capUnitLabel = new JLabel("Wh");
+		JLabel capUnitLabel = new JLabel("mAh");
 		capUnitLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		capUnitLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+		capUnitLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5 ));
 		capUnitLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		capacityFilterPanel.add(capUnitLabel);
 
