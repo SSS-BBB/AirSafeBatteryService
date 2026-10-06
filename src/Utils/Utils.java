@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -203,6 +205,43 @@ public class Utils {
 		button.setOpaque(true);
 		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		return button;
+	}
+	
+	public static String[] setToArray(Set<String> s) {
+		if (s == null) {
+			System.err.println("Null set. unable to turn this set into an array.");
+			return null;
+		}
+		
+		String[] arr = new String[s.size()];
+		
+		int i = 0;
+		for (String element : s)
+			arr[i++] = element;
+		
+		return arr;
+	}
+	
+	public static String[] listToArray(List<String> l) {
+		if (l == null) {
+			System.err.println("Null list. unable to turn this list into an array.");
+			return null;
+		}
+		
+		String[] arr = new String[l.size()];
+		arr = l.toArray(arr);
+		return arr;
+	}
+	
+	public static double getNumberFromTextField(JTextField textField, double invalidNumber) {
+		try {
+			double num = Double.parseDouble(textField.getText());
+			return num;
+		}
+		catch (NumberFormatException e) {
+			// return invalidNumber when the text in text field is not a number
+			return invalidNumber;
+		}
 	}
 	
 	public static <T> JComboBox<T> createAppDropdown(T[] dropDownList, Color backgroundColor, Color menuColor) {

@@ -12,6 +12,12 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -33,9 +39,11 @@ import UserApp.UserMainFrame;
 import Utils.Utils;
 
 public class UserRent extends JPanel {
-
 	private UserMainFrame mainFrame;
 	private Color backgroundColor, menuColor, mainColor;
+
+	private ArrayList<String> addressFilterValues, brandFilterValues, inputFilterValues, outputFilterValues;
+	private Dictionary<String, String> orderByFilterAttributes;
 
 	private JPanel filterPanel, powerbankPanel;
 	private JComboBox<String> addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown;
@@ -45,6 +53,10 @@ public class UserRent extends JPanel {
 	private ArrayList<ForRentPowerBank> forRentPowerBankList;
 
 	private UserForRentDetail detailPage;
+
+	private JButton ascButton, descButton;
+	private boolean ascending;
+	private String orderByAttribute;
 
 	public UserRent(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor,
 			UserForRentDetail detailPage) {
@@ -62,6 +74,46 @@ public class UserRent extends JPanel {
 			forRentPowerBankList = new ArrayList<ForRentPowerBank>();
 		}
 
+		// get possible filter values
+		addressFilterValues = new ArrayList<String>();
+		brandFilterValues = new ArrayList<String>();
+		inputFilterValues = new ArrayList<String>();
+		outputFilterValues = new ArrayList<String>();
+		
+		// none value for not filter
+		addressFilterValues.add("ทั้งหมด");
+		brandFilterValues.add("ทั้งหมด");
+		inputFilterValues.add("ทั้งหมด");
+		outputFilterValues.add("ทั้งหมด");
+		
+		for (ForRentPowerBank powerBank : forRentPowerBankList) {
+			if (!addressFilterValues.contains(powerBank.address)) 
+				addressFilterValues.add(powerBank.address);
+			
+			if (!brandFilterValues.contains(powerBank.deviceInfo.brand)) 
+				brandFilterValues.add(powerBank.deviceInfo.brand);
+			
+			for (String input : powerBank.deviceInfo.input)
+				if (!inputFilterValues.contains(input)) 
+					inputFilterValues.add(input);
+			
+			for (String outut : powerBank.deviceInfo.output)
+				if (!outputFilterValues.contains(outut)) 
+					outputFilterValues.add(outut);
+		}
+		
+		// display name name -> attribute name
+		orderByFilterAttributes = new Hashtable<String, String>();
+		orderByFilterAttributes.put("Brand", "brand");
+		orderByFilterAttributes.put("สถานที่", "address");
+		orderByFilterAttributes.put("ค่าเช่าต่อวัน", "price_per_day");
+		orderByFilterAttributes.put("ค่าปรับส่งคืนช้า", "late_fee_per_day");
+		orderByFilterAttributes.put("จำนวนวันให้เช่าสูงสุด", "max_duration");
+		orderByFilterAttributes.put("ความจุ", "capacity");
+		orderByFilterAttributes.put("Wh", "wh");
+		orderByFilterAttributes.put("น้ำหนัก", "weight");
+		
+		
 		createRentPage();
 	}
 
@@ -139,7 +191,8 @@ public class UserRent extends JPanel {
 		modelLabel.setAlignmentX(componentAlignment);
 		displayPanel.add(modelLabel);
 
-		String whAndCapacity = String.valueOf(powerBank.deviceInfo.wh) + " Wh / " + String.valueOf(powerBank.deviceInfo.capacity) + " mAh";
+		String whAndCapacity = String.valueOf(powerBank.deviceInfo.wh) + " Wh / "
+				+ String.valueOf(powerBank.deviceInfo.capacity) + " mAh";
 		JLabel whAndCapacityLabel = new JLabel(whAndCapacity);
 		whAndCapacityLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		whAndCapacityLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
@@ -147,16 +200,16 @@ public class UserRent extends JPanel {
 		whAndCapacityLabel.setForeground(Color.GRAY);
 		displayPanel.add(whAndCapacityLabel);
 
-		String sizeAndWeight = String.valueOf(powerBank.deviceInfo.width) + "x" + String.valueOf(powerBank.deviceInfo.length) + "x"
-				+ String.valueOf(powerBank.deviceInfo.height) + " cm" + " " + String.valueOf(powerBank.deviceInfo.weight) + " kg";
+		String sizeAndWeight = String.valueOf(powerBank.deviceInfo.width) + "x"
+				+ String.valueOf(powerBank.deviceInfo.length) + "x" + String.valueOf(powerBank.deviceInfo.height)
+				+ " cm" + " " + String.valueOf(powerBank.deviceInfo.weight) + " kg";
 		JLabel sizeAndWeightLabel = new JLabel(sizeAndWeight);
 		sizeAndWeightLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		sizeAndWeightLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		sizeAndWeightLabel.setAlignmentX(componentAlignment);
 		sizeAndWeightLabel.setForeground(Color.GRAY);
 		displayPanel.add(sizeAndWeightLabel);
-		
-		
+
 		String locker = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
 		JLabel lockerLabel = new JLabel(locker);
 		lockerLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
@@ -200,7 +253,7 @@ public class UserRent extends JPanel {
 		rentButton.addActionListener(e -> {
 			// set data
 			detailPage.powerBank = powerBank;
-			
+
 			// update page
 			detailPage.updateForRentDetailPage();
 
@@ -212,15 +265,24 @@ public class UserRent extends JPanel {
 
 		return wrapperPanel;
 	}
-
+	
+	private void updatePowerBankPanel() {
+		if (powerbankPanel == null) {
+			System.err.println("Null Power Bank Panel. Unable to update.");
+			return;
+		}
+		
+		for (int i = 0; i < forRentPowerBankList.size(); i++)
+			powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(i)));
+	}
+	
 	private void createPowerbankPanel() {
 		powerbankPanel = new JPanel(new GridLayout(0, 4, 5, 5));
 		powerbankPanel.setBackground(backgroundColor);
 		powerbankPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		powerbankPanel.setAlignmentX(LEFT_ALIGNMENT);
 
-		for (int i = 0; i < forRentPowerBankList.size(); i++)
-			powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(i)));
+		updatePowerBankPanel();
 	}
 
 	private void createFilterPanel() {
@@ -251,8 +313,7 @@ public class UserRent extends JPanel {
 		addressLabel.setAlignmentX(LEFT_ALIGNMENT);
 		addressFilterPanel.add(addressLabel);
 
-		// TODO: get address from database
-		String[] addressList = { "สนามบินสุวรรณภูมิ", "สนามบินดอนเมือง" };
+		String[] addressList = Utils.listToArray(addressFilterValues);
 		addressDropdown = Utils.createAppDropdown(addressList, backgroundColor, mainColor);
 		addressDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		addressFilterPanel.add(addressDropdown);
@@ -316,7 +377,7 @@ public class UserRent extends JPanel {
 
 		JLabel capUnitLabel = new JLabel("mAh");
 		capUnitLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		capUnitLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5 ));
+		capUnitLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 		capUnitLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		capacityFilterPanel.add(capUnitLabel);
 
@@ -365,8 +426,7 @@ public class UserRent extends JPanel {
 		brandLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		brandFilterPanel.add(brandLabel);
 
-		// TODO: get for rent power bank brand from database
-		String[] brandList = { "Asafjpaf", "Bsafasfg", "Csafsfa", "Dsaf", "Efsaf" };
+		String[] brandList = Utils.listToArray(brandFilterValues);
 		brandDropdown = Utils.createAppDropdown(brandList, backgroundColor, mainColor);
 		brandDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		brandFilterPanel.add(brandDropdown);
@@ -384,8 +444,7 @@ public class UserRent extends JPanel {
 		inputLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		inputFilterPanel.add(inputLabel);
 
-		// TODO: get power bank input type from database
-		String[] inputList = { "Type-C", "Lighting" };
+		String[] inputList = Utils.listToArray(inputFilterValues);
 		inputDropdown = Utils.createAppDropdown(inputList, backgroundColor, mainColor);
 		inputDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		inputFilterPanel.add(inputDropdown);
@@ -403,8 +462,7 @@ public class UserRent extends JPanel {
 		outputLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		outputFilterPanel.add(outputLabel);
 
-		// TODO: get power bank output type from database
-		String[] outputList = { "Type-C", "Lighting" };
+		String[] outputList = Utils.listToArray(outputFilterValues);
 		outputDropdown = Utils.createAppDropdown(outputList, backgroundColor, mainColor);
 		outputDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		outputFilterPanel.add(outputDropdown);
@@ -422,8 +480,14 @@ public class UserRent extends JPanel {
 		orderbyLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
 		orderbyLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		orderbyPanel.add(orderbyLabel);
-
-		String[] orderList = { "ราคา", "ความจุ", "น้ำหนัก" };
+		
+		// get display name
+		String[] orderList = new String[orderByFilterAttributes.size()];
+		Enumeration<String> k = orderByFilterAttributes.keys();
+		int i = 0;
+		while (k.hasMoreElements())
+			orderList[i++] = k.nextElement();
+		
 		orderbyDropdown = Utils.createAppDropdown(orderList, backgroundColor, mainColor);
 		orderbyDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		orderbyPanel.add(orderbyDropdown);
@@ -431,16 +495,15 @@ public class UserRent extends JPanel {
 		// Order type
 		JPanel ordertypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		ordertypePanel.setBackground(backgroundColor);
-		// ordertypePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		gbc.gridx = 1;
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
 		filterPanel.add(ordertypePanel, gbc);
 
-		JButton ascButton = Utils.createBorderButton("น้อยไปมาก", Color.BLACK, Color.BLACK, 16);
+		ascButton = Utils.createBorderButton("น้อยไปมาก", Color.BLACK, Color.BLACK, 16);
 		ordertypePanel.add(ascButton);
 
-		JButton descButton = Utils.createBorderButton("มากไปน้อย", Color.BLACK, Color.BLACK, 16);
+		descButton = Utils.createBorderButton("มากไปน้อย", Color.BLACK, Color.BLACK, 16);
 		ordertypePanel.add(descButton);
 
 		ascButton.addActionListener(e -> {
@@ -450,7 +513,7 @@ public class UserRent extends JPanel {
 			ascButton.setForeground(Color.WHITE);
 			descButton.setForeground(Color.BLACK);
 
-			// TODO: order power banks
+			ascending = true;
 		});
 
 		descButton.addActionListener(e -> {
@@ -460,32 +523,96 @@ public class UserRent extends JPanel {
 			descButton.setForeground(Color.WHITE);
 			ascButton.setForeground(Color.BLACK);
 
-			// TODO: order power banks
+			ascending = false;
+		});
+
+		// Apply Filter
+		JButton applyFilterButton = Utils.createNoBackgroundButton("ยืนยัน", mainColor);
+		applyFilterButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		gbc.gridx = 2;
+		gbc.gridy = 3;
+		filterPanel.add(applyFilterButton, gbc);
+
+		applyFilterButton.addActionListener(e -> {
+			applyFilter();
 		});
 
 		// Clear Filter
 		JButton clearFilterButton = Utils.createNoBackgroundButton("ล้าง filter", new Color(36, 160, 237));
 		clearFilterButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		gbc.gridx = 2;
+		gbc.gridx = 3;
 		gbc.gridy = 3;
 		filterPanel.add(clearFilterButton, gbc);
 
 		clearFilterButton.addActionListener(e -> {
-			// clear input
-			minPriceTextField.setText("");
-			maxPriceTextField.setText("");
-			minCapTextField.setText("");
-			maxCapTextField.setText("");
-			minWeightTextField.setText("");
-			maxWeightTextField.setText("");
-
-			ascButton.setBackground(null);
-			descButton.setBackground(null);
-
-			ascButton.setForeground(Color.BLACK);
-			descButton.setForeground(Color.BLACK);
+			clearFilter();
 		});
 
+	}
+
+	private void applyFilter() {
+		
+		Dictionary<String, Double> numberMinFilterList = new Hashtable<String, Double>();
+		Dictionary<String, Double> numberMaxFilterList = new Hashtable<String, Double>();
+		Dictionary<String, String> textFilterList = new Hashtable<String, String>();
+		
+		// TextField
+		// minPriceTextField, maxPriceTextField, minCapTextField, maxCapTextField, minWeightTextField,
+		// maxWeightTextField;
+		
+		// Price
+		double minPrice = Utils.getNumberFromTextField(minPriceTextField, -1);
+		if (minPrice > 0) numberMinFilterList.put("price_per_day", minPrice);
+		
+		double maxPrice = Utils.getNumberFromTextField(maxPriceTextField, -1);
+		if (maxPrice > minPrice) numberMaxFilterList.put("price_per_day", maxPrice);
+		
+		// Capacity
+		double minCap = Utils.getNumberFromTextField(minCapTextField, -1);
+		if (minCap > 0) numberMinFilterList.put("capacity", minCap);
+		
+		double maxCap = Utils.getNumberFromTextField(maxCapTextField, -1);
+		if (maxCap > minCap) numberMaxFilterList.put("capacity", maxCap);
+		
+		// Weight
+		double minWeight = Utils.getNumberFromTextField(minWeightTextField, -1);
+		if (minWeight > 0) numberMinFilterList.put("weight", minWeight);
+		
+		double maxWeight = Utils.getNumberFromTextField(maxWeightTextField, -1);
+		if (maxWeight > minWeight) numberMaxFilterList.put("weight", maxWeight);
+		
+		// ComboBox
+		// addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown
+		String addressFilter = addressDropdown.getSelectedItem().toString();
+		if (addressFilter != "ทั้งหมด") textFilterList.put("address", addressFilter);
+		
+		String brandFilter = brandDropdown.getSelectedItem().toString();
+		if (brandFilter != "ทั้งหมด") textFilterList.put("brand", brandFilter);
+		// TODO: input and output
+		// TODO: order by
+		
+		
+		forRentPowerBankList.clear();
+		forRentPowerBankList = JDBCConnector.getForRentPowerBank(numberMinFilterList, numberMaxFilterList, textFilterList, "", ascending);
+		
+		powerbankPanel.removeAll();
+		updatePowerBankPanel();
+	}
+
+	private void clearFilter() {
+		// clear input
+		minPriceTextField.setText("");
+		maxPriceTextField.setText("");
+		minCapTextField.setText("");
+		maxCapTextField.setText("");
+		minWeightTextField.setText("");
+		maxWeightTextField.setText("");
+
+		ascButton.setBackground(null);
+		descButton.setBackground(null);
+
+		ascButton.setForeground(Color.BLACK);
+		descButton.setForeground(Color.BLACK);
 	}
 
 }

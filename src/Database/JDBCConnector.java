@@ -216,8 +216,10 @@ public class JDBCConnector {
 
 	}
 
-	public static ArrayList<ForRentPowerBank> getForRentPowerBank(Dictionary<String, Double> numberMinFilterList,
-			Dictionary<String, Double> numberMaxFilterList, Dictionary<String, String> textFilterList,
+	public static ArrayList<ForRentPowerBank> getForRentPowerBank(
+			Dictionary<String, Double> numberMinFilterList,
+			Dictionary<String, Double> numberMaxFilterList, 
+			Dictionary<String, String> textFilterList,
 			String orderByAttribute, boolean ascending) {
 		connect();
 		if (connection == null) {
