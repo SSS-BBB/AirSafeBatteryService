@@ -40,6 +40,7 @@ import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
 import Database.JDBCConnector;
+import Struct.UserDetail;
 
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -75,6 +76,8 @@ public class UserMainFrame extends JFrame {
 			checkStatusPanel;
 	
 	private UserForRentDetail forRentDetailPanel;
+	
+	public UserDetail userDetail;
 
 	// colors
 	private static final Color BACKGROUND_COLOR = Color.decode("#F8FAFC");
@@ -119,6 +122,14 @@ public class UserMainFrame extends JFrame {
 				
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
+		
+		// Sample User Data
+		userDetail = new UserDetail();
+		userDetail.userID = 1;
+		userDetail.firstName = "First";
+		userDetail.lastName = "User";
+		userDetail.email = "firstemail@something.cool";
+		userDetail.phone = "0000000000";
 		
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -2,19 +2,21 @@ USE AIRSAFE_BATTERY_SERVICE;
 
 INSERT INTO USER
 VALUES 
-('ABCDE12345', 'First', 'User', 'firstemail@something.cool', '0000000000', 'ngrweuinhtgwveringrwij'),
-('VWXYZ12345', 'Secode', 'User', 'secondemail@something.cool', '0000000001', 'grnsufgidssiognoi'),
-('ABCDE67890', 'Harry', 'Potter', 'harrylovesmagic@ma.gic', '0000000003', 'iuhtgioughreuipogjnerio');
+(1, 'First', 'User', 'firstemail@something.cool', '0000000000', 'ngrweuinhtgwveringrwij'),
+(2, 'Secode', 'User', 'secondemail@something.cool', '0000000001', 'grnsufgidssiognoi'),
+(3, 'Harry', 'Potter', 'harrylovesmagic@ma.gic', '0000000003', 'iuhtgioughreuipogjnerio');
+
+SELECT * FROM USER;
 
 INSERT INTO TRANSACTION
 VALUES
-('PAY012ABC8', NOW(), 150.00, 'VWXYZ12345'),
-('XYZ123GHI0', NOW(), 200.00, 'ABCDE67890'),
-('OXP987KXR5', NOW(), 180.00, 'VWXYZ12345');
+(1, NOW(), 150.00, 2),
+(2, NOW(), 200.00, 1),
+(3, NOW(), 180.00, 3);
 
 INSERT INTO POWERBANKRULE
 VALUES
-('RULE000001', 2, 100, false, true, 'https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf');
+(1, 2, 100, false, true, 'https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf');
 
 SELECT * FROM POWERBANK;
 
@@ -39,7 +41,11 @@ INSERT INTO FORRENTPOWERBANK VALUES
 ('Aukey', 'Black Basix Mini', 'PB-N83S', 'สนามบินดอนเมือง', 2, 60, 110, 30),
 ('Mofit', 'Mofit Power Bank', 'M11PD', 'สนามบินดอนเมือง', 3, 60, 100, 25),
 ('Xiaomi', '10000 MAH (Integrated Cable)', 'P15ZM', 'สนามบินดอนเมือง', 5, 50, 80, 10),
-('Anker', 'NANO POWER BANK', 'A1638H11', 'สนามบินดอนเมือง', 8, 45, 110, 28)
+('Anker', 'NANO POWER BANK', 'A1638H11', 'สนามบินดอนเมือง', 8, 45, 110, 28),
+('Xiaomi', 'XIAOMI XMI', 'VXN4273GL', 'สนามบินภูเก็ต', 1, 50, 100, 7),
+('UVOLT', 'POWER BANK UVOLT', 'UVP10C-05', 'สนามบินภูเก็ต', 2, 50, 120, 30),
+('Why Pico', 'POWER BANK WHY PICO', 'PB-113E', 'สนามบินภูเก็ต', 3, 40, 80, 21),
+('Anker', 'MAGGO', 'A1664', 'สนามบินภูเก็ต', 4, 50, 100, 14)
 ;
 
 SELECT * FROM POWERBANK;

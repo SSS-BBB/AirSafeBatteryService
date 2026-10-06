@@ -38,6 +38,22 @@ public class InsertSample {
 		// https://www.jib.co.th/web/product/readProduct/81663/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--ANKER-NANO-POWER-BANK---10K-45W-BUILT-IN-RETRACTABLE-USB-C-CABLE-BLACK-A1638H11
 		JDBCConnector.insertIntoPowerbank("Anker", "NANO POWER BANK", "A1638H11", 10000, 37, 5.05, 8.15, 3.61, 0.231,
 				"/power_banks/anker_a1638h11.jpg", new String[] { "USB-C" }, new String[] { "USB-C", "USB-A" });
+		
+		// https://www.jib.co.th/web/product/readProduct/37578/POWER-BANK--%E0%B9%81%E0%B8%9A%E0%B8%95%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%AA%E0%B8%B3%E0%B8%A3%E0%B8%AD%E0%B8%87---Xiaomi--XMI-VXN4273GL-10000mAh-18W-Fast-Charge--Silver-
+		JDBCConnector.insertIntoPowerbank("Xiaomi", "XIAOMI XMI", "VXN4273GL", 10000, 37, 7.12, 1.47, 1.42, 0.47,
+				"/power_banks/xiaomi_vxn4273gl.jpg", new String[] { "USB-C", "Micro USB" }, new String[] { "USB-A" });
+		
+		// https://www.jib.co.th/web/product/readProduct/74874/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--UVOLT-UVP10C-05-35W-10000mAh---SILVER
+		JDBCConnector.insertIntoPowerbank("UVOLT", "POWER BANK UVOLT", "UVP10C-05", 10000, 38.5, 7, 7.9, 2.7, 0.178,
+				"/power_banks/uvolt_uvp10c-05.jpg", new String[] { "USB-C", "Micro USB" }, new String[] { "USB-A" });
+		
+		// https://www.jib.co.th/web/product/readProduct/85372/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--WHY-PB-113E-PICO---10000mAh-PD-22-5W-BROWN
+		JDBCConnector.insertIntoPowerbank("Why Pico", "POWER BANK WHY PICO", "PB-113E", 10000, 37, 6, 7.4, 3, 0.184,
+				"/power_banks/why_pico_pb-113e.jpg", new String[] { "USB-C" }, new String[] { "USB-C" });
+		
+		// https://www.jib.co.th/web/product/readProduct/87412/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--ANKER-A1664-MAGGO---10000mAh-WIRELESS-BLACK-A1664W11
+		JDBCConnector.insertIntoPowerbank("Anker", "MAGGO", "A1664", 10000, 37, 7.06, 10.4, 1.47, 0.2159,
+				"/power_banks/anker_a1664.jpg", new String[] { "USB-C" }, new String[] { "USB-C" });
 
 	}
 
