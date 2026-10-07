@@ -29,6 +29,7 @@ import CustomGUI.CustomDatePicker;
 import CustomGUI.DatePickerAction;
 import Struct.ForRentPowerBank;
 import Struct.PowerBank;
+import Struct.RentedPowerBank;
 import UserApp.UserMainFrame;
 import Utils.Utils;
 
@@ -59,8 +60,12 @@ public class UserForRentDetail extends JPanel {
 	private Calendar rentDate, returnDate;
 	private int rentDuration;
 	private double totalPrice;
+	
+	private UserRentPayment paymentPage;
 
-	public UserForRentDetail(UserMainFrame mainFrame, Color backgroundColor, Color menuColor, Color mainColor) {
+	public UserForRentDetail(UserMainFrame mainFrame, 
+			Color backgroundColor, Color menuColor, Color mainColor,
+			UserRentPayment paymentPage) {
 		super(new BorderLayout());
 		
 		// 342
@@ -69,6 +74,7 @@ public class UserForRentDetail extends JPanel {
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
+		this.paymentPage = paymentPage;
 		
 		createForRentDetailPage();
 	}
@@ -364,12 +370,42 @@ public class UserForRentDetail extends JPanel {
 		payButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonPanel.add(payButton);
 		
+		payButton.addActionListener(e -> {
+			onPayButtonClicked();
+		});
+		
+		
 		buttonPanel.add(Box.createHorizontalGlue());
 		
 		// Make everything closer together
 		detailInputPanel.add(Box.createVerticalStrut(30));
 		
 		return detailInputPanel;
+	}
+	
+	private void onPayButtonClicked() {
+		// returnAddressDropdown
+		// rentDate, returnDate
+		// totalPrice
+		
+		if (paymentPage == null) {
+			System.err.println("Null Payment Page. Unable to change to rent payment page on pay button clicked.");
+			return;
+		}
+		
+		String returnAddress = returnAddressDropdown.getSelectedItem().toString();
+		if (returnAddress == null || returnAddress.isEmpty())
+			return;
+		
+		if (rentDate == null || returnDate == null || totalPrice <= 0.0)
+			return;
+		
+		// Valid input
+		RentedPowerBank toSendPowerBank = new RentedPowerBank(powerBank, returnAddress, rentDate, returnDate, totalPrice);
+		paymentPage.powerBank = toSendPowerBank;
+		paymentPage.updateUserRentPaymentPage();
+		
+		mainFrame.changeCard(2, 9);
 	}
 	
 	private void updateInput() {

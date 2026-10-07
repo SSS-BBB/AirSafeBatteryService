@@ -15,9 +15,11 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import CustomGUI.CustomScrollPane;
 import Struct.ForRentPowerBank;
 import Struct.RentedPowerBank;
 import UserApp.UserMainFrame;
@@ -28,7 +30,7 @@ public class UserRentPayment extends JPanel {
 	public RentedPowerBank powerBank;
 	
 	private UserMainFrame mainFrame;
-	private Color backgroundColor, mainColor;
+	private Color backgroundColor, mainColor, menuColor;
 	
 	// Power bank box
 	private JLabel brandLabel;
@@ -44,14 +46,15 @@ public class UserRentPayment extends JPanel {
 	// Detail box
 	private JLabel[] placeHolderLabels;
 	
-	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor) {
+	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
 		super(new BorderLayout());
 		
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.mainColor = mainColor;
+		this.menuColor = menuColor;
 		
-		this.placeHolderLabels = new JLabel[6];
+		this.placeHolderLabels = new JLabel[7];
 		/* 
 		 * 0 -> renter name
 		 * 1 -> rent date
@@ -59,6 +62,7 @@ public class UserRentPayment extends JPanel {
 		 * 3 -> pick up address
 		 * 4 -> return address
 		 * 5 -> payment amount   
+		 * 6 -> total price display
 		*/
 		
 		setBackground(backgroundColor);
@@ -82,34 +86,99 @@ public class UserRentPayment extends JPanel {
 		titlePanel.add(summaryBox);
 		
 		// Content
-		JPanel contentPanel = new JPanel(new GridBagLayout());
+		JPanel contentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPanel.setBackground(backgroundColor);
-		this.add(contentPanel, BorderLayout.CENTER);
+		
+		CustomScrollPane contentScrollPane = new CustomScrollPane(contentPanel, menuColor, backgroundColor);
+		this.add(contentScrollPane, BorderLayout.CENTER);
 		
 		JPanel powerBankBox = createPowerBankBoxPanel();
-		powerBankBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		contentPanel.add(powerBankBox, gbc);
+		powerBankBox.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+		contentPanel.add(powerBankBox);
 		
 		JPanel detailBox = createPaymentDetail();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		contentPanel.add(detailBox, gbc);
+		detailBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 75));
+		contentPanel.add(detailBox);
+		
+		JPanel paymentBox = createUserPayPanel();
+		paymentBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+		contentPanel.add(paymentBox);
 	}
 	
 	// Initialize with power bank
-	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, ForRentPowerBank powerBank) {
-		this(mainFrame, backgroundColor, mainColor);
+	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor, ForRentPowerBank powerBank) {
+		this(mainFrame, backgroundColor, mainColor, menuColor);
 		
 		Calendar pickUpDate = Calendar.getInstance();
 		Calendar returnDate = Calendar.getInstance();
 		returnDate.add(Calendar.DATE, 10);
 		
 		this.powerBank = new RentedPowerBank(powerBank, "สนามบินสุวรรณภูมิ", pickUpDate, returnDate, 1000.0);
+		updateUserRentPaymentPage();
+	}
+	
+	public void updateUserRentPaymentPage() {
 		updatePowerBankBox();
 		updatePaymentDetail();
+	}
+	
+	private JPanel createUserPayPanel() {
+		JPanel userPayPanel = new JPanel();
+		userPayPanel.setLayout(new BoxLayout(userPayPanel, BoxLayout.Y_AXIS));
+		userPayPanel.setBackground(null);
+		
+		int fontSize = 16;
+		int fontAdd = 4;
+		int margin = 8;
+		
+		// Scan To Pay
+		JLabel scanToPayLabel = new JLabel("แสกนเพื่อชำระเงิน");
+		scanToPayLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize + fontAdd));
+		scanToPayLabel.setAlignmentX(CENTER_ALIGNMENT);
+		userPayPanel.add(scanToPayLabel);
+		userPayPanel.add(Box.createVerticalStrut(margin));
+		
+		// QR Code
+		ImageIcon qrIcon = Utils.createImageIcon("/qr_code.png", "Fake QR Code");
+		JLabel qrIconLabel = new JLabel(qrIcon);
+		qrIconLabel.setAlignmentX(CENTER_ALIGNMENT);
+		userPayPanel.add(qrIconLabel);
+		userPayPanel.add(Box.createVerticalStrut(margin));
+		
+		// Total Price
+		JLabel totalPriceLabel = new JLabel("ยอดชำระทั้งหมด");
+		totalPriceLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize));
+		totalPriceLabel.setAlignmentX(CENTER_ALIGNMENT);
+		userPayPanel.add(totalPriceLabel);
+		userPayPanel.add(Box.createVerticalStrut(4));
+		
+		// Price Display
+		JPanel priceDisplayPanel = createBorderBoxWithLabelInside(6, Color.BLACK, fontSize, 2, new Dimension(200, 30));
+		priceDisplayPanel.setAlignmentX(CENTER_ALIGNMENT);
+		placeHolderLabels[6].setAlignmentX(CENTER_ALIGNMENT);
+		userPayPanel.add(priceDisplayPanel);
+		userPayPanel.add(Box.createVerticalStrut(margin));
+		
+		// Payment Time Limit
+		JLabel timeLimitLabel = new JLabel("กรุณาชำระภายใน 15 นาที");
+		timeLimitLabel.setFont(new Font("Tahoma", Font.BOLD, fontSize));
+		timeLimitLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+		timeLimitLabel.setForeground(new Color(0, 100, 0));
+		timeLimitLabel.setAlignmentX(CENTER_ALIGNMENT);
+		userPayPanel.add(timeLimitLabel);
+		userPayPanel.add(Box.createVerticalStrut(margin));
+		
+		// Payment Confirm
+		Dimension buttonSize = new Dimension(180, 40);
+		JButton paymentConfirmButton = Utils.createColorBackgroundButton("ยืนยันการชำระเงิน", menuColor, Color.WHITE, fontSize);
+		paymentConfirmButton.setAlignmentX(CENTER_ALIGNMENT);
+		paymentConfirmButton.setPreferredSize(buttonSize);
+		paymentConfirmButton.setMaximumSize(buttonSize);
+		userPayPanel.add(paymentConfirmButton);
+		
+		// TODO: add data to transaction and rented power bank when payment confirm button is clicked.
+		
+		return userPayPanel;
 	}
 	
 	private void updatePaymentDetail() {
@@ -130,7 +199,8 @@ public class UserRentPayment extends JPanel {
 		 * 2 -> return date
 		 * 3 -> pick up address
 		 * 4 -> return address
-		 * 5 -> payment amount   
+		 * 5 -> payment amount
+		 * 6 -> total price display
 		*/
 		// Renter Name
 		placeHolderLabels[0].setText(mainFrame.userDetail.firstName + " " + mainFrame.userDetail.lastName);
@@ -151,7 +221,10 @@ public class UserRentPayment extends JPanel {
 		placeHolderLabels[4].setText(powerBank.returnAddress);
 		
 		// Payment Amount
-		placeHolderLabels[5].setText(String.valueOf(powerBank.rentPrice));
+		placeHolderLabels[5].setText(String.valueOf(powerBank.rentPrice) + " บาท");
+		
+		// Total Price Display below qr code
+		placeHolderLabels[6].setText(String.valueOf(powerBank.rentPrice) + " บาท");
 	
 	}
 	
@@ -159,7 +232,7 @@ public class UserRentPayment extends JPanel {
 		JPanel detailPanel = new JPanel();
 		detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
 		detailPanel.setBackground(backgroundColor);
-		detailPanel.setAlignmentX(LEFT_ALIGNMENT);
+		detailPanel.setAlignmentX(CENTER_ALIGNMENT);
 
 		int margin = 8;
 		int fontSize = 16;
@@ -195,7 +268,19 @@ public class UserRentPayment extends JPanel {
 		paymentAmountPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
 		detailPanel.add(paymentAmountPanel);
 		
-		detailPanel.add(Box.createVerticalStrut(200));
+		// Back Button
+		Dimension buttonSize = new Dimension(140, 40);
+		JButton backButton = Utils.createColorBackgroundButton("กลับ", mainColor, Color.WHITE, fontSize);
+		backButton.setAlignmentX(CENTER_ALIGNMENT);
+		backButton.setPreferredSize(buttonSize);
+		backButton.setMaximumSize(buttonSize);
+		detailPanel.add(backButton);
+		
+		backButton.addActionListener(e -> {
+			mainFrame.changeCard(2, 8);
+		});
+		
+		detailPanel.add(Box.createVerticalStrut(160));
 		
 		return detailPanel;
 	}

@@ -180,6 +180,18 @@ public class Utils {
 		return noBgButton;
 	}
 	
+	public static JButton createColorBackgroundButton(String text, Color backgroundColor, Color fontColor, int fontSize) {
+		JButton button = new JButton(text);
+		button.setFont(new Font("Tahoma", Font.BOLD, fontSize));
+		button.setBackground(backgroundColor);
+		button.setForeground(fontColor);
+		button.setFocusPainted(false);
+		button.setBorder(null);
+		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		return button;
+	}
+	
 	public static JButton createBorderButton(String text, Color borderColor, Color textColor, int fontSize) {
 		JButton button = new JButton(text);
 		button.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
