@@ -83,7 +83,12 @@ public class JDBCConnector {
 		 * textFilterList.put("address", "สนามบินดอนเมือง");
 		 */
 
-		return getForRentPowerBank(null, null, null, "", true);
+		return getForRentPowerBank("", "",
+				"", "",
+				-1, -1,
+				-1, -1,
+				-1, -1,
+				"", true);
 	}
 
 	public static ArrayList<String> getPowerBankChargerType(String brand, String name, String model, boolean isInput) {
@@ -121,9 +126,13 @@ public class JDBCConnector {
 
 	}
 
-	public static PreparedStatement createFilterStatement(String unfilteredQuery, ArrayList<String> allowedAttributes,
-			Dictionary<String, Double> numberMinFilterList, Dictionary<String, Double> numberMaxFilterList,
-			Dictionary<String, String> textFilterList, String orderByAttribute, boolean ascending) {
+	public static PreparedStatement createForRentFilterStatement(String unfilteredQuery,
+			String addressFilter, String brandFilter,
+			String inputFilter, String outputFilter,
+			double minPrice, double maxPrice,
+			double minCap, double maxCap,
+			double minWeight, double maxWeight,
+			String orderByAttribute, boolean ascending) {
 
 		try {
 			if (connection == null || connection.isClosed()) {
@@ -138,53 +147,67 @@ public class JDBCConnector {
 		StringBuilder filteredQuery = new StringBuilder(unfilteredQuery + " WHERE 1 = 1");
 
 		// add filter
-		ArrayList<Double> numberParameters = new ArrayList<Double>();
-
-		if (numberMinFilterList != null) {
-			Enumeration<String> filterNames = numberMinFilterList.keys();
-			while (filterNames.hasMoreElements()) {
-				String filterName = filterNames.nextElement();
-
-				if (!allowedAttributes.contains(filterName.toLowerCase()))
-					continue;
-
-				double filterValue = numberMinFilterList.get(filterName);
-				filteredQuery.append(" AND " + filterName + " >= ?");
-				numberParameters.add(filterValue);
-			}
+		ArrayList<Double> doubleParameters = new ArrayList<Double>();
+		
+		if (minPrice >= 0) {
+			filteredQuery.append(" AND price_per_day >= ?");
+			doubleParameters.add(minPrice);
 		}
-
-		if (numberMaxFilterList != null) {
-			Enumeration<String> filterNames = numberMaxFilterList.keys();
-			while (filterNames.hasMoreElements()) {
-				String filterName = filterNames.nextElement();
-
-				if (!allowedAttributes.contains(filterName.toLowerCase()))
-					continue;
-
-				double filterValue = numberMaxFilterList.get(filterName);
-				filteredQuery.append(" AND " + filterName + " <= ?");
-				numberParameters.add(filterValue);
-			}
+		
+		if (maxPrice >= 0) {
+			filteredQuery.append(" AND price_per_day <= ?");
+			doubleParameters.add(maxPrice);
 		}
-
+		
+		if (minCap >= 0) {
+			filteredQuery.append(" AND capacity >= ?");
+			doubleParameters.add(minCap);
+		}
+		
+		if (maxCap >= 0) {
+			filteredQuery.append(" AND capacity <= ?");
+			doubleParameters.add(maxCap);
+		}
+		
+		if (minWeight > 0) {
+			filteredQuery.append(" AND weight >= ?");
+			doubleParameters.add(minWeight);
+		}
+		
+		if (maxWeight > 0) {
+			filteredQuery.append(" AND weight <= ?");
+			doubleParameters.add(maxWeight);
+		}
+		
 		ArrayList<String> textParameters = new ArrayList<String>();
-
-		if (textFilterList != null) {
-			Enumeration<String> filterNames = textFilterList.keys();
-			while (filterNames.hasMoreElements()) {
-				String filterName = filterNames.nextElement();
-
-				if (!allowedAttributes.contains(filterName.toLowerCase()))
-					continue;
-
-				String filterValue = textFilterList.get(filterName);
-				filteredQuery.append(" AND " + filterName + " = ?");
-				textParameters.add(filterValue);
-			}
+		
+		if (!addressFilter.isEmpty()) {
+			filteredQuery.append(" AND address = ?");
+			textParameters.add(addressFilter);
+		}
+		
+		if (!brandFilter.isEmpty()) {
+			filteredQuery.append(" AND brand = ?");
+			textParameters.add(brandFilter);
 		}
 
 		// add order by
+		ArrayList<String> allowedAttributes = new ArrayList<String>();
+		allowedAttributes.add("brand");
+		allowedAttributes.add("name");
+		allowedAttributes.add("model");
+		allowedAttributes.add("address");
+		allowedAttributes.add("locker_number");
+		allowedAttributes.add("late_fee_per_day");
+		allowedAttributes.add("price_per_day");
+		allowedAttributes.add("max_duration");
+		allowedAttributes.add("capacity");
+		allowedAttributes.add("wh");
+		allowedAttributes.add("width");
+		allowedAttributes.add("length");
+		allowedAttributes.add("height");
+		allowedAttributes.add("weight");
+		
 		if (orderByAttribute != null && !orderByAttribute.isEmpty()) {
 			if (allowedAttributes.contains(orderByAttribute.toLowerCase())) {
 				String orderType = (ascending) ? "ASC" : "DESC";
@@ -197,14 +220,14 @@ public class JDBCConnector {
 			PreparedStatement ps = connection.prepareStatement(filteredQuery.toString());
 
 			// add number parameters to prepared statement
-			for (int i = 0; i < numberParameters.size(); i++) {
-				ps.setDouble(i + 1, numberParameters.get(i));
+			for (int i = 0; i < doubleParameters.size(); i++) {
+				ps.setDouble(i + 1, doubleParameters.get(i));
 			}
 
 			// add text parameters to prepared statement
-			int numParaSize = numberParameters.size();
+			int doubleParaSize = doubleParameters.size();
 			for (int i = 0; i < textParameters.size(); i++) {
-				ps.setString(i + numParaSize + 1, textParameters.get(i));
+				ps.setString(i + doubleParaSize + 1, textParameters.get(i));
 			}
 
 			return ps;
@@ -217,9 +240,11 @@ public class JDBCConnector {
 	}
 
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank(
-			Dictionary<String, Double> numberMinFilterList,
-			Dictionary<String, Double> numberMaxFilterList, 
-			Dictionary<String, String> textFilterList,
+			String addressFilter, String brandFilter,
+			String inputFilter, String outputFilter,
+			double minPrice, double maxPrice,
+			double minCap, double maxCap,
+			double minWeight, double maxWeight,
 			String orderByAttribute, boolean ascending) {
 		connect();
 		if (connection == null) {
@@ -230,24 +255,15 @@ public class JDBCConnector {
 		String query = "SELECT * FROM FORRENTPOWERBANK NATURAL JOIN POWERBANK";
 
 		try {
-			ArrayList<String> allowedAttributes = new ArrayList<String>();
-			allowedAttributes.add("brand");
-			allowedAttributes.add("name");
-			allowedAttributes.add("model");
-			allowedAttributes.add("address");
-			allowedAttributes.add("locker_number");
-			allowedAttributes.add("late_fee_per_day");
-			allowedAttributes.add("price_per_day");
-			allowedAttributes.add("max_duration");
-			allowedAttributes.add("capacity");
-			allowedAttributes.add("wh");
-			allowedAttributes.add("width");
-			allowedAttributes.add("length");
-			allowedAttributes.add("height");
-			allowedAttributes.add("weight");
+			
 
-			PreparedStatement ps = createFilterStatement(query, allowedAttributes, numberMinFilterList,
-					numberMaxFilterList, textFilterList, orderByAttribute, ascending);
+			PreparedStatement ps = createForRentFilterStatement(query, 
+					addressFilter, brandFilter,
+					inputFilter, outputFilter,
+					minPrice, maxPrice,
+					minCap, maxCap,
+					minWeight, maxWeight,
+					orderByAttribute, ascending);
 
 			ResultSet resultSet = ps.executeQuery();
 

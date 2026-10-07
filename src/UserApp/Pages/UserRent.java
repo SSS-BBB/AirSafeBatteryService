@@ -274,6 +274,9 @@ public class UserRent extends JPanel {
 		
 		for (int i = 0; i < forRentPowerBankList.size(); i++)
 			powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(i)));
+		
+		powerbankPanel.revalidate();
+		powerbankPanel.repaint();
 	}
 	
 	private void createPowerbankPanel() {
@@ -552,6 +555,7 @@ public class UserRent extends JPanel {
 
 	private void applyFilter() {
 		
+		System.out.println("Adding filter to dictionary");
 		Dictionary<String, Double> numberMinFilterList = new Hashtable<String, Double>();
 		Dictionary<String, Double> numberMaxFilterList = new Hashtable<String, Double>();
 		Dictionary<String, String> textFilterList = new Hashtable<String, String>();
@@ -584,19 +588,33 @@ public class UserRent extends JPanel {
 		// ComboBox
 		// addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown
 		String addressFilter = addressDropdown.getSelectedItem().toString();
-		if (addressFilter != "ทั้งหมด") textFilterList.put("address", addressFilter);
+		addressFilter = (addressFilter != "ทั้งหมด") ? addressFilter : "";
 		
 		String brandFilter = brandDropdown.getSelectedItem().toString();
-		if (brandFilter != "ทั้งหมด") textFilterList.put("brand", brandFilter);
+		brandFilter = (brandFilter != "ทั้งหมด") ? brandFilter : "";
 		// TODO: input and output
 		// TODO: order by
 		
+		System.out.println("Finsihed Adding filter to dictionary");
+		
+		
 		
 		forRentPowerBankList.clear();
-		forRentPowerBankList = JDBCConnector.getForRentPowerBank(numberMinFilterList, numberMaxFilterList, textFilterList, "", ascending);
+		System.out.println("Query power bank");
+		forRentPowerBankList = JDBCConnector.getForRentPowerBank(
+				addressFilter, brandFilter,
+				"", "",
+				minPrice, maxPrice, minCap, maxCap, minWeight, maxWeight,
+				"", true);
+		System.out.println("Finsihed Query power bank");
 		
+		System.out.println("Removing power bank");
 		powerbankPanel.removeAll();
+		System.out.println("Finsihed Removing power bank");
+		
+		System.out.println("Updating power bank display");
 		updatePowerBankPanel();
+		System.out.println("Finsihed Updating power bank display");
 	}
 
 	private void clearFilter() {
