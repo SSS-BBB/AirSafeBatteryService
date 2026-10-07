@@ -17,6 +17,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -31,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import CustomGUI.CustomDropDown;
 import CustomGUI.CustomScrollPane;
 import Database.JDBCConnector;
 import Struct.ForRentPowerBank;
@@ -43,7 +46,7 @@ public class UserRent extends JPanel {
 	private Color backgroundColor, menuColor, mainColor;
 
 	private ArrayList<String> addressFilterValues, brandFilterValues, inputFilterValues, outputFilterValues;
-	private Dictionary<String, String> orderByFilterAttributes;
+	private Map<String, String> orderByFilterAttributes;
 
 	private JPanel filterPanel, powerbankPanel;
 	private JComboBox<String> addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown;
@@ -56,7 +59,6 @@ public class UserRent extends JPanel {
 
 	private JButton ascButton, descButton;
 	private boolean ascending;
-	private String orderByAttribute;
 
 	public UserRent(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor,
 			UserForRentDetail detailPage) {
@@ -103,7 +105,8 @@ public class UserRent extends JPanel {
 		}
 		
 		// display name name -> attribute name
-		orderByFilterAttributes = new Hashtable<String, String>();
+		orderByFilterAttributes = new LinkedHashMap<String, String>();
+		orderByFilterAttributes.put("ไม่มี", "");
 		orderByFilterAttributes.put("Brand", "brand");
 		orderByFilterAttributes.put("สถานที่", "address");
 		orderByFilterAttributes.put("ค่าเช่าต่อวัน", "price_per_day");
@@ -486,12 +489,13 @@ public class UserRent extends JPanel {
 		
 		// get display name
 		String[] orderList = new String[orderByFilterAttributes.size()];
-		Enumeration<String> k = orderByFilterAttributes.keys();
 		int i = 0;
-		while (k.hasMoreElements())
-			orderList[i++] = k.nextElement();
+		for (String displayName : orderByFilterAttributes.keySet()) {
+			orderList[i++] = displayName;
+		}
 		
-		orderbyDropdown = Utils.createAppDropdown(orderList, backgroundColor, mainColor);
+		// orderbyDropdown = Utils.createAppDropdown(orderList, backgroundColor, mainColor);
+		orderbyDropdown = new CustomDropDown<String>(orderList, backgroundColor, mainColor);
 		orderbyDropdown.setAlignmentX(LEFT_ALIGNMENT);
 		orderbyPanel.add(orderbyDropdown);
 
@@ -554,36 +558,24 @@ public class UserRent extends JPanel {
 	}
 
 	private void applyFilter() {
-		
-		System.out.println("Adding filter to dictionary");
-		Dictionary<String, Double> numberMinFilterList = new Hashtable<String, Double>();
-		Dictionary<String, Double> numberMaxFilterList = new Hashtable<String, Double>();
-		Dictionary<String, String> textFilterList = new Hashtable<String, String>();
-		
 		// TextField
 		// minPriceTextField, maxPriceTextField, minCapTextField, maxCapTextField, minWeightTextField,
 		// maxWeightTextField;
 		
 		// Price
 		double minPrice = Utils.getNumberFromTextField(minPriceTextField, -1);
-		if (minPrice > 0) numberMinFilterList.put("price_per_day", minPrice);
 		
 		double maxPrice = Utils.getNumberFromTextField(maxPriceTextField, -1);
-		if (maxPrice > minPrice) numberMaxFilterList.put("price_per_day", maxPrice);
 		
 		// Capacity
 		double minCap = Utils.getNumberFromTextField(minCapTextField, -1);
-		if (minCap > 0) numberMinFilterList.put("capacity", minCap);
 		
 		double maxCap = Utils.getNumberFromTextField(maxCapTextField, -1);
-		if (maxCap > minCap) numberMaxFilterList.put("capacity", maxCap);
 		
 		// Weight
 		double minWeight = Utils.getNumberFromTextField(minWeightTextField, -1);
-		if (minWeight > 0) numberMinFilterList.put("weight", minWeight);
 		
 		double maxWeight = Utils.getNumberFromTextField(maxWeightTextField, -1);
-		if (maxWeight > minWeight) numberMaxFilterList.put("weight", maxWeight);
 		
 		// ComboBox
 		// addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown
@@ -592,39 +584,44 @@ public class UserRent extends JPanel {
 		
 		String brandFilter = brandDropdown.getSelectedItem().toString();
 		brandFilter = (brandFilter != "ทั้งหมด") ? brandFilter : "";
-		// TODO: input and output
-		// TODO: order by
 		
-		System.out.println("Finsihed Adding filter to dictionary");
+		// input and output
+		String inputFilter = inputDropdown.getSelectedItem().toString();
+		inputFilter = (inputFilter != "ทั้งหมด") ? inputFilter : "";
 		
+		String outputFilter = outputDropdown.getSelectedItem().toString();
+		outputFilter = (outputFilter != "ทั้งหมด") ? outputFilter : "";
 		
+		// order by
+		String orderByAttribute = orderByFilterAttributes.get(orderbyDropdown.getSelectedItem().toString());
 		
 		forRentPowerBankList.clear();
-		System.out.println("Query power bank");
 		forRentPowerBankList = JDBCConnector.getForRentPowerBank(
 				addressFilter, brandFilter,
-				"", "",
+				inputFilter, outputFilter,
 				minPrice, maxPrice, minCap, maxCap, minWeight, maxWeight,
-				"", true);
-		System.out.println("Finsihed Query power bank");
-		
-		System.out.println("Removing power bank");
+				orderByAttribute, ascending);
 		powerbankPanel.removeAll();
-		System.out.println("Finsihed Removing power bank");
-		
-		System.out.println("Updating power bank display");
 		updatePowerBankPanel();
-		System.out.println("Finsihed Updating power bank display");
 	}
 
 	private void clearFilter() {
-		// clear input
+		// clear text field
 		minPriceTextField.setText("");
 		maxPriceTextField.setText("");
 		minCapTextField.setText("");
 		maxCapTextField.setText("");
 		minWeightTextField.setText("");
 		maxWeightTextField.setText("");
+		
+		// reset drop down
+		// ComboBox
+		// addressDropdown, brandDropdown, inputDropdown, outputDropdown, orderbyDropdown
+		addressDropdown.setSelectedIndex(0);
+		brandDropdown.setSelectedIndex(0);
+		inputDropdown.setSelectedIndex(0);
+		outputDropdown.setSelectedIndex(0);
+		orderbyDropdown.setSelectedIndex(0);
 
 		ascButton.setBackground(null);
 		descButton.setBackground(null);

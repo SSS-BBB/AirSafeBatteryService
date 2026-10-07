@@ -126,7 +126,7 @@ public class JDBCConnector {
 
 	}
 
-	public static PreparedStatement createForRentFilterStatement(String unfilteredQuery,
+	public static PreparedStatement createForRentFilterStatement(
 			String addressFilter, String brandFilter,
 			String inputFilter, String outputFilter,
 			double minPrice, double maxPrice,
@@ -136,7 +136,7 @@ public class JDBCConnector {
 
 		try {
 			if (connection == null || connection.isClosed()) {
-				System.err.println("Database is not connected, unable to add filter to query " + unfilteredQuery);
+				System.err.println("Database is not connected, unable to create for rent filter query");
 				return null;
 			}
 		} catch (SQLException e) {
@@ -144,7 +144,7 @@ public class JDBCConnector {
 		}
 
 		// Query Builder
-		StringBuilder filteredQuery = new StringBuilder(unfilteredQuery + " WHERE 1 = 1");
+		StringBuilder filteredQuery = new StringBuilder("SELECT * FROM FORRENTPOWERBANK P NATURAL JOIN POWERBANK" + " WHERE 1 = 1");
 
 		// add filter
 		ArrayList<Double> doubleParameters = new ArrayList<Double>();
@@ -190,7 +190,18 @@ public class JDBCConnector {
 			filteredQuery.append(" AND brand = ?");
 			textParameters.add(brandFilter);
 		}
-
+		
+		// input output filter
+		if (!inputFilter.isEmpty()) {
+			filteredQuery.append(" AND ? IN (SELECT INPUT_TYPE FROM POWERBANKINPUT WHERE BRAND = P.BRAND AND NAME = P.NAME AND MODEL = P.MODEL)");
+			textParameters.add(inputFilter);
+		}
+		
+		if (!outputFilter.isEmpty()) {
+			filteredQuery.append(" AND ? IN (SELECT OUTPUT_TYPE FROM POWERBANKOUTPUT WHERE BRAND = P.BRAND AND NAME = P.NAME AND MODEL = P.MODEL)");
+			textParameters.add(outputFilter);
+		}
+		
 		// add order by
 		ArrayList<String> allowedAttributes = new ArrayList<String>();
 		allowedAttributes.add("brand");
@@ -252,12 +263,12 @@ public class JDBCConnector {
 			return null;
 		}
 
-		String query = "SELECT * FROM FORRENTPOWERBANK NATURAL JOIN POWERBANK";
+		String query = "";
 
 		try {
 			
 
-			PreparedStatement ps = createForRentFilterStatement(query, 
+			PreparedStatement ps = createForRentFilterStatement( 
 					addressFilter, brandFilter,
 					inputFilter, outputFilter,
 					minPrice, maxPrice,
