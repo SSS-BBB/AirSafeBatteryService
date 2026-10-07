@@ -522,15 +522,6 @@ public class UserForRentDetail extends JPanel {
 		outputLabel.setForeground(Color.BLACK);
 		powerbankBoxPanel.add(outputLabel);
 
-		/*
-		 * String locker = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
-		 * JLabel lockerLabel = new JLabel(locker); lockerLabel.setFont(new
-		 * Font("Tahoma", Font.PLAIN, fontSize));
-		 * lockerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
-		 * lockerLabel.setAlignmentX(componentAlignment);
-		 * powerbankBoxPanel.add(lockerLabel);
-		 */
-
 		rentPriceLabel = new JLabel();
 		rentPriceLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		rentPriceLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, margin, 0));
@@ -544,16 +535,6 @@ public class UserForRentDetail extends JPanel {
 		maxRentDayLabel.setAlignmentX(componentAlignment);
 		maxRentDayLabel.setAlignmentY(componentAlignment);
 		powerbankBoxPanel.add(maxRentDayLabel);
-
-		/*
-		 * String lateFee = "ค่าปรับส่งคืนสาย " +
-		 * String.valueOf(powerBank.lateFeePerDay) + " บาท/วัน"; JLabel lateFeeLabel =
-		 * new JLabel(lateFee); lateFeeLabel.setFont(new Font("Tahoma", Font.PLAIN,
-		 * fontSize)); lateFeeLabel.setBorder(BorderFactory.createEmptyBorder(0, 0,
-		 * margin, 0)); lateFeeLabel.setAlignmentX(componentAlignment);
-		 * lateFeeLabel.setForeground(new Color(255, 95, 21)); // Warning Color
-		 * powerbankBoxPanel.add(lateFeeLabel);
-		 */
 
 		powerbankBoxPanel.add(Box.createVerticalGlue());
 

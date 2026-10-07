@@ -40,6 +40,7 @@ import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
 import Database.JDBCConnector;
+import Struct.ForRentPowerBank;
 import Struct.UserDetail;
 
 import java.awt.Font;
@@ -68,14 +69,17 @@ public class UserMainFrame extends JFrame {
 	private JPanel logoMenuPanel;
 
 	private JPanel[] menuPanels;
-	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", "StorageCard", "ListCard", "HistoryCard",
-			"NotificationCard", "CheckStatusCard", "ForRentDetail", "ForRentPayment" };
+	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", 
+			"StorageCard", "ListCard", "HistoryCard",
+			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
+			"ForRentPayment" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel, rentPanel, storagePanel, listPanel, historyPanel, notificationPanel,
 			checkStatusPanel;
 	
 	private UserForRentDetail forRentDetailPanel;
+	private UserRentPayment rentPaymentPanel;
 	
 	public UserDetail userDetail;
 
@@ -156,7 +160,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.setBackground(BACKGROUND_COLOR);
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-		changeCard(2, 2);
+		changeCard(2, 9);
 	}
 
 	private void createLogo() {
@@ -224,17 +228,21 @@ public class UserMainFrame extends JFrame {
 	}
 
 	private void createCardScreen() {
+		ForRentPowerBank tempPowerBank = JDBCConnector.getForRentPowerBank().get(0);
+		
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
 		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR);
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
+		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, tempPowerBank);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
 		cardPanel.add(rentPanel, cardNames[2]);
 		cardPanel.add(forRentDetailPanel, cardNames[8]);
+		cardPanel.add(rentPaymentPanel, cardNames[9]);
 	}
 
 	

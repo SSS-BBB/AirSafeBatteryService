@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -129,6 +130,41 @@ public class Utils {
 	public static Border createPaddingBorder(Color color, int padding) {
 		return createPaddingBorder(color, 1, new Insets(padding, padding, padding, padding), new Insets(0, 0, 0, 0));
 	}
+	
+	public static JPanel createBoxWithLabelInside(String text, Color boxColor, Color fontColor, int fontSize) {
+		JPanel wrapperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		wrapperPanel.setBackground(null);
+		
+		JPanel boxPanel = new JPanel(new BorderLayout());
+		boxPanel.setBackground(boxColor);
+		// boxPanel.setPreferredSize(new Dimension(180, 30));
+		wrapperPanel.add(boxPanel);
+		
+		JLabel label = new JLabel(text);
+		label.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		label.setForeground(fontColor);
+		label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		boxPanel.add(label, BorderLayout.CENTER);
+		
+		return wrapperPanel;
+	}
+	
+	/*
+	public static JPanel createBorderBoxWithLabelInside(String text, Color fontColor, int fontSize, int lineThickness) {
+		JPanel placeHolder = new JPanel(new BorderLayout());
+		placeHolder.setBackground(null);
+		placeHolder.setBorder(BorderFactory.createLineBorder(Color.BLACK, lineThickness));
+		placeHolder.setPreferredSize(new Dimension(300, 30));
+		
+		pickUpAddressPlaceHolderLabel = new JLabel();
+		pickUpAddressPlaceHolderLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+		pickUpAddressPlaceHolderLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+		pickUpAddressPlaceHolderLabel.setAlignmentX(componentAlignment);
+		pickUpAddressPlaceHolderLabel.setAlignmentY(CENTER_ALIGNMENT);
+		pickUpAddressPlaceHolder.add(pickUpAddressPlaceHolderLabel, BorderLayout.WEST);
+		pickUpAddressPanel.add(pickUpAddressPlaceHolder);
+	}
+	*/
 	
 	public static JButton createNoBackgroundButton(String text, Color color) {
 		JButton noBgButton = new JButton(text);
