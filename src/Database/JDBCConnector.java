@@ -65,7 +65,37 @@ public class JDBCConnector {
 		}
 
 	}
-
+	
+	public static boolean insertIntoTransaction(double paymentAmount, int userID) {
+		connect();
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to insert into transaction table.");
+			return false;
+		}
+		
+		String query = "INSERT INTO TRANSACTION (PAYMENT_TIMESTAMP, PAYMENT_AMOUNT, USER_ID) VALUES (NOW(), ?, ?)";
+		
+		try(PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setDouble(1, paymentAmount);
+			ps.setInt(2, userID);
+			
+			boolean sucess = ps.executeUpdate() > 0;
+			
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			return sucess;
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
 
 		/*
@@ -91,7 +121,7 @@ public class JDBCConnector {
 				"", true);
 	}
 
-	public static ArrayList<String> getPowerBankChargerType(String brand, String name, String model, boolean isInput) {
+	public static ArrayList<String> getPowerBankChargerType(int powerBankId, boolean isInput) {
 		try {
 			if (connection.isClosed())
 				connect();
@@ -106,12 +136,10 @@ public class JDBCConnector {
 
 		ArrayList<String> chargerType = new ArrayList<String>();
 		String inOrOut = (isInput) ? "INPUT" : "OUTPUT";
-		String query = "SELECT * FROM POWERBANK" + inOrOut + " WHERE Brand = ? AND Name = ? AND Model = ?";
+		String query = "SELECT * FROM POWERBANK" + inOrOut + " WHERE POWERBANK_ID = ?";
 		try {
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, brand);
-			ps.setString(2, name);
-			ps.setString(3, model);
+			ps.setInt(1, powerBankId);
 
 			ResultSet resultSet = ps.executeQuery();
 
@@ -193,12 +221,12 @@ public class JDBCConnector {
 		
 		// input output filter
 		if (!inputFilter.isEmpty()) {
-			filteredQuery.append(" AND ? IN (SELECT INPUT_TYPE FROM POWERBANKINPUT WHERE BRAND = P.BRAND AND NAME = P.NAME AND MODEL = P.MODEL)");
+			filteredQuery.append(" AND ? IN (SELECT INPUT_TYPE FROM POWERBANKINPUT WHERE POWERBANK_ID = P.POWERBANK_ID)");
 			textParameters.add(inputFilter);
 		}
 		
 		if (!outputFilter.isEmpty()) {
-			filteredQuery.append(" AND ? IN (SELECT OUTPUT_TYPE FROM POWERBANKOUTPUT WHERE BRAND = P.BRAND AND NAME = P.NAME AND MODEL = P.MODEL)");
+			filteredQuery.append(" AND ? IN (SELECT OUTPUT_TYPE FROM POWERBANKOUTPUT WHERE POWERBANK_ID = P.POWERBANK_ID)");
 			textParameters.add(outputFilter);
 		}
 		
@@ -263,8 +291,6 @@ public class JDBCConnector {
 			return null;
 		}
 
-		String query = "";
-
 		try {
 			
 
@@ -283,6 +309,7 @@ public class JDBCConnector {
 			while (resultSet.next()) {
 				ForRentPowerBank powerBank = new ForRentPowerBank();
 				// Power bank attributes
+				powerBank.deviceInfo.powerBankId = resultSet.getInt("powerbank_id");
 				powerBank.deviceInfo.brand = resultSet.getString("brand");
 				powerBank.deviceInfo.name = resultSet.getString("name");
 				powerBank.deviceInfo.model = resultSet.getString("model");
@@ -309,11 +336,9 @@ public class JDBCConnector {
 				}
 
 				// Input
-				powerBank.deviceInfo.input = getPowerBankChargerType(powerBank.deviceInfo.brand,
-						powerBank.deviceInfo.name, powerBank.deviceInfo.model, true);
+				powerBank.deviceInfo.input = getPowerBankChargerType(powerBank.deviceInfo.powerBankId, true);
 				// Output
-				powerBank.deviceInfo.output = getPowerBankChargerType(powerBank.deviceInfo.brand,
-						powerBank.deviceInfo.name, powerBank.deviceInfo.model, false);
+				powerBank.deviceInfo.output = getPowerBankChargerType(powerBank.deviceInfo.powerBankId, false);
 
 				forRentPowerBankList.add(powerBank);
 			}
@@ -360,24 +385,47 @@ public class JDBCConnector {
 			String[] outputArray) {
 		boolean insertPowerBankStatus = insertIntoPowerbank(brand, name, model, capacity, wh, width, length, height,
 				weight, imagePath);
-
+		
 		if (!insertPowerBankStatus)
 			return false;
 
-		// Insert Input
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into for rent power bank table.");
 			return false;
 		}
-		String query = "INSERT INTO POWERBANKINPUT VALUES (?, ?, ?, ?)";
+		
+		// Get power bank id
+		String query = "SELECT POWERBANK_ID FROM POWERBANK WHERE BRAND = ? AND MODEL = ?";
+		int powerBankId = -1;
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, brand);
+			ps.setString(2, model);
+			
+			ResultSet resultSet = ps.executeQuery();
+			
+			if (resultSet.next()) {
+				powerBankId = resultSet.getInt("POWERBANK_ID");
+			}
+			else {
+				System.err.println("Couldn't find power bank id with brand " + brand + " and mode " + model);
+				closeConnection();
+				return false;
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			closeConnection();
+			return false;
+		}
+		
+		// Insert Input
+		query = "INSERT INTO POWERBANKINPUT VALUES (?, ?)";
 		for (String input : inputArray) {
-			query = "INSERT INTO POWERBANKINPUT VALUES (?, ?, ?, ?)";
+			query = "INSERT INTO POWERBANKINPUT VALUES (?, ?)";
 			try (PreparedStatement ps = connection.prepareStatement(query)) {
 				ps.setString(1, input);
-				ps.setString(2, brand);
-				ps.setString(3, name);
-				ps.setString(4, model);
+				ps.setInt(2, powerBankId);
 
 				boolean success = ps.executeUpdate() > 0;
 
@@ -395,14 +443,12 @@ public class JDBCConnector {
 		}
 
 		// Insert Output
-		query = "INSERT INTO POWERBANKOUTPUT VALUES (?, ?, ?, ?)";
+		query = "INSERT INTO POWERBANKOUTPUT VALUES (?, ?)";
 		for (String output : outputArray) {
-			query = "INSERT INTO POWERBANKOUTPUT VALUES (?, ?, ?, ?)";
+			query = "INSERT INTO POWERBANKOUTPUT VALUES (?, ?)";
 			try (PreparedStatement ps = connection.prepareStatement(query)) {
 				ps.setString(1, output);
-				ps.setString(2, brand);
-				ps.setString(3, name);
-				ps.setString(4, model);
+				ps.setInt(2, powerBankId);
 
 				boolean success = ps.executeUpdate() > 0;
 
@@ -423,17 +469,28 @@ public class JDBCConnector {
 		closeConnection();
 		return true;
 	}
-
+	
+	public static boolean insertIntoRentedPowerBank(String brand, String name, String model) {
+		connect();
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to insert into rented power bank table.");
+			return false;
+		}
+		
+		// TODO: Check if brand, name, model is 
+		
+		return false;
+	}
+	
 	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
 			double width, double length, double height, double weight, String imagePath) {
-
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into for rent power bank table.");
 			return false;
 		}
 
-		String query = "INSERT INTO POWERBANK VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String query = "INSERT INTO POWERBANK (BRAND, NAME, MODEL, CAPACITY, WH, WIDTH, LENGTH, HEIGHT, WEIGHT, IMAGE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		InputStream inputStream = JDBCConnector.class.getResourceAsStream(imagePath);
 
 		if (inputStream == null) {

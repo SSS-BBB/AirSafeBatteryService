@@ -228,14 +228,14 @@ public class UserMainFrame extends JFrame {
 	}
 
 	private void createCardScreen() {
-		ForRentPowerBank tempPowerBank = JDBCConnector.getForRentPowerBank().get(0);
+		// ForRentPowerBank tempPowerBank = JDBCConnector.getForRentPowerBank().get(0);
 		
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
 		
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
 		
-		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempPowerBank);
+		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR, rentPaymentPanel);
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		

@@ -14,6 +14,8 @@ VALUES
 (2, NOW(), 200.00, 1),
 (3, NOW(), 180.00, 3);
 
+SELECT * FROM TRANSACTION;
+
 INSERT INTO POWERBANKRULE
 VALUES
 (1, 2, 100, false, true, 'https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf');
@@ -33,19 +35,18 @@ INSERT INTO FORRENTPOWERBANK VALUES
 */
 
 INSERT INTO FORRENTPOWERBANK VALUES
-('REMAX', '10000mAh Black', 'RPP-37', 'สนามบินสุวรรณภูมิ', 1, 50, 100, 20),
-('REMAX', '10000mAh Gray', 'WP-117', 'สนามบินสุวรรณภูมิ', 2, 55, 110, 25),
-('Anker', 'PowerCore 10000', 'A1263', 'สนามบินสุวรรณภูมิ', 3, 40, 90, 14),
-('Anker', 'ZOLO White', 'A110EH21', 'สนามบินสุวรรณภูมิ', 4, 65, 125, 21),
-('REMAX', '20000mAh Gray', 'CP-17', 'สนามบินดอนเมือง', 1, 60, 120, 15),
-('Aukey', 'Black Basix Mini', 'PB-N83S', 'สนามบินดอนเมือง', 2, 60, 110, 30),
-('Mofit', 'Mofit Power Bank', 'M11PD', 'สนามบินดอนเมือง', 3, 60, 100, 25),
-('Xiaomi', '10000 MAH (Integrated Cable)', 'P15ZM', 'สนามบินดอนเมือง', 5, 50, 80, 10),
-('Anker', 'NANO POWER BANK', 'A1638H11', 'สนามบินดอนเมือง', 8, 45, 110, 28),
-('Xiaomi', 'XIAOMI XMI', 'VXN4273GL', 'สนามบินภูเก็ต', 1, 50, 100, 7),
-('UVOLT', 'POWER BANK UVOLT', 'UVP10C-05', 'สนามบินภูเก็ต', 2, 50, 120, 30),
-('Why Pico', 'POWER BANK WHY PICO', 'PB-113E', 'สนามบินภูเก็ต', 3, 40, 80, 21),
-('Anker', 'MAGGO', 'A1664', 'สนามบินภูเก็ต', 4, 50, 100, 14)
+(14, 'สนามบินสุวรรณภูมิ', 1, 50, 100, 20),
+(15, 'สนามบินสุวรรณภูมิ', 2, 55, 110, 25),
+(19, 'สนามบินสุวรรณภูมิ', 4, 65, 125, 21),
+(16, 'สนามบินดอนเมือง', 1, 60, 120, 15),
+(20, 'สนามบินดอนเมือง', 2, 60, 110, 30),
+(21, 'สนามบินดอนเมือง', 3, 60, 100, 25),
+(18, 'สนามบินดอนเมือง', 5, 50, 80, 10),
+(22, 'สนามบินดอนเมือง', 8, 45, 110, 28),
+(23, 'สนามบินภูเก็ต', 1, 50, 100, 7),
+(24, 'สนามบินภูเก็ต', 2, 50, 120, 30),
+(25, 'สนามบินภูเก็ต', 3, 40, 80, 21),
+(26, 'สนามบินภูเก็ต', 4, 50, 100, 14)
 ;
 
 SELECT * FROM POWERBANK;
@@ -59,10 +60,28 @@ SELECT * FROM POWERBANKOUTPUT;
 SELECT * FROM FORRENTPOWERBANK P NATURAL JOIN POWERBANK WHERE ADDRESS = 'สนามบินดอนเมือง'
 AND 'Micro USB' IN (
 SELECT INPUT_TYPE FROM POWERBANKINPUT
-WHERE BRAND = P.BRAND AND NAME = P.NAME AND MODEL = P.MODEL
+WHERE POWERBANK_ID = P.POWERBANK_ID
 );
+
+SELECT * FROM FORRENTPOWERBANK P NATURAL JOIN POWERBANK;
 
 SELECT * FROM POWERBANKINPUT
 WHERE Brand = 'Mofit' AND Name = 'Mofit Power Bank' AND Model = 'M11PD';
+
+/*
+DELETE FROM POWERBANKINPUT;
+DELETE FROM POWERBANKOUTPUT;
+DELETE FROM FORRENTPOWERBANK;
+DELETE FROM POWERBANK;
+*/
+
+/*
+DELETE FROM POWERBANKINPUT
+WHERE POWERBANK_ID = 17;
+DELETE FROM POWERBANKOUTPUT
+WHERE POWERBANK_ID = 17;
+DELETE FROM POWERBANK
+WHERE POWERBANK_ID = 17;
+*/
 
 

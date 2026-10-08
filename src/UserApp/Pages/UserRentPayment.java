@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import CustomGUI.CustomScrollPane;
+import Database.JDBCConnector;
 import Struct.ForRentPowerBank;
 import Struct.RentedPowerBank;
 import UserApp.UserMainFrame;
@@ -177,6 +178,20 @@ public class UserRentPayment extends JPanel {
 		userPayPanel.add(paymentConfirmButton);
 		
 		// TODO: add data to transaction and rented power bank when payment confirm button is clicked.
+		// also change to successful payment page
+		
+		paymentConfirmButton.addActionListener(e -> {
+			// Transaction Process
+			boolean successfulTransaction = JDBCConnector.insertIntoTransaction(powerBank.rentPrice, mainFrame.userDetail.userID);
+			
+			if (!successfulTransaction) {
+				System.err.println("Something went wrong when trying to insert data into transaction table. Unable to proceed the rent.");
+				return;
+			}
+			
+			// Add data to rented power bank
+			
+		});
 		
 		return userPayPanel;
 	}
