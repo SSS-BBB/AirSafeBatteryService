@@ -39,7 +39,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
-import Database.JDBCConnector;
+import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
 import Struct.UserDetail;
 

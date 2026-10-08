@@ -23,7 +23,7 @@ import javax.swing.ImageIcon;
 
 import Struct.ForRentPowerBank;
 
-public class JDBCConnector {
+public class DatabaseConnector {
 
 	private static Connection connection;
 
@@ -491,7 +491,7 @@ public class JDBCConnector {
 		}
 
 		String query = "INSERT INTO POWERBANK (BRAND, NAME, MODEL, CAPACITY, WH, WIDTH, LENGTH, HEIGHT, WEIGHT, IMAGE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		InputStream inputStream = JDBCConnector.class.getResourceAsStream(imagePath);
+		InputStream inputStream = DatabaseConnector.class.getResourceAsStream(imagePath);
 
 		if (inputStream == null) {
 			System.err.println("Couldn't find " + imagePath + ". Unable to insert " + "(" + brand + "," + name + ","

@@ -35,7 +35,7 @@ import javax.swing.SwingConstants;
 
 import CustomGUI.CustomDropDown;
 import CustomGUI.CustomScrollPane;
-import Database.JDBCConnector;
+import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
 import UserApp.UserMainFrame;
 
@@ -70,7 +70,7 @@ public class UserRent extends JPanel {
 		this.mainColor = mainColor;
 		this.detailPage = detailPage;
 
-		forRentPowerBankList = JDBCConnector.getForRentPowerBank();
+		forRentPowerBankList = DatabaseConnector.getForRentPowerBank();
 
 		if (forRentPowerBankList == null) {
 			forRentPowerBankList = new ArrayList<ForRentPowerBank>();
@@ -596,7 +596,7 @@ public class UserRent extends JPanel {
 		String orderByAttribute = orderByFilterAttributes.get(orderbyDropdown.getSelectedItem().toString());
 		
 		forRentPowerBankList.clear();
-		forRentPowerBankList = JDBCConnector.getForRentPowerBank(
+		forRentPowerBankList = DatabaseConnector.getForRentPowerBank(
 				addressFilter, brandFilter,
 				inputFilter, outputFilter,
 				minPrice, maxPrice, minCap, maxCap, minWeight, maxWeight,
