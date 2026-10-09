@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,6 +23,9 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import Struct.ForRentPowerBank;
+import Struct.PowerBank;
+import Struct.RentedPowerBank;
+import Utils.Utils;
 
 public class DatabaseConnector {
 
@@ -66,34 +70,94 @@ public class DatabaseConnector {
 
 	}
 	
-	public static boolean insertIntoTransaction(double paymentAmount, int userID) {
+	public static int insertIntoTransaction(double paymentAmount, int userID) {
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into transaction table.");
-			return false;
+			return -1;
 		}
 		
 		String query = "INSERT INTO TRANSACTION (PAYMENT_TIMESTAMP, PAYMENT_AMOUNT, USER_ID) VALUES (NOW(), ?, ?)";
 		
-		try(PreparedStatement ps = connection.prepareStatement(query)) {
+		try(PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			ps.setDouble(1, paymentAmount);
 			ps.setInt(2, userID);
 			
 			boolean sucess = ps.executeUpdate() > 0;
 			
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
+			if (!sucess) return -1;
+			
+			try (ResultSet resultSet = ps.getGeneratedKeys()) {
+				if (resultSet.next()) {
+					return resultSet.getInt(1);
+				}
 			}
 			
-			return sucess;
+			closeConnection();
+			
+			return -1;
 		} 
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		return false;
+		return -1;
+	}
+	
+	public static int getUserIdCount(int userId) {
+		try {
+			if (connection == null || connection.isClosed()) {
+				System.err.println("Database is not connected, unable to get user id count.");
+				return -1;
+			}
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+			return -1;
+		}
+		
+		String query = "SELECT * FROM USER WHERE USER_ID = ?";
+		
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, userId);
+			ResultSet resultSet = ps.executeQuery();
+			int count = 0;
+			while (resultSet.next()) count++;
+			return count;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+	
+	public static int getTransactionIdCount(int paymentId) {
+		try {
+			if (connection == null || connection.isClosed()) {
+				System.err.println("Database is not connected, unable to get transaction id count.");
+				return -1;
+			}
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+			return -1;
+		}
+		
+		String query = "SELECT * FROM TRANSACTION WHERE PAYMENT_ID = ?";
+		
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, paymentId);
+			ResultSet resultSet = ps.executeQuery();
+			int count = 0;
+			while (resultSet.next()) count++;
+			return count;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
 	}
 	
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
@@ -277,7 +341,47 @@ public class DatabaseConnector {
 		return null;
 
 	}
-
+	
+	public static ArrayList<PowerBank> getPowerBank(int powerBankId, boolean getChargerType) {
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to get data from power bank table.");
+			return null;
+		}
+		
+		ArrayList<PowerBank> powerBankList = new ArrayList<PowerBank>();
+		
+		String query = "SELECT * FROM POWERBANK WHERE POWERBANK_ID = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, powerBankId);
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				PowerBank powerBank = new PowerBank();
+				powerBank.powerBankId = resultSet.getInt("powerbank_id");
+				powerBank.brand = resultSet.getString("brand");
+				powerBank.name = resultSet.getString("name");
+				powerBank.model = resultSet.getString("model");
+				powerBank.capacity = resultSet.getDouble("capacity");
+				powerBank.wh = resultSet.getDouble("wh");
+				powerBank.width = resultSet.getDouble("width");
+				powerBank.length = resultSet.getDouble("length");
+				powerBank.height = resultSet.getDouble("height");
+				powerBank.weight = resultSet.getDouble("weight");
+				
+				if (getChargerType) {
+					powerBank.input = getPowerBankChargerType(powerBank.powerBankId, true);
+					powerBank.output = getPowerBankChargerType(powerBank.powerBankId, false);
+				}
+				
+				powerBankList.add(powerBank);
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return powerBankList;
+	}
+	
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank(
 			String addressFilter, String brandFilter,
 			String inputFilter, String outputFilter,
@@ -290,7 +394,7 @@ public class DatabaseConnector {
 			System.err.println("Database is not connected, unable to get data from for rent power bank table.");
 			return null;
 		}
-
+		
 		try {
 			
 
@@ -470,15 +574,102 @@ public class DatabaseConnector {
 		return true;
 	}
 	
-	public static boolean insertIntoRentedPowerBank(String brand, String name, String model) {
+	public static boolean removeForRentPowerBank(String address, int lockerNumber) {
+		connect();
+		if (connection == null) {
+			System.err.println("Database is not connected, unable to remove from for rent power bank table.");
+			return false;
+		}
+		
+		String query = "DELETE FROM FORRENTPOWERBANK WHERE ADDRESS = ? AND LOCKER_NUMBER = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, address);
+			ps.setInt(2, lockerNumber);
+			boolean sucess = ps.executeUpdate() > 0;
+			closeConnection();
+			return sucess;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		closeConnection();
+		return false;
+	}
+	
+	public static boolean insertIntoRentedPowerBank(RentedPowerBank powerBank, int paymentId, int userId) {
+		if (powerBank == null || powerBank.deviceInfo == null) {
+			System.err.println("Null powerbank, unable to insert into rented power bank table.");
+			return false;
+		}
+		
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into rented power bank table.");
 			return false;
 		}
 		
-		// TODO: Check if brand, name, model is 
+		// Make sure that there is a power bank with powerBankId on the power bank table
+		if (getPowerBank(powerBank.deviceInfo.powerBankId, false).size() == 0) {
+			System.err.println("No power bank with power bank id " + String.valueOf(powerBank.deviceInfo.powerBankId) + " on the power bank table. unable to insert into rented power bank table.");
+			return false;
+		}
 		
+		// check transaction payment id
+		if (getTransactionIdCount(paymentId) <= 0) {
+			System.err.println("No transaction with payment id " + String.valueOf(paymentId) + " on the transaction table. unable to insert into rented power bank table.");
+			return false;
+		}
+		
+		// check user id
+		if (getUserIdCount(userId) <= 0) {
+			System.err.println("No user with user id " + String.valueOf(userId) + " on the user table. unable to insert into rented power bank table.");
+			return false;
+		}
+		
+		// generate locker password (3 characters(ignore case) 3 numbers)
+		// ex. ABC123
+		char[] alphabets = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 
+				'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+				'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+		char randAlphanet1 = alphabets[Utils.randRange(0, alphabets.length - 1)];
+		char randAlphanet2 = alphabets[Utils.randRange(0, alphabets.length - 1)];
+		char randAlphanet3 = alphabets[Utils.randRange(0, alphabets.length - 1)];
+		String lockerPassword = "" + randAlphanet1 + randAlphanet2 + randAlphanet3;
+		
+		String numRand1 = String.valueOf(Utils.randRange(0, 9));
+		String numRand2 = String.valueOf(Utils.randRange(0, 9));
+		String numRand3 = String.valueOf(Utils.randRange(0, 9));
+		lockerPassword = lockerPassword + numRand1 + numRand2 + numRand3;
+		
+		// TODO Insert into RentedPowerBank
+		String query = "INSERT INTO RENTEDPOWERBANK "
+				+ "(POWERBANK_ID, LOCKER_PASSWORD, RETURN_ADDRESS, PICK_UP_ADDRESS, PICK_UP_DATE, RENT_STATUS, RETURN_DATE, LATE_FEE_PER_DAY, RENT_PRICE, LOCKER_NUMBER, USER_ID, PAYMENT_ID)"
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, powerBank.deviceInfo.powerBankId);
+			ps.setString(2, lockerPassword);
+			ps.setString(3, powerBank.returnAddress);
+			ps.setString(4, powerBank.pickUpAddress);
+			ps.setString(5, Utils.getCalendarDateFormat(powerBank.rentDate));
+			ps.setString(6, "ยังไม่รับ");
+			ps.setString(7, Utils.getCalendarDateFormat(powerBank.returnDate));
+			ps.setDouble(8, powerBank.lateFeePerDay);
+			ps.setDouble(9, powerBank.rentPrice);
+			ps.setDouble(10, powerBank.lockerNumber);
+			ps.setInt(11, userId);
+			ps.setInt(12, paymentId);
+			
+			boolean sucess = ps.executeUpdate() > 0;
+			
+			closeConnection();
+			return sucess;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		closeConnection();
 		return false;
 	}
 	

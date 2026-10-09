@@ -553,11 +553,12 @@ public class UserRent extends JPanel {
 
 		clearFilterButton.addActionListener(e -> {
 			clearFilter();
+			applyFilter();
 		});
 
 	}
 
-	private void applyFilter() {
+	public void applyFilter() {
 		// TextField
 		// minPriceTextField, maxPriceTextField, minCapTextField, maxCapTextField, minWeightTextField,
 		// maxWeightTextField;
@@ -605,7 +606,7 @@ public class UserRent extends JPanel {
 		updatePowerBankPanel();
 	}
 
-	private void clearFilter() {
+	public void clearFilter() {
 		// clear text field
 		minPriceTextField.setText("");
 		maxPriceTextField.setText("");

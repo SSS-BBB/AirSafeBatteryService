@@ -177,19 +177,37 @@ public class UserRentPayment extends JPanel {
 		paymentConfirmButton.setMaximumSize(buttonSize);
 		userPayPanel.add(paymentConfirmButton);
 		
-		// TODO: add data to transaction and rented power bank when payment confirm button is clicked.
-		// also change to successful payment page
+		// When payment confirm button is clicked
+		// DONE add data to transaction
+		// add data to rented power bank
+		// remove data from for rent power bank
+		// change to successful payment page
 		
 		paymentConfirmButton.addActionListener(e -> {
 			// Transaction Process
-			boolean successfulTransaction = DatabaseConnector.insertIntoTransaction(powerBank.rentPrice, mainFrame.userDetail.userID);
+			int paymentId = DatabaseConnector.insertIntoTransaction(powerBank.rentPrice, mainFrame.userDetail.userID);
 			
-			if (!successfulTransaction) {
+			if (paymentId < 0) {
 				System.err.println("Something went wrong when trying to insert data into transaction table. Unable to proceed the rent.");
 				return;
 			}
 			
 			// Add data to rented power bank
+			boolean rentedInsertSucess = DatabaseConnector.insertIntoRentedPowerBank(powerBank, paymentId, mainFrame.userDetail.userID);
+			if (!rentedInsertSucess) {
+				System.err.println("Something went wrong when trying to insert data into rented power bank table. Unable to proceed the rent.");
+				return;
+			}
+			
+			// Remove data from for rent power bank
+			boolean forRentRemoveSucess = DatabaseConnector.removeForRentPowerBank(powerBank.pickUpAddress, powerBank.lockerNumber);
+			if (!forRentRemoveSucess) {
+				System.err.println("Something went wrong when trying to remove data from for rent power bank table. Unable to proceed the rent.");
+				return;
+			}
+			
+			// TODO: Change to success page
+			
 			
 		});
 		

@@ -51,7 +51,11 @@ import Utils.Utils;
 import UserApp.Pages.*;
 
 public class UserMainFrame extends JFrame {
-
+	
+	private interface CardAction {
+		public void onCardClicked();
+	}
+	
 	private static final long serialVersionUID = 1L;
 	private static final String APP_NAME = "AirSafe Battery Service";
 	private static final int APP_WIDTH = 1280;
@@ -75,9 +79,10 @@ public class UserMainFrame extends JFrame {
 			"ForRentPayment" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel, rentPanel, storagePanel, listPanel, historyPanel, notificationPanel,
+	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
 			checkStatusPanel;
 	
+	private UserRent rentPanel;
 	private UserForRentDetail forRentDetailPanel;
 	private UserRentPayment rentPaymentPanel;
 	
@@ -144,7 +149,13 @@ public class UserMainFrame extends JFrame {
 		// mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		mainPanel.setBackground(BACKGROUND_COLOR);
 		setContentPane(mainPanel);
-
+		
+		// Card Panel
+		cardPanel = new JPanel(new CardLayout());
+		cardPanel.setBackground(BACKGROUND_COLOR);
+		createCardScreen();
+		mainPanel.add(cardPanel, BorderLayout.CENTER);
+		
 		// Menu Panel
 		menuPanel = new JPanel(new BorderLayout());
 		createLogo();
@@ -155,11 +166,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		// Card Panel
-		cardPanel = new JPanel(new CardLayout());
-		cardPanel.setBackground(BACKGROUND_COLOR);
-		createCardScreen();
-		mainPanel.add(cardPanel, BorderLayout.CENTER);
+		
 		changeCard(2, 2);
 	}
 
@@ -178,9 +185,16 @@ public class UserMainFrame extends JFrame {
 		logoMenuPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		menuPanel.add(logoMenuPanel, BorderLayout.NORTH);
 	}
-
+	
 	private void createMenuButton(int panelIndex, String iconPath, String iconDescription, String menuStr,
 			int cardIndex, int margin) {
+		createMenuButton(panelIndex, iconPath, iconDescription, menuStr,
+				cardIndex, margin, null);
+	}
+	
+	private void createMenuButton(int panelIndex, String iconPath, String iconDescription, String menuStr,
+			int cardIndex, int margin, CardAction cardAction) {
+		// TODO: on card clicked
 
 		menuPanels[panelIndex] = new JPanel(new BorderLayout());
 		menuPanels[panelIndex].setBackground(MENU_COLOR);
@@ -205,6 +219,7 @@ public class UserMainFrame extends JFrame {
 		menuPanels[panelIndex].addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if (cardAction != null) cardAction.onCardClicked();
 				changeCard(panelIndex, cardIndex);
 			}
 		});
@@ -218,7 +233,14 @@ public class UserMainFrame extends JFrame {
 
 		createMenuButton(0, "/icons/home_icon.png", "Home Icon", "หน้าหลัก", 0, 8);
 		createMenuButton(1, "/icons/check_icon.png", "Check Icon", "ตรวจสอบ Power Bank", 1, 8);
-		createMenuButton(2, "/icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8);
+		createMenuButton(2, "/icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8, new CardAction() {
+			@Override
+			public void onCardClicked() {
+				rentPanel.clearFilter();
+				rentPanel.applyFilter();
+			}
+			
+		});
 		createMenuButton(3, "/icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 3, 8);
 		createMenuButton(4, "/icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
 		createMenuButton(5, "/icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);

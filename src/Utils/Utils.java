@@ -15,10 +15,13 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -108,6 +111,21 @@ public class Utils {
 		result += list.get(list.size() - 1);
 		
 		return result;
+	}
+	
+	public static int randRange(int min, int max) {
+		Random r = new Random();
+		return r.nextInt(max - min + 1) + min;
+	}
+	
+	public static String getCalendarDateFormat(Calendar c) {
+		return getCalendarDateFormat(c, "yyyy-MM-dd");
+	}
+	
+	public static String getCalendarDateFormat(Calendar c, String format) {
+		SimpleDateFormat dateFormatter = new SimpleDateFormat(format);
+		String formattedDate = dateFormatter.format(c.getTime());
+		return formattedDate;
 	}
 	
 	public static Border createPaddingBorder(Color color, int thickness, Insets paddings, Insets margins) {
