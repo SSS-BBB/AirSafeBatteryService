@@ -597,34 +597,34 @@ public class DatabaseConnector {
 		return false;
 	}
 	
-	public static boolean insertIntoRentedPowerBank(RentedPowerBank powerBank, int paymentId, int userId) {
+	public static String insertIntoRentedPowerBank(RentedPowerBank powerBank, int paymentId, int userId) {
 		if (powerBank == null || powerBank.deviceInfo == null) {
 			System.err.println("Null powerbank, unable to insert into rented power bank table.");
-			return false;
+			return "";
 		}
 		
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into rented power bank table.");
-			return false;
+			return "";
 		}
 		
 		// Make sure that there is a power bank with powerBankId on the power bank table
 		if (getPowerBank(powerBank.deviceInfo.powerBankId, false).size() == 0) {
 			System.err.println("No power bank with power bank id " + String.valueOf(powerBank.deviceInfo.powerBankId) + " on the power bank table. unable to insert into rented power bank table.");
-			return false;
+			return "";
 		}
 		
 		// check transaction payment id
 		if (getTransactionIdCount(paymentId) <= 0) {
 			System.err.println("No transaction with payment id " + String.valueOf(paymentId) + " on the transaction table. unable to insert into rented power bank table.");
-			return false;
+			return "";
 		}
 		
 		// check user id
 		if (getUserIdCount(userId) <= 0) {
 			System.err.println("No user with user id " + String.valueOf(userId) + " on the user table. unable to insert into rented power bank table.");
-			return false;
+			return "";
 		}
 		
 		// generate locker password (3 characters(ignore case) 3 numbers)
@@ -642,7 +642,7 @@ public class DatabaseConnector {
 		String numRand3 = String.valueOf(Utils.randRange(0, 9));
 		lockerPassword = lockerPassword + numRand1 + numRand2 + numRand3;
 		
-		// TODO Insert into RentedPowerBank
+		// Insert into RentedPowerBank
 		String query = "INSERT INTO RENTEDPOWERBANK "
 				+ "(POWERBANK_ID, LOCKER_PASSWORD, RETURN_ADDRESS, PICK_UP_ADDRESS, PICK_UP_DATE, RENT_STATUS, RETURN_DATE, LATE_FEE_PER_DAY, RENT_PRICE, LOCKER_NUMBER, USER_ID, PAYMENT_ID)"
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -660,17 +660,19 @@ public class DatabaseConnector {
 			ps.setInt(11, userId);
 			ps.setInt(12, paymentId);
 			
-			boolean sucess = ps.executeUpdate() > 0;
+			boolean success = ps.executeUpdate() > 0;
 			
-			closeConnection();
-			return sucess;
+			if (success) {
+				closeConnection();
+				return lockerPassword;
+			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		closeConnection();
-		return false;
+		return "";
 	}
 	
 	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,

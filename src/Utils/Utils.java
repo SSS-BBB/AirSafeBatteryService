@@ -149,6 +149,10 @@ public class Utils {
 		return createPaddingBorder(color, 1, new Insets(padding, padding, padding, padding), new Insets(0, 0, 0, 0));
 	}
 	
+	public static Border createPaddingBorder(Color color, int padding, int thickness) {
+		return createPaddingBorder(color, thickness, new Insets(padding, padding, padding, padding), new Insets(0, 0, 0, 0));
+	}
+	
 	public static JPanel createBoxWithLabelInside(String text, Color boxColor, Color fontColor, int fontSize) {
 		JPanel wrapperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		wrapperPanel.setBackground(null);
@@ -211,13 +215,17 @@ public class Utils {
 	}
 	
 	public static JButton createBorderButton(String text, Color borderColor, Color textColor, int fontSize) {
+		return createBorderButton(text, borderColor, textColor, fontSize, 1);
+	}
+	
+	public static JButton createBorderButton(String text, Color borderColor, Color textColor, int fontSize, int lineThickness) {
 		JButton button = new JButton(text);
 		button.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		button.setBackground(null);
 		button.setFocusPainted(false);
 		button.setForeground(textColor);
-		button.setBorder(Utils.createPaddingBorder(borderColor, 5));
+		button.setBorder(Utils.createPaddingBorder(borderColor, 5, lineThickness));
 		
 		return button;
 	}

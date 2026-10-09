@@ -47,13 +47,18 @@ public class UserRentPayment extends JPanel {
 	// Detail box
 	private JLabel[] placeHolderLabels;
 	
-	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
+	private UserProcessStatus rentStatusPage;
+	
+	public UserRentPayment(UserMainFrame mainFrame, 
+			Color backgroundColor, Color mainColor, Color menuColor,
+			UserProcessStatus rentStatusPage) {
 		super(new BorderLayout());
 		
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.mainColor = mainColor;
 		this.menuColor = menuColor;
+		this.rentStatusPage = rentStatusPage;
 		
 		this.placeHolderLabels = new JLabel[7];
 		/* 
@@ -107,8 +112,8 @@ public class UserRentPayment extends JPanel {
 	}
 	
 	// Initialize with power bank
-	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor, ForRentPowerBank powerBank) {
-		this(mainFrame, backgroundColor, mainColor, menuColor);
+	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor, UserProcessStatus rentStatusPage, ForRentPowerBank powerBank) {
+		this(mainFrame, backgroundColor, mainColor, menuColor, rentStatusPage);
 		
 		Calendar pickUpDate = Calendar.getInstance();
 		Calendar returnDate = Calendar.getInstance();
@@ -193,8 +198,8 @@ public class UserRentPayment extends JPanel {
 			}
 			
 			// Add data to rented power bank
-			boolean rentedInsertSucess = DatabaseConnector.insertIntoRentedPowerBank(powerBank, paymentId, mainFrame.userDetail.userID);
-			if (!rentedInsertSucess) {
+			String lockerPassword = DatabaseConnector.insertIntoRentedPowerBank(powerBank, paymentId, mainFrame.userDetail.userID);
+			if (lockerPassword.isEmpty()) {
 				System.err.println("Something went wrong when trying to insert data into rented power bank table. Unable to proceed the rent.");
 				return;
 			}
@@ -207,11 +212,25 @@ public class UserRentPayment extends JPanel {
 			}
 			
 			// TODO: Change to success page
+			if (rentStatusPage == null) {
+				System.err.println("Null Process Status Page Panel. Unable to change to success page.");
+				return;
+			}
+			
+			String lockerNumberText = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
+			String lockerPassWordText = "รหัสสำหรับปลดล็อก " + lockerPassword;
+			rentStatusPage.updateProcessStatusPage(true, "เช่าสำเร็จ", powerBank.pickUpAddress, lockerNumberText, lockerPassWordText, "โปรดบันทึกรหัสนี้ไว้สำหรับการปลดล็อกตู้");
+			
+			mainFrame.changeCard(2, 10);
 			
 			
 		});
 		
 		return userPayPanel;
+	}
+	
+	private void failRentProcess() {
+		rentStatusPage.updateProcessStatusPage(false, "เช่าไม่สำเร็จ", "มีบางอย่างผิดพลาดในกระบวนการเช่า", "โปรดลองอีกครั้งภายหลัง", "", "");
 	}
 	
 	private void updatePaymentDetail() {

@@ -76,11 +76,13 @@ public class UserMainFrame extends JFrame {
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", 
 			"StorageCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
-			"ForRentPayment" };
+			"ForRentPayment", "ProcessStatus" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
 			checkStatusPanel;
+	
+	private UserProcessStatus processStatusPanel;
 	
 	private UserRent rentPanel;
 	private UserForRentDetail forRentDetailPanel;
@@ -194,7 +196,6 @@ public class UserMainFrame extends JFrame {
 	
 	private void createMenuButton(int panelIndex, String iconPath, String iconDescription, String menuStr,
 			int cardIndex, int margin, CardAction cardAction) {
-		// TODO: on card clicked
 
 		menuPanels[panelIndex] = new JPanel(new BorderLayout());
 		menuPanels[panelIndex].setBackground(MENU_COLOR);
@@ -257,7 +258,8 @@ public class UserMainFrame extends JFrame {
 		
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
 		
-		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		processStatusPanel = new UserProcessStatus(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, processStatusPanel);
 		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR, rentPaymentPanel);
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		
@@ -267,6 +269,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(rentPanel, cardNames[2]);
 		cardPanel.add(forRentDetailPanel, cardNames[8]);
 		cardPanel.add(rentPaymentPanel, cardNames[9]);
+		cardPanel.add(processStatusPanel, cardNames[10]);
 	}
 
 	
