@@ -39,6 +39,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
+import GeneralPages.PowerBankPickerPage;
 import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
 import Struct.UserDetail;
@@ -46,6 +47,8 @@ import Struct.UserDetail;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import Utils.Utils;
 import UserApp.Pages.*;
@@ -76,17 +79,21 @@ public class UserMainFrame extends JFrame {
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", 
 			"StorageCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
-			"ForRentPayment", "ProcessStatus" };
+			"ForRentPayment", "ProcessStatus", "PowerBankPicker" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
 			checkStatusPanel;
 	
 	private UserProcessStatus processStatusPanel;
+	private PowerBankPickerPage powerBankPickerPanel;
 	
+	// Rent pages
 	private UserRent rentPanel;
 	private UserForRentDetail forRentDetailPanel;
 	private UserRentPayment rentPaymentPanel;
+	
+	// Deposit pages
 	
 	public UserDetail userDetail;
 
@@ -128,9 +135,8 @@ public class UserMainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		
-		// SQL Connection
-		// JDBCConnector.connect();
-				
+		DatabaseConnector.connect();
+		
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
 		
@@ -168,8 +174,19 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
+		changeCard(3, 11);
 		
-		changeCard(2, 2);
+		// On App Close
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// close database connection before closing the program
+				DatabaseConnector.closeConnection();
+				dispose();
+				System.exit(0);
+			}
+		});
 	}
 
 	private void createLogo() {
@@ -242,7 +259,7 @@ public class UserMainFrame extends JFrame {
 			}
 			
 		});
-		createMenuButton(3, "/icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 3, 8);
+		createMenuButton(3, "/icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 11, 8);
 		createMenuButton(4, "/icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
 		createMenuButton(5, "/icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
 		createMenuButton(6, "/icons/noti_white_icon.png", "Notification Icon", "แจ้งเตือน", 6, 8);
@@ -250,18 +267,22 @@ public class UserMainFrame extends JFrame {
 
 	}
 
-	private void createCardScreen() {
-		// ForRentPowerBank tempPowerBank = JDBCConnector.getForRentPowerBank().get(0);
-		
+	private void createCardScreen() {		
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
 		
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
 		
 		processStatusPanel = new UserProcessStatus(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		
+		// Rent pages
 		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, processStatusPanel);
 		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR, rentPaymentPanel);
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
+		
+		// TODO: Deposit pages
+		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -270,6 +291,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(forRentDetailPanel, cardNames[8]);
 		cardPanel.add(rentPaymentPanel, cardNames[9]);
 		cardPanel.add(processStatusPanel, cardNames[10]);
+		cardPanel.add(powerBankPickerPanel, cardNames[11]);
 	}
 
 	

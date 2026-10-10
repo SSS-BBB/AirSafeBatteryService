@@ -171,23 +171,6 @@ public class Utils {
 		return wrapperPanel;
 	}
 	
-	/*
-	public static JPanel createBorderBoxWithLabelInside(String text, Color fontColor, int fontSize, int lineThickness) {
-		JPanel placeHolder = new JPanel(new BorderLayout());
-		placeHolder.setBackground(null);
-		placeHolder.setBorder(BorderFactory.createLineBorder(Color.BLACK, lineThickness));
-		placeHolder.setPreferredSize(new Dimension(300, 30));
-		
-		pickUpAddressPlaceHolderLabel = new JLabel();
-		pickUpAddressPlaceHolderLabel.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
-		pickUpAddressPlaceHolderLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-		pickUpAddressPlaceHolderLabel.setAlignmentX(componentAlignment);
-		pickUpAddressPlaceHolderLabel.setAlignmentY(CENTER_ALIGNMENT);
-		pickUpAddressPlaceHolder.add(pickUpAddressPlaceHolderLabel, BorderLayout.WEST);
-		pickUpAddressPanel.add(pickUpAddressPlaceHolder);
-	}
-	*/
-	
 	public static JButton createNoBackgroundButton(String text, Color color) {
 		JButton noBgButton = new JButton(text);
 		noBgButton.setFont(new Font("Tahoma", Font.PLAIN, 14));

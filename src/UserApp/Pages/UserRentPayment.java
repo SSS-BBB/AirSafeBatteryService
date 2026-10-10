@@ -211,7 +211,7 @@ public class UserRentPayment extends JPanel {
 				return;
 			}
 			
-			// TODO: Change to success page
+			// Change to success page
 			if (rentStatusPage == null) {
 				System.err.println("Null Process Status Page Panel. Unable to change to success page.");
 				return;

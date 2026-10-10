@@ -342,6 +342,45 @@ public class DatabaseConnector {
 
 	}
 	
+	public static ArrayList<String> getDistinctBrand() {
+		if (!checkConnection("Unable to get distinct brands.")) return null;
+		
+		ArrayList<String> brandList = new ArrayList<String>();
+		
+		String query = "SELECT DISTINCT(BRAND) FROM POWERBANK";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				brandList.add(resultSet.getString("brand"));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return brandList;
+	}
+	
+	public static ArrayList<String> getModelFromBrand(String brand) {
+		if (!checkConnection("Unable to get model from a brand.")) return null;
+		
+		ArrayList<String> modelList = new ArrayList<String>();
+		
+		String query = "SELECT DISTINCT(MODEL) FROM POWERBANK WHERE BRAND = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, brand);
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				modelList.add(resultSet.getString("model"));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return modelList;
+	}
+	
 	public static ArrayList<PowerBank> getPowerBank(int powerBankId, boolean getChargerType) {
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to get data from power bank table.");
@@ -470,8 +509,28 @@ public class DatabaseConnector {
 			return null;
 		}
 	}
-
-	private static void closeConnection() {
+	
+	private static boolean checkConnection(String errorMessage) {
+		if (connection == null) {
+			System.err.println("Null connection. " + errorMessage);
+			return false;
+		}
+		
+		try {
+			if (connection.isClosed()) {
+				System.err.println("Database is not connected. " + errorMessage);
+				return false;
+			}
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public static void closeConnection() {
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to close connection.");
 			return;
