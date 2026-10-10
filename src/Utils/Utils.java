@@ -13,6 +13,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
@@ -68,6 +69,41 @@ public class Utils {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static BufferedImage createBufferedImage(File file) {
+		if (file == null) {
+			System.err.println("Null file. Unable to create a buffered image.");
+			return null;
+		}
+		
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return image;
+	}
+	
+	public static ImageIcon createImageIcon(File file, String description) {
+		if (file == null) {
+			System.err.println("Null file. Unable to create an image icon.");
+			return null;
+		}
+		
+		ImageIcon imageIcon = null;
+		
+		BufferedImage image = createBufferedImage(file);
+		if (image != null) {
+			imageIcon = new ImageIcon(image, description);			
+		}
+		else {
+			System.err.println("Couldn't create a buffered image from this file. Unable to create an image icon.");
+		}
+		
+		return imageIcon;
 	}
 	
 	public static ImageIcon scaleImageKeepRatio(BufferedImage image, int maxWidth, int maxHeight) {
@@ -213,12 +249,17 @@ public class Utils {
 		return button;
 	}
 	
-	public static JTextField createAppTextField(Color backgroundColor, int size) {
+	
+	public static JTextField createAppTextField(Color backgroundColor, int size, int fontSize) {
 		JTextField textField = new JTextField(size);
 		textField.setBackground(backgroundColor);
-		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textField.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		return textField;
+	}
+	
+	public static JTextField createAppTextField(Color backgroundColor, int size) {
+		return createAppTextField(backgroundColor, size, 14);
 	}
 	
 	public static JTextField createAppTextField(Color backgroundColor, Dimension size) {

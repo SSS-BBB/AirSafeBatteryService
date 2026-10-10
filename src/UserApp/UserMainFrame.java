@@ -39,6 +39,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
+import GeneralPages.PowerBankAddPage;
 import GeneralPages.PowerBankPickerPage;
 import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
@@ -79,7 +80,8 @@ public class UserMainFrame extends JFrame {
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", 
 			"StorageCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
-			"ForRentPayment", "ProcessStatus", "PowerBankPicker" };
+			"ForRentPayment", "ProcessStatus", "PowerBankPicker",
+			"PowerBankAdd"};
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
@@ -87,6 +89,7 @@ public class UserMainFrame extends JFrame {
 	
 	private UserProcessStatus processStatusPanel;
 	private PowerBankPickerPage powerBankPickerPanel;
+	private PowerBankAddPage powerBankAddPanel;
 	
 	// Rent pages
 	private UserRent rentPanel;
@@ -174,7 +177,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(3, 11);
+		changeCard(3, 12);
 		
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -283,6 +286,7 @@ public class UserMainFrame extends JFrame {
 		// TODO: Deposit pages
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
+		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -292,6 +296,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(rentPaymentPanel, cardNames[9]);
 		cardPanel.add(processStatusPanel, cardNames[10]);
 		cardPanel.add(powerBankPickerPanel, cardNames[11]);
+		cardPanel.add(powerBankAddPanel, cardNames[12]);
 	}
 
 	
