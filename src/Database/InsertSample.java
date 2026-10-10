@@ -13,11 +13,6 @@ public class InsertSample {
 				"/power_banks/remax_cp-17_gray.jpg", new String[] { "AC", "USB-C", "USB-C cable" },
 				new String[] { "USB", "USB-C", "USB-C cable" });
 
-		// https://www.anker.com/eu-en/products/a1263
-		// https://manuals.plus/th/asin/B0194WDVHI
-		DatabaseConnector.insertIntoPowerbank("Anker", "PowerCore 10000", "A1263", 10000, 36, 6, 9.2, 2.2, 0.180,
-				"/power_banks/anker_a1263.jpg", new String[] { "Micro USB" }, new String[] { "USB-A" });
-
 		// https://www.mi.com/th/product/xiaomi-power-bank-10000mah-integrated-cable/specs/
 		DatabaseConnector.insertIntoPowerbank("Xiaomi", "10000 MAH (Integrated Cable)", "P15ZM", 10000, 37, 6.52, 10.52,
 				2.69, 0.35, "/power_banks/xiaomi_p15zm.jpg", new String[] { "USB-C", "USB-C cable" },

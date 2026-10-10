@@ -198,7 +198,7 @@ public class UserRentPayment extends JPanel {
 			}
 			
 			// Add data to rented power bank
-			String lockerPassword = DatabaseConnector.insertIntoRentedPowerBank(powerBank, paymentId, mainFrame.userDetail.userID);
+			String lockerPassword = DatabaseConnector.insertIntoRentedPowerBank(powerBank, paymentId);
 			if (lockerPassword.isEmpty()) {
 				System.err.println("Something went wrong when trying to insert data into rented power bank table. Unable to proceed the rent.");
 				return;
