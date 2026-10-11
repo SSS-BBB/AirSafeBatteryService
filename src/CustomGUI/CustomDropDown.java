@@ -30,6 +30,7 @@ public class CustomDropDown<E> extends JComboBox<E>  {
 		setForeground(Color.BLACK);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		
+		
 		setUI(new MetalComboBoxUI() {
 			@Override
 			protected ComboPopup createPopup() {

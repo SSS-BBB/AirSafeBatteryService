@@ -284,6 +284,7 @@ public class Utils {
 		
 		JButton button = new JButton(icon);
 		button.setBackground(null);
+		button.setBorder(BorderFactory.createEmptyBorder());
 		button.setBorderPainted(false);
 		button.setFocusPainted(false);
 		button.setContentAreaFilled(false);

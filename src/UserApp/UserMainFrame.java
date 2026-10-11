@@ -254,14 +254,7 @@ public class UserMainFrame extends JFrame {
 
 		createMenuButton(0, "/icons/home_icon.png", "Home Icon", "หน้าหลัก", 0, 8);
 		createMenuButton(1, "/icons/check_icon.png", "Check Icon", "ตรวจสอบ Power Bank", 1, 8);
-		createMenuButton(2, "/icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8, new CardAction() {
-			@Override
-			public void onCardClicked() {
-				rentPanel.clearFilter();
-				rentPanel.applyFilter();
-			}
-			
-		});
+		createMenuButton(2, "/icons/purchase_icon.png", "Purchase Icon", "เช่า Power Bank", 2, 8);
 		createMenuButton(3, "/icons/storage_icon.png", "Storage Icon", "ฝาก Power Bank", 11, 8);
 		createMenuButton(4, "/icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
 		createMenuButton(5, "/icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
@@ -333,6 +326,12 @@ public class UserMainFrame extends JFrame {
 		if (cardIndex < 0 || cardIndex >= cardNames.length) {
 			System.err.println("Card Index out of bounds, unable to change to page " + String.valueOf(cardIndex));
 		} else {
+			// reloading user rent
+			if (cardIndex == 2 && rentPanel != null) {
+				rentPanel.clearFilter();
+				rentPanel.applyFilter();
+			}
+			
 			// change page
 			CardLayout card = (CardLayout) cardPanel.getLayout();
 			card.show(cardPanel, cardNames[cardIndex]);

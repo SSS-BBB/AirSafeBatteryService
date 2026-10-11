@@ -115,6 +115,10 @@ public class PowerBankPickerPage extends JPanel {
 		addNewPowerBankButton.setAlignmentX(CENTER_ALIGNMENT);
 		powerBankPickPanel.add(addNewPowerBankButton);
 		
+		addNewPowerBankButton.addActionListener(e -> {
+			if (userMainFrame != null) userMainFrame.changeCard(3, 12);
+		});
+		
 		powerBankPickPanel.add(Box.createVerticalStrut(250));
 		
 		return powerBankPickPanel;
