@@ -342,6 +342,65 @@ public class DatabaseConnector {
 
 	}
 	
+	public static ArrayList<Integer> getUnavailableDepositLocker(String address) {
+		// Locker from DepositedPowerBank
+		if (!checkConnection("Unable to get unavailable deposit locker.")) return null;
+		ArrayList<Integer> unAvailableLocker = new ArrayList<Integer>();
+		
+		// DepositedPowerBank		
+		String query = "SELECT DISTINCT(LOCKER_NUMBER) FROM DEPOSITEDPOWERBANK WHERE ADDRESS = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, address);
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				unAvailableLocker.add(resultSet.getInt("locker_number"));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return unAvailableLocker;
+	}
+	
+	public static ArrayList<Integer> getUnavailableRentLocker(String address) {
+		// Locker from RentedPowerBank and ForRentPowerBank
+		if (!checkConnection("Unable to get unavailable rent locker.")) return null;
+		ArrayList<Integer> unAvailableLocker = new ArrayList<Integer>();
+		
+		// RentedPowerBank		
+		String query = "SELECT DISTINCT(LOCKER_NUMBER) FROM RENTEDPOWERBANK WHERE PICK_UP_ADDRESS = ? AND RENT_STATUS = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, address);
+			ps.setString(2, "ยังไม่รับ");
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				unAvailableLocker.add(resultSet.getInt("locker_number"));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		// ForRentPowerBank
+		query = "SELECT DISTINCT(LOCKER_NUMBER) FROM FORRENTPOWERBANK WHERE ADDRESS = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, address);
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				unAvailableLocker.add(resultSet.getInt("locker_number"));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return unAvailableLocker;
+	}
+	
 	public static ArrayList<String> getDistinctBrand() {
 		if (!checkConnection("Unable to get distinct brands.")) return null;
 		
@@ -423,6 +482,14 @@ public class DatabaseConnector {
 				if (getChargerType) {
 					powerBank.input = getPowerBankChargerType(powerBank.powerBankId, true);
 					powerBank.output = getPowerBankChargerType(powerBank.powerBankId, false);
+				}
+				
+				// Image
+				try {
+					powerBank.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
+				} catch (IOException e) {
+					powerBank.image = null;
+					e.printStackTrace();
 				}
 				
 				powerBankList.add(powerBank);

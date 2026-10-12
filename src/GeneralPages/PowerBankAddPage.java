@@ -129,12 +129,13 @@ public class PowerBankAddPage extends JPanel {
 			if (powerBank == null) return;
 			
 			// check for duplicate of (brand, model) on the power bank table
-			if (DatabaseConnector.powerBankExist(powerBank.brand, powerBank.model) && userMainFrame != null)
-				Utils.showDialog(userMainFrame, "มีข้อมูล Power Bank รุ่นนี้แล้ว", 
-						"Power Bank brand " + powerBank.brand + " model " + powerBank.model + 
-						" มีอยู่ในฐานข้อมูล", "โปรดกลับไปยังหน้าเลือก Power Bank เพื่อเลือก Power Bank นี้");
-			else System.out.println("Yeaaaah.");
-			
+			if (userMainFrame != null) {
+				if (DatabaseConnector.powerBankExist(powerBank.brand, powerBank.model))
+					Utils.showDialog(userMainFrame, "มีข้อมูล Power Bank รุ่นนี้แล้ว", 
+							"Power Bank brand " + powerBank.brand + " model " + powerBank.model + 
+							" มีอยู่ในฐานข้อมูล", "โปรดกลับไปยังหน้าเลือก Power Bank เพื่อเลือก Power Bank นี้");
+				else System.out.println("Yeaaaah."); // TODO: change to user deposit page
+			}
 		});
 		
 		return buttonPanel;

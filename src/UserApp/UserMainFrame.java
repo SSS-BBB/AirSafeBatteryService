@@ -39,10 +39,10 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
-import GeneralPages.PowerBankAddPage;
-import GeneralPages.PowerBankPickerPage;
+import GeneralPages.*;
 import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
+import Struct.PowerBank;
 import Struct.UserDetail;
 
 import java.awt.Font;
@@ -78,7 +78,7 @@ public class UserMainFrame extends JFrame {
 
 	private JPanel[] menuPanels;
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", 
-			"StorageCard", "ListCard", "HistoryCard",
+			"DepositCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
 			"ForRentPayment", "ProcessStatus", "PowerBankPicker",
 			"PowerBankAdd"};
@@ -96,7 +96,9 @@ public class UserMainFrame extends JFrame {
 	private UserForRentDetail forRentDetailPanel;
 	private UserRentPayment rentPaymentPanel;
 	
-	// Deposit pages
+	// TODO: Deposit pages
+	private UserDeposit depositPanel;
+	
 	
 	public UserDetail userDetail;
 
@@ -177,7 +179,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(3, 12);
+		changeCard(3, 3);
 		
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -279,12 +281,16 @@ public class UserMainFrame extends JFrame {
 		// TODO: Deposit pages
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
-		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR);
+		
+		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(1, true).get(0);
+		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempPowerBank);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
 		cardPanel.add(rentPanel, cardNames[2]);
+		cardPanel.add(depositPanel, cardNames[3]);
 		cardPanel.add(forRentDetailPanel, cardNames[8]);
 		cardPanel.add(rentPaymentPanel, cardNames[9]);
 		cardPanel.add(processStatusPanel, cardNames[10]);

@@ -21,14 +21,18 @@ import javax.swing.plaf.metal.MetalComboBoxUI;
 
 public class CustomDropDown<E> extends JComboBox<E>  {
 	
-	public CustomDropDown(E[] dropDownList, Color backgroundColor, Color menuColor) {
+	public CustomDropDown(E[] dropDownList, Color backgroundColor, Color selectColor) {
+		this(dropDownList, backgroundColor, selectColor, 1);
+	}
+	
+	public CustomDropDown(E[] dropDownList, Color backgroundColor, Color selectColor, int borderThickness) {
 		super(dropDownList);
 		
 		setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		setBackground(backgroundColor);
 		setForeground(Color.BLACK);
-		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		setBorder(BorderFactory.createLineBorder(Color.BLACK, borderThickness));
 		
 		
 		setUI(new MetalComboBoxUI() {
@@ -87,7 +91,7 @@ public class CustomDropDown<E> extends JComboBox<E>  {
 				
 				
 				label.setBackground(
-						isSelected ? menuColor : backgroundColor
+						isSelected ? selectColor : backgroundColor
 				);
 				
 				label.setForeground(
