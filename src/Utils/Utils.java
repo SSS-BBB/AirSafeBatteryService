@@ -27,6 +27,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -459,6 +461,42 @@ public class Utils {
 		detailLabel.setForeground(Color.BLACK);
 		detailLabel.setBackground(Color.WHITE);
 		wrapperPanel.add(detailLabel, BorderLayout.CENTER);
+		
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
+	}
+	
+	public static void showDialog(JFrame frame, String title, String detail1, String detail2) {
+		// two line dialog
+		JDialog dialog = new JDialog(frame, title, true);
+		dialog.setBackground(Color.WHITE);
+		dialog.setSize(800, 150);
+		
+		// Detail Labels
+		JPanel labelContainer = new JPanel();
+		labelContainer.setLayout(new BoxLayout(labelContainer, BoxLayout.Y_AXIS));
+		labelContainer.setBackground(Color.WHITE);
+		dialog.add(labelContainer);
+		
+		labelContainer.add(Box.createVerticalGlue());
+		
+		JLabel detailLabel1 = new JLabel(detail1);
+		detailLabel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+		detailLabel1.setAlignmentY(Component.CENTER_ALIGNMENT);
+		detailLabel1.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		detailLabel1.setForeground(Color.BLACK);
+		detailLabel1.setBackground(Color.WHITE);
+		labelContainer.add(detailLabel1);
+		
+		JLabel detailLabel2 = new JLabel(detail2);
+		detailLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+		detailLabel2.setAlignmentY(Component.CENTER_ALIGNMENT);
+		detailLabel2.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		detailLabel2.setForeground(Color.BLACK);
+		detailLabel2.setBackground(Color.WHITE);
+		labelContainer.add(detailLabel2);
+		
+		labelContainer.add(Box.createVerticalGlue());
 		
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);

@@ -381,11 +381,25 @@ public class DatabaseConnector {
 		return modelList;
 	}
 	
-	public static ArrayList<PowerBank> getPowerBank(int powerBankId, boolean getChargerType) {
-		if (connection == null) {
-			System.err.println("Database is not connected, unable to get data from power bank table.");
-			return null;
+	public static boolean powerBankExist(String brand, String model) {
+		if (!checkConnection("Unable to check if the power bank exists.")) return false;
+		
+		String query = "SELECT POWERBANK_ID FROM POWERBANK WHERE BRAND = ? AND MODEL = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, brand);
+			ps.setString(2, model);
+			ResultSet resultSet = ps.executeQuery();
+			return resultSet.next();
 		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	public static ArrayList<PowerBank> getPowerBank(int powerBankId, boolean getChargerType) {
+		if (!checkConnection("Unable to get data from power bank table.")) return null;
 		
 		ArrayList<PowerBank> powerBankList = new ArrayList<PowerBank>();
 		

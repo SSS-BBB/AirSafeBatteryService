@@ -27,6 +27,7 @@ import javax.swing.filechooser.FileFilter;
 import CustomGUI.CustomDropDown;
 import CustomGUI.CustomList;
 import CustomGUI.CustomScrollPane;
+import Database.DatabaseConnector;
 import Struct.PowerBank;
 import UserApp.UserMainFrame;
 import Utils.Utils;
@@ -125,7 +126,15 @@ public class PowerBankAddPage extends JPanel {
 			PowerBank powerBank = getPowerBankDataFromUserInput();
 			System.out.println(powerBank);
 			
-			// TODO: check for duplicate of (brand, model) on the power bank table
+			if (powerBank == null) return;
+			
+			// check for duplicate of (brand, model) on the power bank table
+			if (DatabaseConnector.powerBankExist(powerBank.brand, powerBank.model) && userMainFrame != null)
+				Utils.showDialog(userMainFrame, "มีข้อมูล Power Bank รุ่นนี้แล้ว", 
+						"Power Bank brand " + powerBank.brand + " model " + powerBank.model + 
+						" มีอยู่ในฐานข้อมูล", "โปรดกลับไปยังหน้าเลือก Power Bank เพื่อเลือก Power Bank นี้");
+			else System.out.println("Yeaaaah.");
+			
 		});
 		
 		return buttonPanel;
