@@ -457,6 +457,50 @@ public class DatabaseConnector {
 		return false;
 	}
 	
+	public static PowerBank getPowerBank(String brand, String model, boolean getChargerType) {
+		if (!checkConnection("Unable to get data from power bank table.")) return null;
+		
+		PowerBank powerBank = null;
+		
+		String query = "SELECT * FROM POWERBANK WHERE BRAND = ? AND MODEL = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, brand);
+			ps.setString(2, model);
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				powerBank = new PowerBank();
+				powerBank.powerBankId = resultSet.getInt("powerbank_id");
+				powerBank.brand = resultSet.getString("brand");
+				powerBank.name = resultSet.getString("name");
+				powerBank.model = resultSet.getString("model");
+				powerBank.capacity = resultSet.getDouble("capacity");
+				powerBank.wh = resultSet.getDouble("wh");
+				powerBank.width = resultSet.getDouble("width");
+				powerBank.length = resultSet.getDouble("length");
+				powerBank.height = resultSet.getDouble("height");
+				powerBank.weight = resultSet.getDouble("weight");
+				
+				if (getChargerType) {
+					powerBank.input = getPowerBankChargerType(powerBank.powerBankId, true);
+					powerBank.output = getPowerBankChargerType(powerBank.powerBankId, false);
+				}
+				
+				// Image
+				try {
+					powerBank.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
+				} catch (IOException e) {
+					powerBank.image = null;
+					e.printStackTrace();
+				}
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return powerBank;
+	}
+	
 	public static ArrayList<PowerBank> getPowerBank(int powerBankId, boolean getChargerType) {
 		if (!checkConnection("Unable to get data from power bank table.")) return null;
 		

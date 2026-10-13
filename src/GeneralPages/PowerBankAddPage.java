@@ -30,6 +30,7 @@ import CustomGUI.CustomScrollPane;
 import Database.DatabaseConnector;
 import Struct.PowerBank;
 import UserApp.UserMainFrame;
+import UserApp.Pages.UserDeposit;
 import Utils.Utils;
 
 public class PowerBankAddPage extends JPanel {
@@ -48,13 +49,17 @@ public class PowerBankAddPage extends JPanel {
 	private CustomDropDown[] chargerSelectDropDown;
 	private CustomList[] chargerList;
 	
-	public PowerBankAddPage(UserMainFrame userMainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
+	private UserDeposit userDepositPage;
+	
+	public PowerBankAddPage(UserMainFrame userMainFrame, 
+			Color backgroundColor, Color mainColor, Color menuColor, UserDeposit userDepositPage) {
 		super(new GridBagLayout());
 		
 		this.userMainFrame = userMainFrame;
 		this.backgroundColor = backgroundColor;
 		this.mainColor = mainColor;
 		this.menuColor = menuColor;
+		this.userDepositPage = userDepositPage;
 		
 		setBackground(backgroundColor);
 		
@@ -124,7 +129,6 @@ public class PowerBankAddPage extends JPanel {
 		
 		nextButton.addActionListener(e -> {
 			PowerBank powerBank = getPowerBankDataFromUserInput();
-			System.out.println(powerBank);
 			
 			if (powerBank == null) return;
 			
@@ -134,7 +138,10 @@ public class PowerBankAddPage extends JPanel {
 					Utils.showDialog(userMainFrame, "มีข้อมูล Power Bank รุ่นนี้แล้ว", 
 							"Power Bank brand " + powerBank.brand + " model " + powerBank.model + 
 							" มีอยู่ในฐานข้อมูล", "โปรดกลับไปยังหน้าเลือก Power Bank เพื่อเลือก Power Bank นี้");
-				else System.out.println("Yeaaaah."); // TODO: change to user deposit page
+				else if (userDepositPage != null) {
+					userDepositPage.updatePage(powerBank);
+					userMainFrame.changeCard(3, 3);
+				}
 			}
 		});
 		

@@ -228,9 +228,11 @@ public class Utils {
 		button.setFont(new Font("Tahoma", Font.BOLD, fontSize));
 		button.setBackground(backgroundColor);
 		button.setForeground(fontColor);
-		button.setFocusPainted(false);
 		button.setBorder(null);
 		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		button.setFocusPainted(false);
+		button.setContentAreaFilled(false);
+		button.setOpaque(true);
 		
 		return button;
 	}
@@ -244,9 +246,11 @@ public class Utils {
 		button.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		button.setBackground(null);
-		button.setFocusPainted(false);
 		button.setForeground(textColor);
 		button.setBorder(Utils.createPaddingBorder(borderColor, 5, lineThickness));
+		button.setFocusPainted(false);
+		button.setContentAreaFilled(false);
+		button.setOpaque(true);
 		
 		return button;
 	}

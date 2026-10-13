@@ -1,0 +1,83 @@
+package CustomGUI;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class NameValueHolder extends JPanel {
+	
+	// Name Label to tell what value is being hold
+	// Value Label to hold that value inside a box
+	
+	private JLabel valueLabel;
+	
+	public NameValueHolder(String valueName, int headingFontSize, int bodyFontSize, Dimension boxSize) {
+		super();
+		
+		// Name before the value
+		createTextWithComponentToAdd(this, valueName, headingFontSize);
+		
+		// Value inside a box
+		JPanel holderBoxPanel = createPlaceHolderBox(boxSize);
+		this.add(holderBoxPanel);
+		
+		valueLabel = createComponentLabel(Font.PLAIN, bodyFontSize);
+		valueLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+		holderBoxPanel.add(valueLabel, BorderLayout.WEST);
+	}
+	
+	public String getValue() {
+		if (valueLabel == null) {
+			System.err.println("Null Value Label. Unable to get a value from Name Value Holder.");
+			return "";
+		}
+		
+		return valueLabel.getText();
+	}
+	
+	public void setValue(String valueText) {
+		if (valueLabel == null) {
+			System.err.println("Null Value Label. Unable to set a value to Name Value Holder.");
+			return;
+		}
+		
+		valueLabel.setText(valueText);
+	}
+	
+	private JPanel createPlaceHolderBox(Dimension size) {
+		JPanel placeHolderBoxPanel = new JPanel(new BorderLayout());
+		placeHolderBoxPanel.setBackground(null);
+		placeHolderBoxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+		placeHolderBoxPanel.setPreferredSize(size);
+		
+		return placeHolderBoxPanel;
+	}
+	
+	private JLabel createComponentLabel(int fontStyle, int fontSize) {
+		JLabel label = new JLabel();
+		label.setFont(new Font("Tahoma", fontStyle, fontSize));
+		label.setBackground(null);
+		label.setAlignmentX(LEFT_ALIGNMENT);
+		label.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
+		
+		return label;
+	}
+	
+	private void createTextWithComponentToAdd(JPanel holderPanel, String text, int fontSize) {
+		holderPanel.setLayout((new FlowLayout(FlowLayout.LEFT, 5, 0)));
+		holderPanel.setAlignmentX(LEFT_ALIGNMENT);
+		holderPanel.setBackground(null);
+		
+		JLabel textLabel = createComponentLabel(Font.BOLD, fontSize);
+		textLabel.setText(text);
+		textLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+		holderPanel.add(textLabel);
+	}
+	
+}

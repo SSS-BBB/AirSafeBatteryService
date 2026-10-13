@@ -17,7 +17,9 @@ import javax.swing.JPanel;
 
 import CustomGUI.CustomDropDown;
 import Database.DatabaseConnector;
+import Struct.PowerBank;
 import UserApp.UserMainFrame;
+import UserApp.Pages.UserDeposit;
 import Utils.Utils;
 
 public class PowerBankPickerPage extends JPanel {
@@ -27,14 +29,19 @@ public class PowerBankPickerPage extends JPanel {
 
 	private JLabel titleLabel;
 	private CustomDropDown<Object> brandDropDown, modelDropDown;
+	
+	private UserDeposit userDepositPage;
 
-	public PowerBankPickerPage(UserMainFrame userMainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
+	public PowerBankPickerPage(UserMainFrame userMainFrame, 
+			Color backgroundColor, Color mainColor, Color menuColor,
+			UserDeposit userDepositPage) {
 
 		super(new BorderLayout());
 		this.userMainFrame = userMainFrame;
 		this.backgroundColor = backgroundColor;
 		this.mainColor = mainColor;
 		this.menuColor = menuColor;
+		this.userDepositPage = userDepositPage;
 
 		setBackground(backgroundColor);
 
@@ -102,6 +109,21 @@ public class PowerBankPickerPage extends JPanel {
 		nextButton.setMaximumSize(buttonSize);
 		nextButton.setAlignmentX(CENTER_ALIGNMENT);
 		powerBankPickPanel.add(nextButton);
+		
+		nextButton.addActionListener(e -> {
+			PowerBank powerBank = DatabaseConnector.getPowerBank(brandDropDown.getSelectedItem().toString(),
+										   modelDropDown.getSelectedItem().toString(),
+										   true);
+			if (powerBank == null) {
+				System.err.println("Couldn't get a power bank from database. Unable to go to the next page.");
+				return;
+			}
+			
+			if (userMainFrame != null && userDepositPage != null) {
+				userDepositPage.updatePage(powerBank);
+				userMainFrame.changeCard(3, 3);
+			}
+		});
 		
 		powerBankPickPanel.add(Box.createVerticalStrut(10));
 		

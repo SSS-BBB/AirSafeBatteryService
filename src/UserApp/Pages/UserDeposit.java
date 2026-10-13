@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.swing.BorderFactory;
@@ -16,10 +17,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import CustomGUI.CustomDatePicker;
 import CustomGUI.CustomDropDown;
+import CustomGUI.DatePickerAction;
 import CustomGUI.LockerChooser;
+import CustomGUI.NameValueHolder;
 import CustomGUI.PowerBankBox;
+import Struct.DepositedPowerBank;
 import Struct.PowerBank;
 import UserApp.UserMainFrame;
 import Utils.Utils;
@@ -34,11 +40,13 @@ public class UserDeposit extends JPanel {
 	// User Input Components
 	private CustomDropDown<String> addressDropDown;
 	
+	private PowerBank deviceInfo;
+	
 	// Input Data
 	private String depositAddress;
 	private int depositLockerNumber;
 	private Calendar depositDate, returnDate;
-	private double depositPrice;
+	private double depositPrice, lateFeePerDay, depositPricePerDay;
 	
 	public UserDeposit(UserMainFrame mainFrame, 
 			Color backgroundColor, Color menuColor, Color mainColor) {
@@ -48,6 +56,8 @@ public class UserDeposit extends JPanel {
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
+		this.lateFeePerDay = 50.0;
+		this.depositPricePerDay = 25.0;
 		
 		depositAddress = "";
 		depositLockerNumber = -1;
@@ -83,7 +93,8 @@ public class UserDeposit extends JPanel {
 			return;
 		}
 		
-		powerBankBox.updatePowerbankBox(powerBank);
+		this.deviceInfo = powerBank;
+		powerBankBox.updatePowerbankBox(deviceInfo);
 	}
 	
 	private JPanel createUserInputPanel() {
@@ -100,6 +111,7 @@ public class UserDeposit extends JPanel {
 		// Address
 		String[] addressList = new String[] {"สนามบินสุวรรณภูมิ", "สนามบินดอนเมือง", "สนามบินภูเก็ต", "สนามบินเชียงใหม่", "สนามบินแม่ฟ้าหลวง", "สนามบินหาดใหญ่", "สนามบินขอนแก่น"};
 		JPanel addressInputPanel = createTextWithComponentToAdd("สถานที่ฝาก:", bodyFontSize);
+		addressInputPanel.setAlignmentX(LEFT_ALIGNMENT);
 		userInputPanel.add(addressInputPanel);
 		
 		addressDropDown = new CustomDropDown<String>(addressList, backgroundColor, menuColor, 2);
@@ -109,26 +121,18 @@ public class UserDeposit extends JPanel {
 		Dimension boxSize = new Dimension(addressDropDown.getMinimumSize().width, 30);
 		
 		// Locker Number
-		JPanel lockerPanel = createTextWithComponentToAdd("หมายเลข Locker:", bodyFontSize);
-		userInputPanel.add(lockerPanel);
-		
-		JPanel lockerPlaceHolderBoxPanel = createPlaceHolderBox(boxSize);
-		lockerPanel.add(lockerPlaceHolderBoxPanel);
-		
-		JLabel lockerHolderLabel = createPageLabel(Font.PLAIN, bodyFontSize);
-		lockerHolderLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-		lockerPlaceHolderBoxPanel.add(lockerHolderLabel, BorderLayout.WEST);
+		NameValueHolder lockerHolder = new NameValueHolder("หมายเลข Locker:", bodyFontSize, bodyFontSize, boxSize);
+		userInputPanel.add(lockerHolder);
 		
 		ImageIcon lockerImage = Utils.createImageIcon("/icons/locker_icon_24.png", "Locker Icon");
 		JButton lockerSelectButton = Utils.createIconButton(lockerImage);
-		lockerPanel.add(lockerSelectButton);
+		lockerHolder.add(lockerSelectButton);
 		
 		lockerSelectButton.addActionListener(e -> {
-			// String selectedAddress = addressDropDown.getSelectedItem().toString();
 			LockerChooser lockerPicker = new LockerChooser(mainFrame, backgroundColor, Color.BLACK, mainColor, Color.DARK_GRAY, Color.BLACK);
 			lockerPicker.setLockerChooserAction(lockerNumber -> {
 				depositLockerNumber = lockerNumber;
-				lockerHolderLabel.setText(String.valueOf(lockerNumber));
+				lockerHolder.setValue(String.valueOf(lockerNumber));
 				
 			});
 			lockerPicker.showLockerChooser(depositAddress, false);
@@ -141,12 +145,171 @@ public class UserDeposit extends JPanel {
 				if (!selectedAddress.equals(depositAddress)) {
 					depositAddress = selectedAddress;
 					depositLockerNumber = -1;
-					lockerHolderLabel.setText("");
+					lockerHolder.setValue("");
 				}
 			}
 		});
 		
+		// Deposit Date
+		NameValueHolder depositDateHolder = new NameValueHolder("วันที่ฝาก:", bodyFontSize, bodyFontSize, boxSize);
+		userInputPanel.add(depositDateHolder);
+		
+		ImageIcon calendarIcon = Utils.createImageIcon("/icons/calendar_icon_24.png", "Calendar Icon");
+		JButton calendarDepositButton = Utils.createIconButton(calendarIcon);
+		depositDateHolder.add(calendarDepositButton);
+		
+		// Return Date
+		NameValueHolder returnDateHolder = new NameValueHolder("วันที่คืน:", bodyFontSize, bodyFontSize, boxSize);
+		userInputPanel.add(returnDateHolder);
+				
+		ImageIcon calendarReturnIcon = Utils.createImageIcon("/icons/calendar_icon_24.png", "Calendar Icon");
+		JButton calendarReturnButton = Utils.createIconButton(calendarReturnIcon);
+		returnDateHolder.add(calendarReturnButton);
+		
+		// Deposit Price
+		NameValueHolder depositPriceHolder = new NameValueHolder("ค่าฝาก:", bodyFontSize, bodyFontSize, boxSize);
+		userInputPanel.add(depositPriceHolder);
+		
+		// action listener
+		calendarDepositButton.addActionListener(e -> {
+			selectDate(false, depositDateHolder, returnDateHolder, depositPriceHolder);
+		});
+		
+		calendarReturnButton.addActionListener(e -> {
+			selectDate(true, depositDateHolder, returnDateHolder, depositPriceHolder);
+		});
+		
+		// Note
+		JLabel depositPricePerDayLabel = createPageLabel(Font.PLAIN, bodyFontSize);
+		String depositPricePerDayText = "หมายเหตุ: ค่าฝาก " + String.valueOf(depositPricePerDay) + " บาท/วัน";
+		depositPricePerDayLabel.setText(depositPricePerDayText);
+		depositPricePerDayLabel.setForeground(Color.RED);
+		userInputPanel.add(depositPricePerDayLabel);
+		
+		JLabel lateFeePerDayLabel = createPageLabel(Font.PLAIN, bodyFontSize);
+		String lateFeePerDayText = "ค่าปรับกรณีมารับคืนเลยวันที่กำหนด " + String.valueOf(lateFeePerDay) + " บาท/วัน";
+		lateFeePerDayLabel.setText(lateFeePerDayText);
+		lateFeePerDayLabel.setForeground(Color.RED);
+		userInputPanel.add(lateFeePerDayLabel);
+		
+		// Buttons
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		buttonPanel.setBackground(null);
+		userInputPanel.add(buttonPanel);
+		
+		Dimension buttonSize = new Dimension(150, 50);
+		JButton backButton = Utils.createBorderButton("กลับ", mainColor, menuColor, bodyFontSize, 2);
+		backButton.setPreferredSize(buttonSize);
+		backButton.setMaximumSize(buttonSize);
+		buttonPanel.add(backButton);
+		
+		buttonPanel.add(Box.createHorizontalStrut(25));
+		
+		JButton nextButton = Utils.createColorBackgroundButton("ต่อไป", mainColor, Color.WHITE, bodyFontSize);
+		nextButton.setPreferredSize(buttonSize);
+		nextButton.setMaximumSize(buttonSize);
+		buttonPanel.add(nextButton);
+		
+		// action listener
+		backButton.addActionListener(e -> {
+			mainFrame.changeCard(3, 11);
+		});
+		
+		nextButton.addActionListener(e -> {
+			if (deviceInfo == null) {
+				System.err.println("Null Device Info. Unable to go to deposit payment page.");
+				return;
+			}
+			
+			// check empty values
+			if (depositAddress.isEmpty()) return;
+			if (depositDate == null || returnDate == null) return;
+			if (depositLockerNumber <= 0) return;
+			if (lateFeePerDay < 0) return;
+			if (depositPrice < 0) return;
+			
+			DepositedPowerBank powerBank = new DepositedPowerBank(deviceInfo, depositAddress, depositDate, returnDate, 
+					depositLockerNumber, lateFeePerDay, depositPrice);
+			// TODO: go to deposit payment page
+		});
+		
 		return userInputPanel;
+	}
+	
+	private void updatePrice(NameValueHolder depositPriceHolder) {
+		if (depositDate == null || returnDate == null) {
+			System.err.println("Not enough date data. Unable to calculate the deposit price.");
+		}
+		
+		int depositDayCount = Utils.countDays(depositDate, returnDate);
+		if (depositDayCount == 0) depositDayCount = 1;
+		
+		depositPrice = depositPricePerDay * depositDayCount;
+		
+		if (depositPrice >= 0)
+			depositPriceHolder.setValue(String.valueOf(depositPrice) + " บาท");
+		else
+			depositPriceHolder.setValue("");
+	}
+	
+	private void selectDate(boolean isReturnDate, NameValueHolder depositDateHolder, 
+			NameValueHolder returnDateHolder, NameValueHolder priceHolder) {
+		
+		if (isReturnDate && depositDate == null) {
+			Utils.showDialog(mainFrame, "โปรดเลือกวันฝาก", "คุณจะต้องเลือกวันฝากก่อนจึงจะสามารถเลือกวันส่งคืนได้");
+			return;
+		}
+		
+		CustomDatePicker datePicker = new CustomDatePicker(SwingUtilities.getWindowAncestor(this), backgroundColor,
+				Color.LIGHT_GRAY, Color.BLACK);
+		
+		datePicker.addDatePickerAction(new DatePickerAction() {
+			@Override
+			public void onDatePicked() {
+				if (Utils.isDatePast(datePicker.selectedDate)) {
+					Utils.showDialog(mainFrame, "เลือกวันในอดีตไม่ได้!", "คุณไม่สามารถเลือกวันในอดีตได้ โปรดเลือกวันนี้หรือวันข้างหน้า");
+					return;
+				}
+				
+				if (!isReturnDate) {
+					// Deposit Date
+					returnDate = null;
+					returnDateHolder.setValue("");
+					depositPrice = -1.0;
+					priceHolder.setValue("");
+					
+					depositDate = datePicker.selectedDate;
+					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+					String formattedDate = dateFormatter.format(depositDate.getTime());
+					depositDateHolder.setValue(formattedDate);
+				}
+				
+				else {
+					// Return Date
+					int countDay = Utils.countDays(depositDate, datePicker.selectedDate);
+					
+					if (countDay < 0) {
+						Utils.showDialog(mainFrame, "วันที่คืนก่อนหน้าวันที่ฝาก!", "คุณไม่สามารถย้อนอดีตเพื่อคืน Powerbank ได้ โปรดเลือกวันที่คืนหลังจากวันที่ฝาก");
+						return;
+					}
+					
+					returnDate = datePicker.selectedDate;
+					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+					String formattedDate = dateFormatter.format(returnDate.getTime());
+					returnDateHolder.setValue(formattedDate);
+					
+					updatePrice(priceHolder);
+				}
+				
+			}
+			
+		});
+		
+		datePicker.createDatePicker();
+
+		datePicker.setSize(600, 400);
+		datePicker.setLocationRelativeTo(null);
+		datePicker.setVisible(true);
 	}
 	
 	private JPanel createContentPanel() {
@@ -167,15 +330,6 @@ public class UserDeposit extends JPanel {
 		return contentPanel;
 	}
 	
-	private JPanel createPlaceHolderBox(Dimension size) {
-		JPanel placeHolderBoxPanel = new JPanel(new BorderLayout());
-		placeHolderBoxPanel.setBackground(null);
-		placeHolderBoxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-		placeHolderBoxPanel.setPreferredSize(size);
-		
-		return placeHolderBoxPanel;
-	}
-	
 	private JLabel createPageLabel(int fontStyle, int fontSize) {
 		JLabel pageLabel = new JLabel();
 		pageLabel.setFont(new Font("Tahoma", fontStyle, fontSize));
@@ -187,7 +341,7 @@ public class UserDeposit extends JPanel {
 	}
 	
 	private JPanel createTextWithComponentToAdd(String text, int fontSize) {
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 		panel.setBackground(null);
 		
 		JLabel textLabel = createPageLabel(Font.BOLD, fontSize);

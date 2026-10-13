@@ -179,7 +179,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(3, 3);
+		changeCard(3, 11);
 		
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -279,12 +279,11 @@ public class UserMainFrame extends JFrame {
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		
 		// TODO: Deposit pages
-		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
-		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
-		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR);
-		
 		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(1, true).get(0);
-		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempPowerBank);
+		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
+		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
+		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
