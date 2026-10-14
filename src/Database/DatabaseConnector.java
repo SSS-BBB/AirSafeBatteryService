@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -22,6 +23,7 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import Struct.DepositedPowerBank;
 import Struct.ForRentPowerBank;
 import Struct.PowerBank;
 import Struct.RentedPowerBank;
@@ -69,97 +71,95 @@ public class DatabaseConnector {
 		}
 
 	}
-	
+
 	public static int insertIntoTransaction(double paymentAmount, int userID) {
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into transaction table.");
 			return -1;
 		}
-		
+
 		String query = "INSERT INTO TRANSACTION (PAYMENT_TIMESTAMP, PAYMENT_AMOUNT, USER_ID) VALUES (NOW(), ?, ?)";
-		
-		try(PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+		try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			ps.setDouble(1, paymentAmount);
 			ps.setInt(2, userID);
-			
+
 			boolean sucess = ps.executeUpdate() > 0;
-			
-			if (!sucess) return -1;
-			
+
+			if (!sucess)
+				return -1;
+
 			try (ResultSet resultSet = ps.getGeneratedKeys()) {
 				if (resultSet.next()) {
 					return resultSet.getInt(1);
 				}
 			}
-			
+
 			closeConnection();
-			
+
 			return -1;
-		} 
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return -1;
 	}
-	
+
 	public static int getUserIdCount(int userId) {
 		try {
 			if (connection == null || connection.isClosed()) {
 				System.err.println("Database is not connected, unable to get user id count.");
 				return -1;
 			}
-		} 
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
 		}
-		
+
 		String query = "SELECT * FROM USER WHERE USER_ID = ?";
-		
+
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
 			ResultSet resultSet = ps.executeQuery();
 			int count = 0;
-			while (resultSet.next()) count++;
+			while (resultSet.next())
+				count++;
 			return count;
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return -1;
 	}
-	
+
 	public static int getTransactionIdCount(int paymentId) {
 		try {
 			if (connection == null || connection.isClosed()) {
 				System.err.println("Database is not connected, unable to get transaction id count.");
 				return -1;
 			}
-		} 
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return -1;
 		}
-		
+
 		String query = "SELECT * FROM TRANSACTION WHERE PAYMENT_ID = ?";
-		
+
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, paymentId);
 			ResultSet resultSet = ps.executeQuery();
 			int count = 0;
-			while (resultSet.next()) count++;
+			while (resultSet.next())
+				count++;
 			return count;
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return -1;
 	}
-	
+
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
 
 		/*
@@ -177,12 +177,7 @@ public class DatabaseConnector {
 		 * textFilterList.put("address", "สนามบินดอนเมือง");
 		 */
 
-		return getForRentPowerBank("", "",
-				"", "",
-				-1, -1,
-				-1, -1,
-				-1, -1,
-				"", true);
+		return getForRentPowerBank("", "", "", "", -1, -1, -1, -1, -1, -1, "", true);
 	}
 
 	public static ArrayList<String> getPowerBankChargerType(int powerBankId, boolean isInput) {
@@ -218,13 +213,9 @@ public class DatabaseConnector {
 
 	}
 
-	public static PreparedStatement createForRentFilterStatement(
-			String addressFilter, String brandFilter,
-			String inputFilter, String outputFilter,
-			double minPrice, double maxPrice,
-			double minCap, double maxCap,
-			double minWeight, double maxWeight,
-			String orderByAttribute, boolean ascending) {
+	public static PreparedStatement createForRentFilterStatement(String addressFilter, String brandFilter,
+			String inputFilter, String outputFilter, double minPrice, double maxPrice, double minCap, double maxCap,
+			double minWeight, double maxWeight, String orderByAttribute, boolean ascending) {
 
 		try {
 			if (connection == null || connection.isClosed()) {
@@ -236,64 +227,67 @@ public class DatabaseConnector {
 		}
 
 		// Query Builder
-		StringBuilder filteredQuery = new StringBuilder("SELECT * FROM FORRENTPOWERBANK P NATURAL JOIN POWERBANK" + " WHERE 1 = 1");
+		StringBuilder filteredQuery = new StringBuilder(
+				"SELECT * FROM FORRENTPOWERBANK P NATURAL JOIN POWERBANK" + " WHERE 1 = 1");
 
 		// add filter
 		ArrayList<Double> doubleParameters = new ArrayList<Double>();
-		
+
 		if (minPrice >= 0) {
 			filteredQuery.append(" AND price_per_day >= ?");
 			doubleParameters.add(minPrice);
 		}
-		
+
 		if (maxPrice >= 0) {
 			filteredQuery.append(" AND price_per_day <= ?");
 			doubleParameters.add(maxPrice);
 		}
-		
+
 		if (minCap >= 0) {
 			filteredQuery.append(" AND capacity >= ?");
 			doubleParameters.add(minCap);
 		}
-		
+
 		if (maxCap >= 0) {
 			filteredQuery.append(" AND capacity <= ?");
 			doubleParameters.add(maxCap);
 		}
-		
+
 		if (minWeight > 0) {
 			filteredQuery.append(" AND weight >= ?");
 			doubleParameters.add(minWeight);
 		}
-		
+
 		if (maxWeight > 0) {
 			filteredQuery.append(" AND weight <= ?");
 			doubleParameters.add(maxWeight);
 		}
-		
+
 		ArrayList<String> textParameters = new ArrayList<String>();
-		
+
 		if (!addressFilter.isEmpty()) {
 			filteredQuery.append(" AND address = ?");
 			textParameters.add(addressFilter);
 		}
-		
+
 		if (!brandFilter.isEmpty()) {
 			filteredQuery.append(" AND brand = ?");
 			textParameters.add(brandFilter);
 		}
-		
+
 		// input output filter
 		if (!inputFilter.isEmpty()) {
-			filteredQuery.append(" AND ? IN (SELECT INPUT_TYPE FROM POWERBANKINPUT WHERE POWERBANK_ID = P.POWERBANK_ID)");
+			filteredQuery
+					.append(" AND ? IN (SELECT INPUT_TYPE FROM POWERBANKINPUT WHERE POWERBANK_ID = P.POWERBANK_ID)");
 			textParameters.add(inputFilter);
 		}
-		
+
 		if (!outputFilter.isEmpty()) {
-			filteredQuery.append(" AND ? IN (SELECT OUTPUT_TYPE FROM POWERBANKOUTPUT WHERE POWERBANK_ID = P.POWERBANK_ID)");
+			filteredQuery
+					.append(" AND ? IN (SELECT OUTPUT_TYPE FROM POWERBANKOUTPUT WHERE POWERBANK_ID = P.POWERBANK_ID)");
 			textParameters.add(outputFilter);
 		}
-		
+
 		// add order by
 		ArrayList<String> allowedAttributes = new ArrayList<String>();
 		allowedAttributes.add("brand");
@@ -310,7 +304,7 @@ public class DatabaseConnector {
 		allowedAttributes.add("length");
 		allowedAttributes.add("height");
 		allowedAttributes.add("weight");
-		
+
 		if (orderByAttribute != null && !orderByAttribute.isEmpty()) {
 			if (allowedAttributes.contains(orderByAttribute.toLowerCase())) {
 				String orderType = (ascending) ? "ASC" : "DESC";
@@ -341,13 +335,14 @@ public class DatabaseConnector {
 		return null;
 
 	}
-	
+
 	public static ArrayList<Integer> getUnavailableDepositLocker(String address) {
 		// Locker from DepositedPowerBank
-		if (!checkConnection("Unable to get unavailable deposit locker.")) return null;
+		if (!checkConnection("Unable to get unavailable deposit locker."))
+			return null;
 		ArrayList<Integer> unAvailableLocker = new ArrayList<Integer>();
-		
-		// DepositedPowerBank		
+
+		// DepositedPowerBank
 		String query = "SELECT DISTINCT(LOCKER_NUMBER) FROM DEPOSITEDPOWERBANK WHERE ADDRESS = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, address);
@@ -355,21 +350,21 @@ public class DatabaseConnector {
 			while (resultSet.next()) {
 				unAvailableLocker.add(resultSet.getInt("locker_number"));
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return unAvailableLocker;
 	}
-	
+
 	public static ArrayList<Integer> getUnavailableRentLocker(String address) {
 		// Locker from RentedPowerBank and ForRentPowerBank
-		if (!checkConnection("Unable to get unavailable rent locker.")) return null;
+		if (!checkConnection("Unable to get unavailable rent locker."))
+			return null;
 		ArrayList<Integer> unAvailableLocker = new ArrayList<Integer>();
-		
-		// RentedPowerBank		
+
+		// RentedPowerBank
 		String query = "SELECT DISTINCT(LOCKER_NUMBER) FROM RENTEDPOWERBANK WHERE PICK_UP_ADDRESS = ? AND RENT_STATUS = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, address);
@@ -378,12 +373,11 @@ public class DatabaseConnector {
 			while (resultSet.next()) {
 				unAvailableLocker.add(resultSet.getInt("locker_number"));
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		// ForRentPowerBank
 		query = "SELECT DISTINCT(LOCKER_NUMBER) FROM FORRENTPOWERBANK WHERE ADDRESS = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -392,39 +386,39 @@ public class DatabaseConnector {
 			while (resultSet.next()) {
 				unAvailableLocker.add(resultSet.getInt("locker_number"));
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return unAvailableLocker;
 	}
-	
+
 	public static ArrayList<String> getDistinctBrand() {
-		if (!checkConnection("Unable to get distinct brands.")) return null;
-		
+		if (!checkConnection("Unable to get distinct brands."))
+			return null;
+
 		ArrayList<String> brandList = new ArrayList<String>();
-		
+
 		String query = "SELECT DISTINCT(BRAND) FROM POWERBANK";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ResultSet resultSet = ps.executeQuery();
 			while (resultSet.next()) {
 				brandList.add(resultSet.getString("brand"));
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return brandList;
 	}
-	
+
 	public static ArrayList<String> getModelFromBrand(String brand) {
-		if (!checkConnection("Unable to get model from a brand.")) return null;
-		
+		if (!checkConnection("Unable to get model from a brand."))
+			return null;
+
 		ArrayList<String> modelList = new ArrayList<String>();
-		
+
 		String query = "SELECT DISTINCT(MODEL) FROM POWERBANK WHERE BRAND = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, brand);
@@ -432,36 +426,36 @@ public class DatabaseConnector {
 			while (resultSet.next()) {
 				modelList.add(resultSet.getString("model"));
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return modelList;
 	}
-	
+
 	public static boolean powerBankExist(String brand, String model) {
-		if (!checkConnection("Unable to check if the power bank exists.")) return false;
-		
+		if (!checkConnection("Unable to check if the power bank exists."))
+			return false;
+
 		String query = "SELECT POWERBANK_ID FROM POWERBANK WHERE BRAND = ? AND MODEL = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, brand);
 			ps.setString(2, model);
 			ResultSet resultSet = ps.executeQuery();
 			return resultSet.next();
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return false;
 	}
-	
+
 	public static PowerBank getPowerBank(String brand, String model, boolean getChargerType) {
-		if (!checkConnection("Unable to get data from power bank table.")) return null;
-		
+		if (!checkConnection("Unable to get data from power bank table."))
+			return null;
+
 		PowerBank powerBank = null;
-		
+
 		String query = "SELECT * FROM POWERBANK WHERE BRAND = ? AND MODEL = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, brand);
@@ -479,12 +473,13 @@ public class DatabaseConnector {
 				powerBank.length = resultSet.getDouble("length");
 				powerBank.height = resultSet.getDouble("height");
 				powerBank.weight = resultSet.getDouble("weight");
-				
+				powerBank.imageFormat = resultSet.getString("image_format");
+
 				if (getChargerType) {
 					powerBank.input = getPowerBankChargerType(powerBank.powerBankId, true);
 					powerBank.output = getPowerBankChargerType(powerBank.powerBankId, false);
 				}
-				
+
 				// Image
 				try {
 					powerBank.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
@@ -493,19 +488,19 @@ public class DatabaseConnector {
 					e.printStackTrace();
 				}
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return powerBank;
 	}
-	
+
 	public static ArrayList<PowerBank> getPowerBank(int powerBankId, boolean getChargerType) {
-		if (!checkConnection("Unable to get data from power bank table.")) return null;
-		
+		if (!checkConnection("Unable to get data from power bank table."))
+			return null;
+
 		ArrayList<PowerBank> powerBankList = new ArrayList<PowerBank>();
-		
+
 		String query = "SELECT * FROM POWERBANK WHERE POWERBANK_ID = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, powerBankId);
@@ -522,12 +517,13 @@ public class DatabaseConnector {
 				powerBank.length = resultSet.getDouble("length");
 				powerBank.height = resultSet.getDouble("height");
 				powerBank.weight = resultSet.getDouble("weight");
-				
+				powerBank.imageFormat = resultSet.getString("image_format");
+
 				if (getChargerType) {
 					powerBank.input = getPowerBankChargerType(powerBank.powerBankId, true);
 					powerBank.output = getPowerBankChargerType(powerBank.powerBankId, false);
 				}
-				
+
 				// Image
 				try {
 					powerBank.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
@@ -535,40 +531,29 @@ public class DatabaseConnector {
 					powerBank.image = null;
 					e.printStackTrace();
 				}
-				
+
 				powerBankList.add(powerBank);
 			}
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return powerBankList;
 	}
-	
-	public static ArrayList<ForRentPowerBank> getForRentPowerBank(
-			String addressFilter, String brandFilter,
-			String inputFilter, String outputFilter,
-			double minPrice, double maxPrice,
-			double minCap, double maxCap,
-			double minWeight, double maxWeight,
-			String orderByAttribute, boolean ascending) {
+
+	public static ArrayList<ForRentPowerBank> getForRentPowerBank(String addressFilter, String brandFilter,
+			String inputFilter, String outputFilter, double minPrice, double maxPrice, double minCap, double maxCap,
+			double minWeight, double maxWeight, String orderByAttribute, boolean ascending) {
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to get data from for rent power bank table.");
 			return null;
 		}
-		
-		try {
-			
 
-			PreparedStatement ps = createForRentFilterStatement( 
-					addressFilter, brandFilter,
-					inputFilter, outputFilter,
-					minPrice, maxPrice,
-					minCap, maxCap,
-					minWeight, maxWeight,
-					orderByAttribute, ascending);
+		try {
+
+			PreparedStatement ps = createForRentFilterStatement(addressFilter, brandFilter, inputFilter, outputFilter,
+					minPrice, maxPrice, minCap, maxCap, minWeight, maxWeight, orderByAttribute, ascending);
 
 			ResultSet resultSet = ps.executeQuery();
 
@@ -587,6 +572,7 @@ public class DatabaseConnector {
 				powerBank.deviceInfo.length = resultSet.getDouble("length");
 				powerBank.deviceInfo.height = resultSet.getDouble("height");
 				powerBank.deviceInfo.weight = resultSet.getDouble("weight");
+				powerBank.deviceInfo.imageFormat = resultSet.getString("image_format");
 
 				// For rent attributes
 				powerBank.address = resultSet.getString("address");
@@ -634,27 +620,26 @@ public class DatabaseConnector {
 			return null;
 		}
 	}
-	
+
 	private static boolean checkConnection(String errorMessage) {
 		if (connection == null) {
 			System.err.println("Null connection. " + errorMessage);
 			return false;
 		}
-		
+
 		try {
 			if (connection.isClosed()) {
 				System.err.println("Database is not connected. " + errorMessage);
 				return false;
 			}
-		} 
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public static void closeConnection() {
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to close connection.");
@@ -668,39 +653,147 @@ public class DatabaseConnector {
 		}
 	}
 
-	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
-			double width, double length, double height, double weight, String imagePath, String[] inputArray,
-			String[] outputArray) {
-		boolean insertPowerBankStatus = insertIntoPowerbank(brand, name, model, capacity, wh, width, length, height,
-				weight, imagePath);
+	private static byte[] bufferedImageToByte(BufferedImage image, String imageFormat) {
+		if (image == null) {
+			System.err.println("Null buffered image. Unable to turn this into to byte array.");
+			return null;
+		}
+
+		if (!imageFormat.equalsIgnoreCase("jpg") && !imageFormat.equalsIgnoreCase("png")) {
+			System.err.println("Only support jpg and png image format. Unable to turn this into to byte array.");
+			return null;
+		}
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ImageIO.write(image, imageFormat, baos);
+			return baos.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static boolean insertIntoCharger(int powerBankId, ArrayList<String> chargerList, boolean isInput) {
+		// insert into input and output
+		if (chargerList.isEmpty()) {
+			System.err.println("Empty charger type. Unable to insert into power bank input or output table.");
+			return false;
+		}
+
+		String inOrOut = (isInput) ? "INPUT" : "OUTPUT";
+
+		StringBuilder queryBuilder = new StringBuilder("INSERT INTO POWERBANK" + inOrOut + " VALUES (?, ?)");
+		for (int i = 1; i < chargerList.size(); i++) {
+			queryBuilder.append(", (?, ?)");
+		}
 		
+		String query = queryBuilder.toString();
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			for (int i = 1; i <= chargerList.size(); i++) {
+				ps.setString(2 * i - 1, chargerList.get(i - 1));
+				ps.setInt(2 * i, powerBankId);
+			}
+
+			boolean result = ps.executeUpdate() > 0;
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static int insertIntoPowerbank(PowerBank powerBank) {
+		if (!checkConnection("Unable to insert data into power bank table."))
+			return -1;
+
+		byte[] imageBytes = bufferedImageToByte(powerBank.image, powerBank.imageFormat);
+		if (imageBytes == null) {
+			System.err.println(
+					"Couldn't turn buffered image into byte array. Unable to insert data into power bank table.");
+			return -1;
+		}
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
+
+		// insert into power bank table
+		String query = "INSERT INTO POWERBANK (BRAND, NAME, MODEL, CAPACITY, WH, WIDTH, LENGTH, HEIGHT, WEIGHT, IMAGE, IMAGE_FORMAT) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		int powerBankId = -1;
+		try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+			ps.setString(1, powerBank.brand);
+			ps.setString(2, powerBank.name);
+			ps.setString(3, powerBank.model);
+			ps.setDouble(4, powerBank.capacity);
+			ps.setDouble(5, powerBank.wh);
+			ps.setDouble(6, powerBank.width);
+			ps.setDouble(7, powerBank.length);
+			ps.setDouble(8, powerBank.height);
+			ps.setDouble(9, powerBank.weight);
+			ps.setBinaryStream(10, bais, imageBytes.length);
+			ps.setString(11, powerBank.imageFormat);			
+			ps.executeUpdate();
+			
+			ResultSet resultSet = ps.getGeneratedKeys();
+			if (resultSet.next())
+				powerBankId = resultSet.getInt(1);
+			else {
+				System.err
+						.println("Couldn't get generated power bank id. Unable to insert into input and output table.");
+				return -1;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return -1;
+		}
+
+		// insert into input and output table
+		boolean inputInsertResult = insertIntoCharger(powerBankId, powerBank.input, true);
+		if (!inputInsertResult) {
+			System.err.println("Couldn't insert into input power bank table.");
+			return -1;
+		}
+		boolean outputInsertResult = insertIntoCharger(powerBankId, powerBank.input, false);
+		if (!outputInsertResult) {
+			System.err.println("Couldn't insert into output power bank table.");
+			return -1;
+		}
+
+		return powerBankId;
+	}
+
+	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
+			double width, double length, double height, double weight, String imagePath, String imageFormat,
+			String[] inputArray, String[] outputArray) {
+		boolean insertPowerBankStatus = insertIntoPowerbank(brand, name, model, capacity, wh, width, length, height,
+				weight, imagePath, imageFormat);
+
 		if (!insertPowerBankStatus)
 			return false;
 
-		if (!checkConnection("Unable to insert data into power bank table.")) return false;
-		
+		if (!checkConnection("Unable to insert data into power bank table."))
+			return false;
+
 		// Get power bank id
 		String query = "SELECT POWERBANK_ID FROM POWERBANK WHERE BRAND = ? AND MODEL = ?";
 		int powerBankId = -1;
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, brand);
 			ps.setString(2, model);
-			
+
 			ResultSet resultSet = ps.executeQuery();
-			
+
 			if (resultSet.next()) {
 				powerBankId = resultSet.getInt("POWERBANK_ID");
-			}
-			else {
+			} else {
 				System.err.println("Couldn't find power bank id with brand " + brand + " and mode " + model);
 				return false;
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		// Insert Input
 		query = "INSERT INTO POWERBANKINPUT VALUES (?, ?)";
 		for (String input : inputArray) {
@@ -746,14 +839,14 @@ public class DatabaseConnector {
 		// Successful insert
 		return true;
 	}
-	
+
 	public static boolean removeForRentPowerBank(String address, int lockerNumber) {
 		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to remove from for rent power bank table.");
 			return false;
 		}
-		
+
 		String query = "DELETE FROM FORRENTPOWERBANK WHERE ADDRESS = ? AND LOCKER_NUMBER = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, address);
@@ -761,50 +854,51 @@ public class DatabaseConnector {
 			boolean sucess = ps.executeUpdate() > 0;
 			closeConnection();
 			return sucess;
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		closeConnection();
 		return false;
 	}
-	
+
 	public static String insertIntoRentedPowerBank(RentedPowerBank powerBank, int paymentId) {
 		if (powerBank == null || powerBank.deviceInfo == null) {
 			System.err.println("Null powerbank, unable to insert into rented power bank table.");
 			return "";
 		}
-		
-		if (!checkConnection("Unable to insert into rented power bank table.")) return "";
-		
+
+		if (!checkConnection("Unable to insert into rented power bank table."))
+			return "";
+
 		// Make sure that there is a power bank with powerBankId on the power bank table
 		if (getPowerBank(powerBank.deviceInfo.powerBankId, false).size() == 0) {
-			System.err.println("No power bank with power bank id " + String.valueOf(powerBank.deviceInfo.powerBankId) + " on the power bank table. unable to insert into rented power bank table.");
+			System.err.println("No power bank with power bank id " + String.valueOf(powerBank.deviceInfo.powerBankId)
+					+ " on the power bank table. unable to insert into rented power bank table.");
 			return "";
 		}
-		
+
 		// check transaction payment id
 		if (getTransactionIdCount(paymentId) <= 0) {
-			System.err.println("No transaction with payment id " + String.valueOf(paymentId) + " on the transaction table. unable to insert into rented power bank table.");
+			System.err.println("No transaction with payment id " + String.valueOf(paymentId)
+					+ " on the transaction table. unable to insert into rented power bank table.");
 			return "";
 		}
-		
+
 		// generate locker password (3 characters(ignore case) 3 numbers)
 		// ex. ABC123
-		char[] alphabets = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 
-				'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-				'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+		char[] alphabets = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+				'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 		char randAlphanet1 = alphabets[Utils.randRange(0, alphabets.length - 1)];
 		char randAlphanet2 = alphabets[Utils.randRange(0, alphabets.length - 1)];
 		char randAlphanet3 = alphabets[Utils.randRange(0, alphabets.length - 1)];
 		String lockerPassword = "" + randAlphanet1 + randAlphanet2 + randAlphanet3;
-		
+
 		String numRand1 = String.valueOf(Utils.randRange(0, 9));
 		String numRand2 = String.valueOf(Utils.randRange(0, 9));
 		String numRand3 = String.valueOf(Utils.randRange(0, 9));
 		lockerPassword = lockerPassword + numRand1 + numRand2 + numRand3;
-		
+
 		// Insert into RentedPowerBank
 		String query = "INSERT INTO RENTEDPOWERBANK "
 				+ "(POWERBANK_ID, LOCKER_PASSWORD, RETURN_ADDRESS, PICK_UP_ADDRESS, PICK_UP_DATE, RENT_STATUS, RETURN_DATE, LATE_FEE_PER_DAY, RENT_PRICE, LOCKER_NUMBER, PAYMENT_ID)"
@@ -821,26 +915,79 @@ public class DatabaseConnector {
 			ps.setDouble(9, powerBank.rentPrice);
 			ps.setDouble(10, powerBank.lockerNumber);
 			ps.setInt(11, paymentId);
-			
+
 			boolean success = ps.executeUpdate() > 0;
-			
+
 			if (success) {
-				closeConnection();
 				return lockerPassword;
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
+
+		return "";
+	}
+
+	private static String generateRandomPassword() {
+		// generate locker password (3 characters(ignore case) 3 numbers)
+		// ex. ABC123
+		char[] alphabets = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+				'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+		char randAlphanet1 = alphabets[Utils.randRange(0, alphabets.length - 1)];
+		char randAlphanet2 = alphabets[Utils.randRange(0, alphabets.length - 1)];
+		char randAlphanet3 = alphabets[Utils.randRange(0, alphabets.length - 1)];
+		String lockerPassword = "" + randAlphanet1 + randAlphanet2 + randAlphanet3;
+
+		String numRand1 = String.valueOf(Utils.randRange(0, 9));
+		String numRand2 = String.valueOf(Utils.randRange(0, 9));
+		String numRand3 = String.valueOf(Utils.randRange(0, 9));
+		lockerPassword = lockerPassword + numRand1 + numRand2 + numRand3;
+		
+		return lockerPassword;
+	}
+
+	public static String insertIntoDepositedPowerBank(DepositedPowerBank depositInfo, int powerBankId, int paymentId) {
+		if (!checkConnection("Unable to insert data into deposited power bank table."))
+			return "";
+
+		if (depositInfo == null || powerBankId < 0 || paymentId < 0) {
+			System.err.println("Invalid parameters. Unable to insert data into deposited power bank table.");
+			return "";
+		}
+
+		String query = "INSERT INTO DEPOSITEDPOWERBANK (POWERBANK_ID, DEPOSIT_STATUS, ADDRESS, DEPOSIT_DATE, RETURN_DATE, LOCKER_NUMBER, LATE_FEE_PER_DAY, DEPOSIT_PRICE, LOCKER_PASSWORD, PAYMENT_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+		// TODO: insert data into DepositedPowerBank table
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, powerBankId);
+			ps.setString(2, "จองที่ฝากแล้ว");
+			ps.setString(3, depositInfo.address);
+			ps.setString(4, Utils.getCalendarDateFormat(depositInfo.depositDate));
+			ps.setString(5, Utils.getCalendarDateFormat(depositInfo.returnDate));
+			ps.setInt(6, depositInfo.lockerNumber);
+			ps.setDouble(7, depositInfo.lateFeePerDay);
+			ps.setDouble(8, depositInfo.depositPrice);
+			String lockerPassword = generateRandomPassword();
+			ps.setString(9, lockerPassword);
+			ps.setInt(10, paymentId);
+			
+			boolean success = ps.executeUpdate() > 0;
+			if (success) return lockerPassword;
+			
+		} 
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return "";
 	}
-	
-	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
-			double width, double length, double height, double weight, String imagePath) {
-		if (!checkConnection("Unable to insert data into power bank table.")) return false;
 
-		String query = "INSERT INTO POWERBANK (BRAND, NAME, MODEL, CAPACITY, WH, WIDTH, LENGTH, HEIGHT, WEIGHT, IMAGE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	public static boolean insertIntoPowerbank(String brand, String name, String model, double capacity, double wh,
+			double width, double length, double height, double weight, String imagePath, String imageFormat) {
+		if (!checkConnection("Unable to insert data into power bank table."))
+			return false;
+
+		String query = "INSERT INTO POWERBANK (BRAND, NAME, MODEL, CAPACITY, WH, WIDTH, LENGTH, HEIGHT, WEIGHT, IMAGE, IMAGE_FORMAT) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		InputStream inputStream = DatabaseConnector.class.getResourceAsStream(imagePath);
 
 		if (inputStream == null) {
@@ -865,6 +1012,7 @@ public class DatabaseConnector {
 			ps.setDouble(8, height);
 			ps.setDouble(9, weight);
 			ps.setBlob(10, inputStream);
+			ps.setString(11, imageFormat);
 
 			boolean sucess = ps.executeUpdate() > 0;
 

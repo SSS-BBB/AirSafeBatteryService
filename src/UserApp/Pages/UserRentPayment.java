@@ -194,6 +194,7 @@ public class UserRentPayment extends JPanel {
 			
 			if (paymentId < 0) {
 				System.err.println("Something went wrong when trying to insert data into transaction table. Unable to proceed the rent.");
+				failRentProcess();
 				return;
 			}
 			
@@ -201,6 +202,7 @@ public class UserRentPayment extends JPanel {
 			String lockerPassword = DatabaseConnector.insertIntoRentedPowerBank(powerBank, paymentId);
 			if (lockerPassword.isEmpty()) {
 				System.err.println("Something went wrong when trying to insert data into rented power bank table. Unable to proceed the rent.");
+				failRentProcess();
 				return;
 			}
 			
@@ -208,12 +210,14 @@ public class UserRentPayment extends JPanel {
 			boolean forRentRemoveSucess = DatabaseConnector.removeForRentPowerBank(powerBank.pickUpAddress, powerBank.lockerNumber);
 			if (!forRentRemoveSucess) {
 				System.err.println("Something went wrong when trying to remove data from for rent power bank table. Unable to proceed the rent.");
+				failRentProcess();
 				return;
 			}
 			
 			// Change to success page
 			if (rentStatusPage == null) {
 				System.err.println("Null Process Status Page Panel. Unable to change to success page.");
+				failRentProcess();
 				return;
 			}
 			
@@ -231,6 +235,7 @@ public class UserRentPayment extends JPanel {
 	
 	private void failRentProcess() {
 		rentStatusPage.updateProcessStatusPage(false, "เช่าไม่สำเร็จ", "มีบางอย่างผิดพลาดในกระบวนการเช่า", "โปรดลองอีกครั้งภายหลัง", "", "");
+		mainFrame.changeCard(2, 10);
 	}
 	
 	private void updatePaymentDetail() {

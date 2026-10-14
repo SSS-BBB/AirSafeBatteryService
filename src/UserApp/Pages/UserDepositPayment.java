@@ -32,26 +32,29 @@ public class UserDepositPayment extends JPanel {
 
 	private PowerBankBox powerBankBox;
 
-	// TODO: Deposit Detail Value Holders
-	NameValueHolder userNameHolder, addressHolder, lockerNumberHolder, depositDateHolder, returnDateHolder,
+	// Deposit Detail Value Holders
+	private NameValueHolder userNameHolder, addressHolder, lockerNumberHolder, depositDateHolder, returnDateHolder,
 			depositPriceHolder;
+
+	// Payment detail value holders
+	private NameValueHolder priceDisplayHolder;
 	
-	// TODO: Payment detail value holders
-	NameValueHolder priceDisplayHolder;
+	private UserProcessStatus depositStatusPage;
 
 	public UserDepositPayment(UserMainFrame mainFrame, Color backgroundColor, Color menuColor, Color mainColor,
-			DepositedPowerBank powerBank) {
-		this(mainFrame, backgroundColor, menuColor, mainColor);
+			DepositedPowerBank powerBank, UserProcessStatus depositStatusPage) {
+		this(mainFrame, backgroundColor, menuColor, mainColor, depositStatusPage);
 		updatePage(powerBank);
 	}
 
-	public UserDepositPayment(UserMainFrame mainFrame, Color backgroundColor, Color menuColor, Color mainColor) {
+	public UserDepositPayment(UserMainFrame mainFrame, Color backgroundColor, Color menuColor, Color mainColor, UserProcessStatus depositStatusPage) {
 		super(new BorderLayout());
 
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
+		this.depositStatusPage = depositStatusPage;
 
 		setBackground(backgroundColor);
 
@@ -87,75 +90,124 @@ public class UserDepositPayment extends JPanel {
 		JPanel detailBox = createPaymentDetail();
 		detailBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 75));
 		contentPanel.add(detailBox);
-		
+
 		// Payment Box
 		JPanel paymentBox = createUserPayPanel();
 		paymentBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 		contentPanel.add(paymentBox);
 	}
-	
+
 	private JPanel createUserPayPanel() {
 		JPanel userPayPanel = new JPanel();
 		userPayPanel.setLayout(new BoxLayout(userPayPanel, BoxLayout.Y_AXIS));
 		userPayPanel.setBackground(null);
-		
+
 		int bodyFontSize = 16;
 		int headingFontSize = 18;
 		int margin = 8;
-		
-		// TODO: create payment
-		
+
+		// create payment
+
 		// Scan To Pay
 		JLabel scanToPayLabel = createPageLabel("แสกนเพื่อชำระเงิน", Font.BOLD, headingFontSize);
 		userPayPanel.add(scanToPayLabel);
-		
+
 		// QR Code
 		ImageIcon qrIcon = Utils.createImageIcon("/qr_code.png", "Fake QR Code");
 		JLabel qrIconLabel = new JLabel(qrIcon);
 		qrIconLabel.setAlignmentX(CENTER_ALIGNMENT);
 		userPayPanel.add(qrIconLabel);
 		userPayPanel.add(Box.createVerticalStrut(margin));
-		
+
 		// Total Price
 		JLabel totalPriceLabel = createPageLabel("ยอดชำระทั้งหมด", Font.BOLD, bodyFontSize);
 		userPayPanel.add(totalPriceLabel);
-		
+
 		// Price Display
 		priceDisplayHolder = new NameValueHolder("", bodyFontSize, bodyFontSize, new Dimension(200, 30));
 		priceDisplayHolder.setAlignmentX(CENTER_ALIGNMENT);
 		userPayPanel.add(priceDisplayHolder);
 		userPayPanel.add(Box.createVerticalStrut(margin));
-		
+
 		// Payment Time Limit
 		JLabel timeLimitLabel = createPageLabel("กรุณาชำระภายใน 15 นาที", Font.BOLD, bodyFontSize);
 		timeLimitLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 		timeLimitLabel.setForeground(new Color(0, 100, 0));
 		userPayPanel.add(timeLimitLabel);
 		userPayPanel.add(Box.createVerticalStrut(margin));
-		
+
 		// Payment Confirm
 		Dimension buttonSize = new Dimension(180, 40);
-		JButton paymentConfirmButton = Utils.createColorBackgroundButton("ยืนยันการชำระเงิน", mainColor, Color.WHITE, bodyFontSize);
+		JButton paymentConfirmButton = Utils.createColorBackgroundButton("ยืนยันการชำระเงิน", mainColor, Color.WHITE,
+				bodyFontSize);
 		paymentConfirmButton.setAlignmentX(CENTER_ALIGNMENT);
 		paymentConfirmButton.setPreferredSize(buttonSize);
 		paymentConfirmButton.setMaximumSize(buttonSize);
 		userPayPanel.add(paymentConfirmButton);
-		
+
 		// When payment confirm button is clicked
-		// TODO: add data to transaction
+		// add data to transaction
 		// if power bank exists get power bank id
 		// else add data to power bank and get the id
 		// add data to deposited power bank
 		// change to successful payment page
-		
+
 		paymentConfirmButton.addActionListener(e -> {
+			// Transaction Process
+			int paymentId = DatabaseConnector.insertIntoTransaction(powerBank.depositPrice, mainFrame.userDetail.userID);
+
+			if (paymentId < 0) {
+				System.err.println(
+						"Something went wrong when trying to insert data into transaction table. Unable to proceed the deposit.");
+				failDepositProcess();
+				return;
+			}
 			
+			// Add data to power bank table if not exists
+			int powerBankId = -1;
+			if (!DatabaseConnector.powerBankExist(powerBank.deviceInfo.brand, powerBank.deviceInfo.model)) {
+				powerBankId = DatabaseConnector.insertIntoPowerbank(powerBank.deviceInfo);
+				if (powerBankId < 0) {
+					System.err.println(
+							"Something went wrong when trying to insert data into power bank table. Unable to proceed the deposit.");
+					failDepositProcess();
+					return;
+				}
+			}
+			else {
+				powerBankId = DatabaseConnector.getPowerBank(powerBank.deviceInfo.brand, powerBank.deviceInfo.model, false).powerBankId;
+				if (powerBankId < 0) {
+					System.err.println(
+							"Something went wrong when trying to get data from power bank table. Unable to proceed the deposit.");
+					failDepositProcess();
+					return;
+				}
+			}
+			
+			// DepositedPowerBank
+			String lockerPassword = DatabaseConnector.insertIntoDepositedPowerBank(powerBank, powerBankId, paymentId);
+			if (lockerPassword.isEmpty()) {
+				System.err.println(
+						"Something went wrong when trying to insert data into deposited power bank table. Unable to proceed the deposit.");
+				failDepositProcess();
+				return;
+			}
+			
+			String lockerNumberText = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
+			String lockerPassWordText = "รหัสสำหรับปลดล็อก " + lockerPassword;
+			depositStatusPage.updateProcessStatusPage(true, "ฝากสำเร็จ", powerBank.address, lockerNumberText, lockerPassWordText, "โปรดบันทึกรหัสนี้ไว้สำหรับการปลดล็อกตู้");
+			
+			mainFrame.changeCard(3, 10);
 		});
-		
-		
+
 		return userPayPanel;
 	}
 	
+	private void failDepositProcess() {
+		depositStatusPage.updateProcessStatusPage(false, "ฝากไม่สำเร็จ", "มีบางอย่างผิดพลาดในกระบวนการฝาก", "โปรดลองอีกครั้งภายหลัง", "", "");
+		mainFrame.changeCard(3, 10);
+	}
+
 	private JPanel createPaymentDetail() {
 		JPanel detailPanel = new JPanel();
 		detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
@@ -202,7 +254,7 @@ public class UserDepositPayment extends JPanel {
 		buttonWrapper.setBackground(null);
 		buttonWrapper.setAlignmentX(LEFT_ALIGNMENT);
 		detailPanel.add(buttonWrapper);
-		
+
 		Dimension buttonSize = new Dimension(140, 40);
 		JButton backButton = Utils.createColorBackgroundButton("กลับ", menuColor, Color.WHITE, bodyFontSize);
 		backButton.setAlignmentX(CENTER_ALIGNMENT);
@@ -213,7 +265,7 @@ public class UserDepositPayment extends JPanel {
 		backButton.addActionListener(e -> {
 			mainFrame.changeCard(3, 3);
 		});
-		
+
 		detailPanel.add(Box.createVerticalStrut(160));
 
 		return detailPanel;
@@ -227,25 +279,25 @@ public class UserDepositPayment extends JPanel {
 
 		this.powerBank = powerBank;
 		powerBankBox.updatePowerbankBox(powerBank.deviceInfo);
-		
+
 		// update components
 		String displayName = mainFrame.userDetail.firstName + " " + mainFrame.userDetail.lastName;
 		userNameHolder.setValue(displayName);
-		
+
 		addressHolder.setValue(powerBank.address);
-		
+
 		lockerNumberHolder.setValue(String.valueOf(powerBank.lockerNumber));
-		
+
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
 		String depositDateText = dateFormatter.format(powerBank.depositDate.getTime());
 		depositDateHolder.setValue(depositDateText);
-		
+
 		String returnDateText = dateFormatter.format(powerBank.returnDate.getTime());
 		returnDateHolder.setValue(returnDateText);
-		
+
 		String priceText = String.valueOf(powerBank.depositPrice) + " บาท";
 		depositPriceHolder.setValue(priceText);
-		
+
 		priceDisplayHolder.setValue(priceText);
 	}
 

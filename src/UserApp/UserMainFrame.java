@@ -15,6 +15,7 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 
@@ -181,7 +182,14 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(3, 13);
+		changeCard(3, 11);
+		/*
+		ArrayList<String> sampleInput = new ArrayList<String>();
+		sampleInput.add("USB-C");
+		sampleInput.add("USB-A");
+		sampleInput.add("Lightning");
+		DatabaseConnector.insertIntoCharger(100, sampleInput, true);
+		*/
 		
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -285,8 +293,8 @@ public class UserMainFrame extends JFrame {
 		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
 																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
 		
-		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
-		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank);
+		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank, processStatusPanel);
+		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPaymentPanel);
 
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");

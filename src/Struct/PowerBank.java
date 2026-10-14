@@ -9,6 +9,7 @@ public class PowerBank {
 	public String brand, name, model;
 	public double capacity, wh, width, length, height, weight;
 	public BufferedImage image;
+	public String imageFormat;
 	public ArrayList<String> input, output;
 	
 	@Override
@@ -21,7 +22,8 @@ public class PowerBank {
 			   "Weight: " + String.valueOf(weight) + "\n" +
 			   "Width: " + String.valueOf(width) + "\n" +
 			   "Length: " + String.valueOf(length) + "\n" +
-			   "Height: " + String.valueOf(height) + "\n";
+			   "Height: " + String.valueOf(height) + "\n" +
+			   "Image Format: " + String.valueOf(imageFormat) + "\n";
 		
 		text += "Input: (";
 		for (int i = 0; i < input.size(); i++) {

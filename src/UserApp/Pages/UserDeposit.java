@@ -48,8 +48,11 @@ public class UserDeposit extends JPanel {
 	private Calendar depositDate, returnDate;
 	private double depositPrice, lateFeePerDay, depositPricePerDay;
 	
+	private UserDepositPayment paymentPage;
+	
 	public UserDeposit(UserMainFrame mainFrame, 
-			Color backgroundColor, Color menuColor, Color mainColor) {
+			Color backgroundColor, Color menuColor, Color mainColor,
+			UserDepositPayment paymentPage) {
 		
 		super(new BorderLayout());
 		this.mainFrame = mainFrame;
@@ -58,6 +61,7 @@ public class UserDeposit extends JPanel {
 		this.mainColor = mainColor;
 		this.lateFeePerDay = 50.0;
 		this.depositPricePerDay = 25.0;
+		this.paymentPage = paymentPage;
 		
 		depositAddress = "";
 		depositLockerNumber = -1;
@@ -82,8 +86,8 @@ public class UserDeposit extends JPanel {
 	
 	public UserDeposit(UserMainFrame mainFrame, 
 			Color backgroundColor, Color menuColor, Color mainColor,
-			PowerBank tempPowerBank) {
-		this(mainFrame, backgroundColor, menuColor, mainColor);
+			PowerBank tempPowerBank, UserDepositPayment paymentPage) {
+		this(mainFrame, backgroundColor, menuColor, mainColor, paymentPage);
 		updatePage(tempPowerBank);
 	}
 	
@@ -231,6 +235,13 @@ public class UserDeposit extends JPanel {
 			DepositedPowerBank powerBank = new DepositedPowerBank(deviceInfo, depositAddress, depositDate, returnDate, 
 					depositLockerNumber, lateFeePerDay, depositPrice);
 			// TODO: go to deposit payment page
+			if (paymentPage == null) {
+				System.err.println("Null Payment Page. Unable to go to deposit payment page.");
+				return;
+			}
+			paymentPage.updatePage(powerBank);
+			mainFrame.changeCard(3, 13);
+			
 		});
 		
 		return userInputPanel;

@@ -49,6 +49,8 @@ public class PowerBankAddPage extends JPanel {
 	private CustomDropDown[] chargerSelectDropDown;
 	private CustomList[] chargerList;
 	
+	private String imageFormat;
+	
 	private UserDeposit userDepositPage;
 	
 	public PowerBankAddPage(UserMainFrame userMainFrame, 
@@ -60,11 +62,14 @@ public class PowerBankAddPage extends JPanel {
 		this.mainColor = mainColor;
 		this.menuColor = menuColor;
 		this.userDepositPage = userDepositPage;
+		this.imageFormat = "";
 		
 		setBackground(backgroundColor);
 		
 		// 0 -> input, 1 -> output
-		String[] chargerArray = new String[] { "USB-C", "USB-A", "Micro USB", "Lightning" };
+		String[] chargerArray = new String[] { "USB-C", "USB-A", "Micro USB", 
+											  "Lightning", "USB-C cable", "Gross",
+											  "Cable Lightning(IPH)"};
 		
 		chargerSelectDropDown = new CustomDropDown[] {
 			new CustomDropDown<String>(chargerArray, backgroundColor, mainColor),
@@ -181,6 +186,7 @@ public class PowerBankAddPage extends JPanel {
 		
 		// Image
 		if (powerBankImage == null) return null;
+		if (imageFormat.isEmpty()) return null;
 		
 		// Charger Type
 		if (chargerList[0].getItemList().isEmpty()) return null;
@@ -197,6 +203,7 @@ public class PowerBankAddPage extends JPanel {
 		powerBank.length = length;
 		powerBank.height = height;
 		powerBank.image = powerBankImage;
+		powerBank.imageFormat = imageFormat;
 		powerBank.input = chargerList[0].getItemList();
 		powerBank.output = chargerList[1].getItemList();
 		
@@ -444,7 +451,12 @@ public class PowerBankAddPage extends JPanel {
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File selectedImageFile = fileChooser.getSelectedFile();
 			String fileName = selectedImageFile.getName().toLowerCase();
-			if (fileName.endsWith(".jpg") || fileName.endsWith(".png")) {
+			if (fileName.endsWith(".jpg")) {
+				imageFormat = "jpg";
+				image = Utils.createBufferedImage(selectedImageFile);
+			}
+			else if (fileName.endsWith(".png")) {
+				imageFormat = "png";
 				image = Utils.createBufferedImage(selectedImageFile);
 			}
 		}
