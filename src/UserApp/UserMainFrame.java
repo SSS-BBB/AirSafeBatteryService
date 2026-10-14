@@ -15,6 +15,7 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Formatter;
 
 import javax.imageio.ImageIO;
@@ -41,6 +42,7 @@ import javax.swing.text.NumberFormatter;
 import Database.InsertSample;
 import GeneralPages.*;
 import Database.DatabaseConnector;
+import Struct.DepositedPowerBank;
 import Struct.ForRentPowerBank;
 import Struct.PowerBank;
 import Struct.UserDetail;
@@ -81,7 +83,7 @@ public class UserMainFrame extends JFrame {
 			"DepositCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
 			"ForRentPayment", "ProcessStatus", "PowerBankPicker",
-			"PowerBankAdd"};
+			"PowerBankAdd", "DepositPayment" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
@@ -98,7 +100,7 @@ public class UserMainFrame extends JFrame {
 	
 	// TODO: Deposit pages
 	private UserDeposit depositPanel;
-	
+	private UserDepositPayment depositPaymentPanel;
 	
 	public UserDetail userDetail;
 
@@ -179,7 +181,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(3, 11);
+		changeCard(3, 13);
 		
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -279,8 +281,13 @@ public class UserMainFrame extends JFrame {
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		
 		// TODO: Deposit pages
-		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(1, true).get(0);
+		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
+		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
+																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
+		
 		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank);
+
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
 		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
@@ -295,6 +302,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(processStatusPanel, cardNames[10]);
 		cardPanel.add(powerBankPickerPanel, cardNames[11]);
 		cardPanel.add(powerBankAddPanel, cardNames[12]);
+		cardPanel.add(depositPaymentPanel, cardNames[13]);
 	}
 
 	

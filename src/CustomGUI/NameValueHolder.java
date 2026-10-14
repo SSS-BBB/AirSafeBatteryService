@@ -20,8 +20,10 @@ public class NameValueHolder extends JPanel {
 	public NameValueHolder(String valueName, int headingFontSize, int bodyFontSize, Dimension boxSize) {
 		super();
 		
+		setBackground(null);
+		
 		// Name before the value
-		createTextWithComponentToAdd(this, valueName, headingFontSize);
+		if (!valueName.isEmpty()) createTextWithComponentToAdd(this, valueName, headingFontSize);
 		
 		// Value inside a box
 		JPanel holderBoxPanel = createPlaceHolderBox(boxSize);
