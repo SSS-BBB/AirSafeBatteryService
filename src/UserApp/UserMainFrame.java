@@ -99,9 +99,12 @@ public class UserMainFrame extends JFrame {
 	private UserForRentDetail forRentDetailPanel;
 	private UserRentPayment rentPaymentPanel;
 	
-	// TODO: Deposit pages
+	// Deposit pages
 	private UserDeposit depositPanel;
 	private UserDepositPayment depositPaymentPanel;
+	
+	// TODO: List page
+	private UserList powerBankListPanel;
 	
 	public UserDetail userDetail;
 
@@ -182,7 +185,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(3, 11);
+		changeCard(4, 4);
 		/*
 		ArrayList<String> sampleInput = new ArrayList<String>();
 		sampleInput.add("USB-C");
@@ -288,7 +291,7 @@ public class UserMainFrame extends JFrame {
 		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR, rentPaymentPanel);
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		
-		// TODO: Deposit pages
+		// Deposit pages
 		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
 		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
 																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
@@ -299,6 +302,9 @@ public class UserMainFrame extends JFrame {
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
 		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
+		
+		// TODO: List page
+		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -311,6 +317,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(powerBankPickerPanel, cardNames[11]);
 		cardPanel.add(powerBankAddPanel, cardNames[12]);
 		cardPanel.add(depositPaymentPanel, cardNames[13]);
+		cardPanel.add(powerBankListPanel, cardNames[4]);
 	}
 
 	
