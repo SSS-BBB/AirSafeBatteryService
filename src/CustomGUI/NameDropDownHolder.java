@@ -27,6 +27,18 @@ public class NameDropDownHolder extends JPanel {
 		
 	}
 	
+	public void setSelectedValue(int index) {
+		dropDown.setSelectedIndex(index);
+	}
+	
+	public void setSelectedValue(String value) {
+		dropDown.setSelectedItem(value);
+	}
+	
+	public String getValue() {
+		return dropDown.getSelectedItem().toString();
+	}
+	
 	private JLabel createComponentLabel(int fontStyle, int fontSize) {
 		JLabel label = new JLabel();
 		label.setFont(new Font("Tahoma", fontStyle, fontSize));
