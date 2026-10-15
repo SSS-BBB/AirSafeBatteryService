@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 
 import CustomGUI.CustomScrollPane;
 import CustomGUI.NameDropDownHolder;
+import Database.DatabaseConnector;
 import Struct.DepositedPowerBank;
 import Struct.PowerBank;
 import Struct.RentedPowerBank;
@@ -79,6 +80,8 @@ public class UserList extends JPanel {
 				switch (status) {
 				case "จองที่ฝากแล้ว":
 					return Color.GRAY;
+				case "กำลังฝาก":
+					return new Color(0, 100, 0);
 				default:
 					return Color.BLACK;
 				}
@@ -88,6 +91,8 @@ public class UserList extends JPanel {
 				switch (status) {
 				case "ยังไม่รับ":
 					return Color.GRAY;
+				case "สามารถใช้งานได้":
+					return new Color(0, 100, 0);
 				default:
 					return Color.BLACK;
 				}
@@ -153,9 +158,22 @@ public class UserList extends JPanel {
 		JPanel listDisplayPanel = createListDisplayPanel();
 		CustomScrollPane listScrollPane = new CustomScrollPane(listDisplayPanel, menuColor, backgroundColor);
 		this.add(listScrollPane, BorderLayout.CENTER);
+		
+		updateListDisplayPanel();
 	}
 
 	private void updateListDisplayPanel() {
+		powerBankDisplayList.clear();
+		
+		// TODO: get data from rented power bank and deposited power bank table
+		ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID);
+		for (RentedPowerBank powerBank : rentedPowerBankList)
+			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
+		
+		ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID);
+		for (DepositedPowerBank powerBank : depositedPowerBankList)
+			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
+		
 		listDisplayPanel.removeAll();
 
 		for (PowerBankDisplay powerBank : powerBankDisplayList)
@@ -212,7 +230,7 @@ public class UserList extends JPanel {
 		displayPanel.add(modelLabel);
 		displayPanel.add(Box.createVerticalStrut(margin));
 
-		// TODO: add display data
+		// add display data
 		// Type
 		String type = powerBank.type;
 		JLabel typeLabel = createPageLabel(Font.BOLD, fontSize, componentAlignment);

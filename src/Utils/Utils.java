@@ -447,6 +447,15 @@ public class Utils {
 		return dropDown;
 	}
 	
+	public static Calendar dateToCalendar(java.util.Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		
+		c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 543);
+		
+		return c;
+	}
+	
 	public static boolean isDatePast(Calendar date) {
 		Calendar today = Calendar.getInstance();
 		today.set(Calendar.HOUR_OF_DAY, 0);

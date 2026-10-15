@@ -11,6 +11,7 @@ public class RentedPowerBank {
 	public String status;
 	public double lateFeePerDay, rentPrice;
 	public int lockerNumber;
+	public String lockerPassword;
 	
 	public RentedPowerBank() {
 		deviceInfo = new PowerBank();

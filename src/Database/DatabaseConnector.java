@@ -540,11 +540,141 @@ public class DatabaseConnector {
 
 		return powerBankList;
 	}
-
+	
+	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId) {
+		if (!checkConnection("Unable to get deposited power bank data.")) return null;
+		
+		ArrayList<DepositedPowerBank> depositedPowerBankList = null;
+		
+		String query = "SELECT * FROM DEPOSITEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, userId);
+			
+			depositedPowerBankList = new ArrayList<DepositedPowerBank>();
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				// get device info
+				PowerBank deviceInfo = new PowerBank();
+				deviceInfo.powerBankId = resultSet.getInt("powerbank_id");
+				deviceInfo.brand = resultSet.getString("brand");
+				deviceInfo.name = resultSet.getString("name");
+				deviceInfo.model = resultSet.getString("model");
+				deviceInfo.capacity = resultSet.getDouble("capacity");
+				deviceInfo.wh = resultSet.getDouble("wh");
+				deviceInfo.width = resultSet.getDouble("width");
+				deviceInfo.length = resultSet.getDouble("length");
+				deviceInfo.height = resultSet.getDouble("height");
+				deviceInfo.weight = resultSet.getDouble("weight");
+				
+				// get device image
+				try {
+					deviceInfo.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
+				} catch (IOException e) {
+					deviceInfo.image = null;
+					e.printStackTrace();
+				}
+				deviceInfo.imageFormat = resultSet.getString("image_format");
+				
+				// get input
+				deviceInfo.input = getPowerBankChargerType(deviceInfo.powerBankId, true);
+				
+				// get output
+				// get input
+				deviceInfo.output = getPowerBankChargerType(deviceInfo.powerBankId, false);
+				
+				// get deposit information
+				DepositedPowerBank depositedPowerBank = new DepositedPowerBank();
+				depositedPowerBank.deviceInfo = deviceInfo;
+				depositedPowerBank.depositId = resultSet.getInt("depposit_id");
+				depositedPowerBank.depositStatus = resultSet.getString("deposit_status");
+				depositedPowerBank.address = resultSet.getString("address");
+				depositedPowerBank.depositDate = Utils.dateToCalendar(resultSet.getTimestamp("deposit_date"));
+				depositedPowerBank.returnDate = Utils.dateToCalendar(resultSet.getTimestamp("return_date"));
+				depositedPowerBank.lockerNumber = resultSet.getInt("locker_number");
+				depositedPowerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
+				depositedPowerBank.depositPrice = resultSet.getDouble("deposit_price");
+				depositedPowerBank.lockerPassword = resultSet.getString("locker_password");
+				
+				depositedPowerBankList.add(depositedPowerBank);
+			}
+			
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return depositedPowerBankList;
+	}
+	
+	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId) {
+		if (!checkConnection("Unable to get rented power bank data.")) return null;
+		
+		ArrayList<RentedPowerBank> rentedPowerBankList = null;
+		
+		String query = "SELECT * FROM RENTEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, userId);
+			
+			rentedPowerBankList = new ArrayList<RentedPowerBank>();
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				// get device info
+				PowerBank deviceInfo = new PowerBank();
+				deviceInfo.powerBankId = resultSet.getInt("powerbank_id");
+				deviceInfo.brand = resultSet.getString("brand");
+				deviceInfo.name = resultSet.getString("name");
+				deviceInfo.model = resultSet.getString("model");
+				deviceInfo.capacity = resultSet.getDouble("capacity");
+				deviceInfo.wh = resultSet.getDouble("wh");
+				deviceInfo.width = resultSet.getDouble("width");
+				deviceInfo.length = resultSet.getDouble("length");
+				deviceInfo.height = resultSet.getDouble("height");
+				deviceInfo.weight = resultSet.getDouble("weight");
+				
+				// get device image
+				try {
+					deviceInfo.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
+				} catch (IOException e) {
+					deviceInfo.image = null;
+					e.printStackTrace();
+				}
+				deviceInfo.imageFormat = resultSet.getString("image_format");
+				
+				// get input
+				deviceInfo.input = getPowerBankChargerType(deviceInfo.powerBankId, true);
+				
+				// get output
+				// get input
+				deviceInfo.output = getPowerBankChargerType(deviceInfo.powerBankId, false);
+				
+				// get rent information
+				RentedPowerBank rentedPowerBank = new RentedPowerBank();
+				rentedPowerBank.deviceInfo = deviceInfo;
+				rentedPowerBank.rentID = resultSet.getInt("rent_id");
+				rentedPowerBank.lockerPassword = resultSet.getString("locker_password");
+				rentedPowerBank.pickUpAddress = resultSet.getString("pick_up_address");
+				rentedPowerBank.returnAddress = resultSet.getString("return_address");
+				rentedPowerBank.rentDate = Utils.dateToCalendar(resultSet.getTimestamp("pick_up_date"));
+				rentedPowerBank.status = resultSet.getString("rent_status");
+				rentedPowerBank.returnDate = Utils.dateToCalendar(resultSet.getTimestamp("return_date"));
+				rentedPowerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
+				rentedPowerBank.rentPrice = resultSet.getDouble("rent_price");
+				rentedPowerBank.lockerNumber = resultSet.getInt("locker_number");
+				
+				rentedPowerBankList.add(rentedPowerBank);
+			}
+			
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return rentedPowerBankList;
+	}
+	
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank(String addressFilter, String brandFilter,
 			String inputFilter, String outputFilter, double minPrice, double maxPrice, double minCap, double maxCap,
 			double minWeight, double maxWeight, String orderByAttribute, boolean ascending) {
-		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to get data from for rent power bank table.");
 			return null;
@@ -957,7 +1087,7 @@ public class DatabaseConnector {
 
 		String query = "INSERT INTO DEPOSITEDPOWERBANK (POWERBANK_ID, DEPOSIT_STATUS, ADDRESS, DEPOSIT_DATE, RETURN_DATE, LOCKER_NUMBER, LATE_FEE_PER_DAY, DEPOSIT_PRICE, LOCKER_PASSWORD, PAYMENT_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-		// TODO: insert data into DepositedPowerBank table
+		// insert data into DepositedPowerBank table
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, powerBankId);
 			ps.setString(2, "จองที่ฝากแล้ว");

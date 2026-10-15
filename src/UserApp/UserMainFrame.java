@@ -304,7 +304,7 @@ public class UserMainFrame extends JFrame {
 		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
 																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
 		tempDepositedPowerBank.depositStatus = "จองที่ฝากแล้ว";
-		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank);
+		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
