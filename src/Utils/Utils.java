@@ -61,13 +61,38 @@ public class Utils {
 		try {
 			bufferedImage = ImageIO.read(inputStream);
 			if (bufferedImage == null) {
-				System.err.println("Couldn't decide the image from: " + path);
+				System.err.println("Couldn't read the image from: " + path);
 				return null;
 			}
 
 			return new ImageIcon(bufferedImage, description);
 
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static BufferedImage createBufferedImage(String path) {
+		InputStream inputStream = Utils.class.getResourceAsStream(path);
+
+		if (inputStream == null) {
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
+		
+		BufferedImage bufferedImage;
+		try {
+			bufferedImage = ImageIO.read(inputStream);
+			if (bufferedImage == null) {
+				System.err.println("Couldn't read the image from: " + path);
+				return null;
+			}
+			
+			return bufferedImage;
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}

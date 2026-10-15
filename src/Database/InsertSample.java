@@ -1,9 +1,16 @@
 package Database;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import Struct.PowerBank;
+import Utils.Utils;
+
 public class InsertSample {
 
 	public static void insertPowerBank() {
 		// Data from https://www.remaxthailand.co.th/collections/power_bank
+		/*
 		DatabaseConnector.insertIntoPowerbank("REMAX", "10000mAh Black", "RPP-37", 10000, 37, 6.8, 14.1, 1.8, 0.238,
 				"/power_banks/remax_rpp_37_max.jpg", "jpg", new String[] { "USB-C", "USB Cable" },
 				new String[] { "USB-C cable", "iPh Cable", "USB", "USB-C", "Gross" });
@@ -49,7 +56,72 @@ public class InsertSample {
 		// https://www.jib.co.th/web/product/readProduct/87412/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--ANKER-A1664-MAGGO---10000mAh-WIRELESS-BLACK-A1664W11
 		DatabaseConnector.insertIntoPowerbank("Anker", "MAGGO", "A1664", 10000, 37, 7.06, 10.4, 1.47, 0.2159,
 				"/power_banks/anker_a1664.jpg", "jpg", new String[] { "USB-C" }, new String[] { "USB-C" });
-
+		*/
+		
+		// https://www.jib.co.th/web/product/readProduct/84004/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--D-POWER-GC1002---10000-mAh-BLUE
+		PowerBank powerBank = new PowerBank();
+		powerBank.brand = "d-power";
+		powerBank.name = "Power Bank D-POWER";
+		powerBank.model = "GC1002";
+		powerBank.capacity = 10000;
+		powerBank.wh = 38.5;
+		powerBank.width = 5.5;
+		powerBank.length = 7.3;
+		powerBank.height = 2.75;
+		powerBank.weight = 0.25;
+		powerBank.image = Utils.createBufferedImage("/power_banks/d-power_gc1002.jpg");
+		powerBank.imageFormat = "jpg";
+		powerBank.input = new ArrayList<String>(List.of("USB-C"));
+		powerBank.output = new ArrayList<String>(List.of("USB-C", "USB-A"));
+		DatabaseConnector.insertIntoPowerbank(powerBank);
+		
+		// https://www.jib.co.th/web/product/readProduct/80178/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--ANITECH-X-SNOOPY-PB10-B-10000mAh---WHITE
+		powerBank.brand = "ANITECH";
+		powerBank.name = "ANITECH X SNOOPY";
+		powerBank.model = "PB10-B";
+		powerBank.capacity = 10000;
+		powerBank.wh = 37;
+		powerBank.width = 6.94;
+		powerBank.length = 10.76;
+		powerBank.height = 1.62;
+		powerBank.weight = 0.337;
+		powerBank.image = Utils.createBufferedImage("/power_banks/anitech_pb10-b.jpg");
+		powerBank.imageFormat = "jpg";
+		powerBank.input = new ArrayList<String>(List.of("USB-C"));
+		powerBank.output = new ArrayList<String>(List.of("USB-C", "USB-A"));
+		DatabaseConnector.insertIntoPowerbank(powerBank);
+		
+		// https://www.jib.co.th/web/product/readProduct/81923/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--PISEN-TS-D373-POWERPIX---30W-MINI-10000-mAh-WHITE
+		powerBank.brand = "Pisen";
+		powerBank.name = "POWERPIX 30W MINI";
+		powerBank.model = "TS-D373";
+		powerBank.capacity = 10000;
+		powerBank.wh = 37;
+		powerBank.width = 6.5;
+		powerBank.length = 8.5;
+		powerBank.height = 2.95;
+		powerBank.weight = 0.21;
+		powerBank.image = Utils.createBufferedImage("/power_banks/pisen_ts-d373.jpg");
+		powerBank.imageFormat = "jpg";
+		powerBank.input = new ArrayList<String>(List.of("USB-C"));
+		powerBank.output = new ArrayList<String>(List.of("USB-C"));
+		DatabaseConnector.insertIntoPowerbank(powerBank);
+		
+		// https://www.jib.co.th/web/product/readProduct/84026/20/POWER-BANK--%E0%B8%9E%E0%B8%B2%E0%B8%A7%E0%B9%80%E0%B8%A7%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%81%E0%B8%9A%E0%B8%87%E0%B8%84%E0%B9%8C--D-POWER-GC57-Q-MAX---10000-mAh-BLACK
+		powerBank.brand = "D-Power";
+		powerBank.name = "10000 mAh BLACK";
+		powerBank.model = "GC 57 Q.max";
+		powerBank.capacity = 10000;
+		powerBank.wh = 37;
+		powerBank.width = 7.0;
+		powerBank.length = 14.7;
+		powerBank.height = 1.6;
+		powerBank.weight = 0.17;
+		powerBank.image = Utils.createBufferedImage("/power_banks/d-power_gc-57-qmax.jpg");
+		powerBank.imageFormat = "jpg";
+		powerBank.input = new ArrayList<String>(List.of("USB-C"));
+		powerBank.output = new ArrayList<String>(List.of("USB-A"));
+		DatabaseConnector.insertIntoPowerbank(powerBank);
 	}
 
 }
