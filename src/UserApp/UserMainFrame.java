@@ -292,11 +292,7 @@ public class UserMainFrame extends JFrame {
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
 		
 		// Deposit pages
-		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
-		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
-																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
-		
-		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank, processStatusPanel);
+		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, processStatusPanel);
 		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPaymentPanel);
 
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
@@ -304,7 +300,11 @@ public class UserMainFrame extends JFrame {
 		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		
 		// TODO: List page
-		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
+		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
+																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
+		tempDepositedPowerBank.depositStatus = "จองที่ฝากแล้ว";
+		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
