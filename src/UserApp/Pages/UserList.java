@@ -182,7 +182,7 @@ public class UserList extends JPanel {
 		for (RentedPowerBank powerBank : rentedPowerBankList)
 			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
 		
-		ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID);
+		ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, showPastDue);
 		for (DepositedPowerBank powerBank : depositedPowerBankList)
 			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
 		
@@ -190,6 +190,9 @@ public class UserList extends JPanel {
 
 		for (PowerBankDisplay powerBank : powerBankDisplayList)
 			listDisplayPanel.add(createPowerBankDisplay(powerBank));
+		
+		listDisplayPanel.revalidate();
+		listDisplayPanel.repaint();
 	}
 
 	private JPanel createListDisplayPanel() {
@@ -294,7 +297,7 @@ public class UserList extends JPanel {
 			System.err.println("Null List detail page. Unable to add event when detail button is clicked.");
 			return wrapperPanel;
 		}
-		// TODO: change page when detail button is clicked
+		// change page when detail button is clicked
 		detailButton.addActionListener(e -> {
 			if (powerBank.rentedPowerBank != null) {
 				rentedDetailPage.updatePage(powerBank.rentedPowerBank);
@@ -463,7 +466,7 @@ public class UserList extends JPanel {
 	}
 
 	private void applyFilter() {
-
+		updateListDisplayPanel();
 	}
 
 	private JLabel createPageLabel(int fontStyle, int fontSize, float alignment) {

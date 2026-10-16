@@ -149,7 +149,6 @@ public class UserMainFrame extends JFrame {
 		}
 
 		DatabaseConnector.connect();
-		Utils.getDateFormat(LocalDate.now());
 
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();

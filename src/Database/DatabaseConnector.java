@@ -538,12 +538,17 @@ public class DatabaseConnector {
 		return powerBankList;
 	}
 	
-	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId) {
+	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId, boolean showPastDue) {
 		if (!checkConnection("Unable to get deposited power bank data.")) return null;
 		
 		ArrayList<DepositedPowerBank> depositedPowerBankList = null;
 		
-		String query = "SELECT * FROM DEPOSITEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?";
+		StringBuilder queryBuilder = new StringBuilder("SELECT * FROM DEPOSITEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
+		if (showPastDue) {
+			queryBuilder.append(" AND NOW() > RETURN_DATE");
+		}
+		
+		String query = queryBuilder.toString();
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
 			
@@ -603,12 +608,17 @@ public class DatabaseConnector {
 		return depositedPowerBankList;
 	}
 	
-	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean pastDueDate) {
+	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue) {
 		if (!checkConnection("Unable to get rented power bank data.")) return null;
 		
 		ArrayList<RentedPowerBank> rentedPowerBankList = null;
 		
-		String query = "SELECT * FROM RENTEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?";
+		StringBuilder queryBuilder = new StringBuilder("SELECT * FROM RENTEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
+		if (showPastDue) {
+			queryBuilder.append(" AND NOW() > RETURN_DATE");
+		}
+		
+		String query = queryBuilder.toString();
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
 			

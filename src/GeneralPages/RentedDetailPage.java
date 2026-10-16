@@ -69,8 +69,8 @@ public class RentedDetailPage extends JPanel {
 		JPanel contentPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 		contentPanel.setBackground(null);
 		
-		int headingFontSize = 18;
-		int bodyFontSize = 16;
+		int headingFontSize = 20;
+		int bodyFontSize = 18;
 		
 		// Power Bank Box
 		powerBankBox = new PowerBankBox(backgroundColor, headingFontSize, bodyFontSize, 5);
