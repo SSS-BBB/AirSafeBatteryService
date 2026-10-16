@@ -73,7 +73,6 @@ public class DatabaseConnector {
 	}
 
 	public static int insertIntoTransaction(double paymentAmount, int userID) {
-		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into transaction table.");
 			return -1;
@@ -95,8 +94,6 @@ public class DatabaseConnector {
 					return resultSet.getInt(1);
 				}
 			}
-
-			closeConnection();
 
 			return -1;
 		} catch (SQLException e) {
@@ -971,7 +968,6 @@ public class DatabaseConnector {
 	}
 
 	public static boolean removeForRentPowerBank(String address, int lockerNumber) {
-		connect();
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to remove from for rent power bank table.");
 			return false;
@@ -982,13 +978,11 @@ public class DatabaseConnector {
 			ps.setString(1, address);
 			ps.setInt(2, lockerNumber);
 			boolean sucess = ps.executeUpdate() > 0;
-			closeConnection();
 			return sucess;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		closeConnection();
 		return false;
 	}
 

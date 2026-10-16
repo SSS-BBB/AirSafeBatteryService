@@ -217,10 +217,14 @@ public class UserRentPayment extends JPanel {
 			// Change to success page
 			if (rentStatusPage == null) {
 				System.err.println("Null Process Status Page Panel. Unable to change to success page.");
-				failRentProcess();
 				return;
 			}
 			
+			// refresh rent and list page
+			mainFrame.refreshRentPage();
+			mainFrame.refreshListPage();
+			
+			// change to rent success page
 			String lockerNumberText = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
 			String lockerPassWordText = "รหัสสำหรับปลดล็อก " + lockerPassword;
 			rentStatusPage.updateProcessStatusPage(true, "เช่าสำเร็จ", powerBank.pickUpAddress, lockerNumberText, lockerPassWordText, "โปรดบันทึกรหัสนี้ไว้สำหรับการปลดล็อกตู้");

@@ -22,6 +22,8 @@ import javax.swing.JPanel;
 import CustomGUI.CustomScrollPane;
 import CustomGUI.NameDropDownHolder;
 import Database.DatabaseConnector;
+import GeneralPages.DepositedDetailPage;
+import GeneralPages.RentedDetailPage;
 import Struct.DepositedPowerBank;
 import Struct.PowerBank;
 import Struct.RentedPowerBank;
@@ -117,15 +119,23 @@ public class UserList extends JPanel {
 
 	// Power Bank Display components
 	private JPanel listDisplayPanel;
+	
+	// List detail pages
+	private RentedDetailPage rentedDetailPage;
+	private DepositedDetailPage depositedDetailPage;
 
-	public UserList(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor,
+	public UserList(UserMainFrame mainFrame, 
+			Color backgroundColor, Color mainColor, Color menuColor,
+			RentedDetailPage rentedDetailPage, DepositedDetailPage depositedDetailPage,
 			DepositedPowerBank depositedPowerBank) {
-		this(mainFrame, backgroundColor, mainColor, menuColor);
+		this(mainFrame, backgroundColor, mainColor, menuColor, rentedDetailPage, depositedDetailPage);
 		powerBankDisplayList.add(new PowerBankDisplay(depositedPowerBank));
 		updateListDisplayPanel();
 	}
 
-	public UserList(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
+	public UserList(UserMainFrame mainFrame, 
+			Color backgroundColor, Color mainColor, Color menuColor,
+			RentedDetailPage rentedDetailPage, DepositedDetailPage depositedDetailPage) {
 		super(new BorderLayout());
 
 		this.mainFrame = mainFrame;
@@ -133,6 +143,8 @@ public class UserList extends JPanel {
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
 		this.powerBankDisplayList = new ArrayList<PowerBankDisplay>();
+		this.rentedDetailPage = rentedDetailPage;
+		this.depositedDetailPage = depositedDetailPage;
 
 		setBackground(backgroundColor);
 
@@ -277,6 +289,25 @@ public class UserList extends JPanel {
 		detailButton.setAlignmentX(componentAlignment);
 		displayPanel.add(detailButton);
 		displayPanel.add(Box.createVerticalStrut(margin));
+		
+		if (rentedDetailPage == null || depositedDetailPage == null) {
+			System.err.println("Null List detail page. Unable to add event when detail button is clicked.");
+			return wrapperPanel;
+		}
+		// TODO: change page when detail button is clicked
+		detailButton.addActionListener(e -> {
+			if (powerBank.rentedPowerBank != null) {
+				rentedDetailPage.updatePage(powerBank.rentedPowerBank);
+				mainFrame.changeCard(4, 14);
+			}
+			else if (powerBank.depositedPowerBank != null)  {
+				depositedDetailPage.updatePage(powerBank.depositedPowerBank);
+				mainFrame.changeCard(4, 15);
+			}
+			else {
+				System.err.println("This power bank display is neither rented nor deposited power bank. Unable to change the page to show more detail.");
+			}
+		});
 
 		return wrapperPanel;
 	}

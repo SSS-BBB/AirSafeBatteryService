@@ -193,6 +193,9 @@ public class UserDepositPayment extends JPanel {
 				return;
 			}
 			
+			// refresh list page
+			mainFrame.refreshListPage();
+			
 			String lockerNumberText = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
 			String lockerPassWordText = "รหัสสำหรับปลดล็อก " + lockerPassword;
 			depositStatusPage.updateProcessStatusPage(true, "ฝากสำเร็จ", powerBank.address, lockerNumberText, lockerPassWordText, "โปรดบันทึกรหัสนี้ไว้สำหรับการปลดล็อกตู้");

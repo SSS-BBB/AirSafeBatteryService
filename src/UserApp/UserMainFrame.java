@@ -1,4 +1,5 @@
 package UserApp;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -59,11 +60,11 @@ import Utils.Utils;
 import UserApp.Pages.*;
 
 public class UserMainFrame extends JFrame {
-	
+
 	private interface CardAction {
 		public void onCardClicked();
 	}
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final String APP_NAME = "AirSafe Battery Service";
 	private static final int APP_WIDTH = 1280;
@@ -73,7 +74,7 @@ public class UserMainFrame extends JFrame {
 	private JPanel menuPanel;
 	private JPanel menuSelectPanel;
 	private JPanel cardPanel;
-	
+
 	JPanel statusPanel;
 	JLabel statusIconLabel, statusLabelTitle, statusLabelDetail, whLabel;
 
@@ -81,37 +82,33 @@ public class UserMainFrame extends JFrame {
 	private JPanel logoMenuPanel;
 
 	private JPanel[] menuPanels;
-	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", 
-			"DepositCard", "ListCard", "HistoryCard",
-			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
-			"ForRentPayment", "ProcessStatus", "PowerBankPicker",
-			"PowerBankAdd", "DepositPayment", "RentedDetail",
-			"DepositedDetail" };
+	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", "DepositCard", "ListCard", "HistoryCard",
+			"NotificationCard", "CheckStatusCard", "ForRentDetail", "ForRentPayment", "ProcessStatus",
+			"PowerBankPicker", "PowerBankAdd", "DepositPayment", "RentedDetail", "DepositedDetail" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
-			checkStatusPanel;
-	
+	private JPanel homePanel, checkPanel, storagePanel, listPanel, historyPanel, notificationPanel, checkStatusPanel;
+
 	private UserProcessStatus processStatusPanel;
 	private PowerBankPickerPage powerBankPickerPanel;
 	private PowerBankAddPage powerBankAddPanel;
-	
+
 	// Rent pages
 	private UserRent rentPanel;
 	private UserForRentDetail forRentDetailPanel;
 	private UserRentPayment rentPaymentPanel;
-	
+
 	// Deposit pages
 	private UserDeposit depositPanel;
 	private UserDepositPayment depositPaymentPanel;
-	
+
 	// List page
 	private UserList powerBankListPanel;
-	
+
 	// TODO: List Display pages
 	private RentedDetailPage rentedDetailPanel;
 	private DepositedDetailPage depositedDetailPanel;
-	
+
 	public UserDetail userDetail;
 
 	// colors
@@ -145,18 +142,17 @@ public class UserMainFrame extends JFrame {
 	public UserMainFrame() {
 		// Change Default UI Color
 		try {
-			UIManager.put("ComboBox.selectionBackground", new ColorUIResource(BACKGROUND_COLOR));			
+			UIManager.put("ComboBox.selectionBackground", new ColorUIResource(BACKGROUND_COLOR));
 			// UIManager.put("Button.select", new ColorUIResource(BACKGROUND_COLOR));
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		DatabaseConnector.connect();
-		
+
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
-		
+
 		// Sample User Data
 		userDetail = new UserDetail();
 		userDetail.userID = 1;
@@ -164,7 +160,7 @@ public class UserMainFrame extends JFrame {
 		userDetail.lastName = "User";
 		userDetail.email = "firstemail@something.cool";
 		userDetail.phone = "0000000000";
-		
+
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(APP_WIDTH, APP_HEIGHT);
@@ -174,13 +170,13 @@ public class UserMainFrame extends JFrame {
 		// mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		mainPanel.setBackground(BACKGROUND_COLOR);
 		setContentPane(mainPanel);
-		
+
 		// Card Panel
 		cardPanel = new JPanel(new CardLayout());
 		cardPanel.setBackground(BACKGROUND_COLOR);
 		createCardScreen();
 		mainPanel.add(cardPanel, BorderLayout.CENTER);
-		
+
 		// Menu Panel
 		menuPanel = new JPanel(new BorderLayout());
 		createLogo();
@@ -191,15 +187,14 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(4, 15);
+		changeCard(4, 4);
 		/*
-		ArrayList<String> sampleInput = new ArrayList<String>();
-		sampleInput.add("USB-C");
-		sampleInput.add("USB-A");
-		sampleInput.add("Lightning");
-		DatabaseConnector.insertIntoCharger(100, sampleInput, true);
-		*/
-		
+		 * ArrayList<String> sampleInput = new ArrayList<String>();
+		 * sampleInput.add("USB-C"); sampleInput.add("USB-A");
+		 * sampleInput.add("Lightning"); DatabaseConnector.insertIntoCharger(100,
+		 * sampleInput, true);
+		 */
+
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -228,13 +223,12 @@ public class UserMainFrame extends JFrame {
 		logoMenuPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		menuPanel.add(logoMenuPanel, BorderLayout.NORTH);
 	}
-	
+
 	private void createMenuButton(int panelIndex, String iconPath, String iconDescription, String menuStr,
 			int cardIndex, int margin) {
-		createMenuButton(panelIndex, iconPath, iconDescription, menuStr,
-				cardIndex, margin, null);
+		createMenuButton(panelIndex, iconPath, iconDescription, menuStr, cardIndex, margin, null);
 	}
-	
+
 	private void createMenuButton(int panelIndex, String iconPath, String iconDescription, String menuStr,
 			int cardIndex, int margin, CardAction cardAction) {
 
@@ -261,7 +255,8 @@ public class UserMainFrame extends JFrame {
 		menuPanels[panelIndex].addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (cardAction != null) cardAction.onCardClicked();
+				if (cardAction != null)
+					cardAction.onCardClicked();
 				changeCard(panelIndex, cardIndex);
 			}
 		});
@@ -284,34 +279,40 @@ public class UserMainFrame extends JFrame {
 
 	}
 
-	private void createCardScreen() {		
+	private void createCardScreen() {
 		// create card panel objects
 		homePanel = new UserHome(this, BACKGROUND_COLOR, DETAIL_FONT_COLOR, APP_NAME);
-		
+
 		checkPanel = new UserCheck(this, BACKGROUND_COLOR);
-		
+
 		processStatusPanel = new UserProcessStatus(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
-		
+
 		// Rent pages
 		rentPaymentPanel = new UserRentPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, processStatusPanel);
 		forRentDetailPanel = new UserForRentDetail(this, BACKGROUND_COLOR, MENU_COLOR, MAIN_COLOR, rentPaymentPanel);
 		rentPanel = new UserRent(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, forRentDetailPanel);
-		
+
 		// Deposit pages
-		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, processStatusPanel);
+		depositPaymentPanel = new UserDepositPayment(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR,
+				processStatusPanel);
 		depositPanel = new UserDeposit(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPaymentPanel);
 
 		powerBankPickerPanel = new PowerBankPickerPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
 		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
-		
+
+		// TODO: List Detail pages
+		rentedDetailPanel = new RentedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		depositedDetailPanel = new DepositedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+
 		// List page
 		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
 		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
-																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
+				Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
 		tempDepositedPowerBank.depositStatus = "จองที่ฝากแล้ว";
-		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
-		
+		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, rentedDetailPanel,
+				depositedDetailPanel);
+
 		// Rented Detail page
 		RentedPowerBank tempRentedPowerBank = new RentedPowerBank();
 		tempRentedPowerBank.deviceInfo = tempPowerBank;
@@ -325,13 +326,10 @@ public class UserMainFrame extends JFrame {
 		tempRentedPowerBank.rentPrice = 1000.0;
 		tempRentedPowerBank.lockerNumber = 35;
 		tempRentedPowerBank.lockerPassword = "ABC123";
-		
-		rentedDetailPanel = new RentedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempRentedPowerBank);
-		
-		// TODO: Deposited Detail Page
+
+		// Deposited Detail Page
 		tempDepositedPowerBank.lockerPassword = "BCD987";
-		depositedDetailPanel = new DepositedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank);
-		
+
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
@@ -347,16 +345,33 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(rentedDetailPanel, cardNames[14]);
 		cardPanel.add(depositedDetailPanel, cardNames[15]);
 	}
-
 	
-	
-	public void addCard(JPanel card, int cardIndex) {
-		if (cardIndex < 0 || cardIndex >= cardNames.length)
-		{
-			System.err.println("Card Index out of bounds, unable to add card at " + String.valueOf(cardIndex));
+	public void refreshListPage() {
+		if (powerBankListPanel == null) {
+			System.err.println("Null Power Bank List Panel. Unable to refresh list page");
 			return;
 		}
 		
+		powerBankListPanel.updateListDisplayPanel();
+	}
+	
+	public void refreshRentPage() {
+		if (rentPanel == null) {
+			System.err.println("Null Rent Panel. Unable to refresh rent page");
+			return;
+		}
+		
+		rentPanel.clearFilter();
+		rentPanel.applyFilter();
+
+	}
+
+	public void addCard(JPanel card, int cardIndex) {
+		if (cardIndex < 0 || cardIndex >= cardNames.length) {
+			System.err.println("Card Index out of bounds, unable to add card at " + String.valueOf(cardIndex));
+			return;
+		}
+
 		cardPanel.add(card, cardNames[cardIndex]);
 	}
 
@@ -382,12 +397,6 @@ public class UserMainFrame extends JFrame {
 		if (cardIndex < 0 || cardIndex >= cardNames.length) {
 			System.err.println("Card Index out of bounds, unable to change to page " + String.valueOf(cardIndex));
 		} else {
-			// reloading user rent
-			if (cardIndex == 2 && rentPanel != null) {
-				rentPanel.clearFilter();
-				rentPanel.applyFilter();
-			}
-			
 			// change page
 			CardLayout card = (CardLayout) cardPanel.getLayout();
 			card.show(cardPanel, cardNames[cardIndex]);
