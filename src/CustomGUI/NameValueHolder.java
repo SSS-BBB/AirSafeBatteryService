@@ -34,6 +34,22 @@ public class NameValueHolder extends JPanel {
 		holderBoxPanel.add(valueLabel, BorderLayout.WEST);
 	}
 	
+	public NameValueHolder(String valueName, int headingFontSize, int bodyFontSize) {
+		// Name value holder without a box
+		
+		super();
+		
+		setBackground(null);
+		
+		// Name before the value
+		if (!valueName.isEmpty()) createTextWithComponentToAdd(this, valueName, headingFontSize);
+		
+		// Value not inside a box
+		valueLabel = createComponentLabel(Font.PLAIN, bodyFontSize);
+		valueLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+		this.add(valueLabel);
+	}
+	
 	public String getValue() {
 		if (valueLabel == null) {
 			System.err.println("Null Value Label. Unable to get a value from Name Value Holder.");

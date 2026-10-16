@@ -162,10 +162,10 @@ public class UserList extends JPanel {
 		updateListDisplayPanel();
 	}
 
-	private void updateListDisplayPanel() {
+	public void updateListDisplayPanel() {
 		powerBankDisplayList.clear();
 		
-		// TODO: get data from rented power bank and deposited power bank table
+		// get data from rented power bank and deposited power bank table
 		ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID);
 		for (RentedPowerBank powerBank : rentedPowerBankList)
 			powerBankDisplayList.add(new PowerBankDisplay(powerBank));

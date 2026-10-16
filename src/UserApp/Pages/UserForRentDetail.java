@@ -68,8 +68,6 @@ public class UserForRentDetail extends JPanel {
 			UserRentPayment paymentPage) {
 		super(new BorderLayout());
 		
-		// 342
-		
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;

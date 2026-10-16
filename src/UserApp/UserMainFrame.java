@@ -46,6 +46,7 @@ import Database.DatabaseConnector;
 import Struct.DepositedPowerBank;
 import Struct.ForRentPowerBank;
 import Struct.PowerBank;
+import Struct.RentedPowerBank;
 import Struct.UserDetail;
 
 import java.awt.Font;
@@ -84,7 +85,7 @@ public class UserMainFrame extends JFrame {
 			"DepositCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
 			"ForRentPayment", "ProcessStatus", "PowerBankPicker",
-			"PowerBankAdd", "DepositPayment" };
+			"PowerBankAdd", "DepositPayment", "RentedDetail" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
@@ -103,8 +104,11 @@ public class UserMainFrame extends JFrame {
 	private UserDeposit depositPanel;
 	private UserDepositPayment depositPaymentPanel;
 	
-	// TODO: List page
+	// List page
 	private UserList powerBankListPanel;
+	
+	// TODO: List Display pages
+	private RentedDetailPage rentedDetailPanel;
 	
 	public UserDetail userDetail;
 
@@ -185,7 +189,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(4, 4);
+		changeCard(4, 14);
 		/*
 		ArrayList<String> sampleInput = new ArrayList<String>();
 		sampleInput.add("USB-C");
@@ -299,12 +303,28 @@ public class UserMainFrame extends JFrame {
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
 		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 		
-		// TODO: List page
+		// List page
 		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
 		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
 																		Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
 		tempDepositedPowerBank.depositStatus = "จองที่ฝากแล้ว";
 		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		
+		// TODO: Rented Detail page
+		RentedPowerBank tempRentedPowerBank = new RentedPowerBank();
+		tempRentedPowerBank.deviceInfo = tempPowerBank;
+		tempRentedPowerBank.pickUpAddress = "สนามบินสุวรรณภูมิ";
+		tempRentedPowerBank.returnAddress = "สนามบินดอนเมือง";
+		tempRentedPowerBank.rentDate = Calendar.getInstance();
+		tempRentedPowerBank.returnDate = Calendar.getInstance();
+		tempRentedPowerBank.returnDate.add(Calendar.DATE, 10);
+		tempRentedPowerBank.status = "ยังไม่รับ";
+		tempRentedPowerBank.lateFeePerDay = 50.0;
+		tempRentedPowerBank.rentPrice = 1000.0;
+		tempRentedPowerBank.lockerNumber = 35;
+		tempRentedPowerBank.lockerPassword = "ABC123";
+		
+		rentedDetailPanel = new RentedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempRentedPowerBank);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -318,6 +338,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(powerBankAddPanel, cardNames[12]);
 		cardPanel.add(depositPaymentPanel, cardNames[13]);
 		cardPanel.add(powerBankListPanel, cardNames[4]);
+		cardPanel.add(rentedDetailPanel, cardNames[14]);
 	}
 
 	
