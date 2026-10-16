@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -291,12 +290,9 @@ public class UserDepositPayment extends JPanel {
 
 		lockerNumberHolder.setValue(String.valueOf(powerBank.lockerNumber));
 
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-		String depositDateText = dateFormatter.format(powerBank.depositDate.getTime());
-		depositDateHolder.setValue(depositDateText);
+		depositDateHolder.setValue(Utils.getDateFormat(powerBank.depositDate, "dd/MM/yyyy"));
 
-		String returnDateText = dateFormatter.format(powerBank.returnDate.getTime());
-		returnDateHolder.setValue(returnDateText);
+		returnDateHolder.setValue(Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
 
 		String priceText = String.valueOf(powerBank.depositPrice) + " บาท";
 		depositPriceHolder.setValue(priceText);

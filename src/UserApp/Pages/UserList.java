@@ -8,8 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -42,8 +42,8 @@ public class UserList extends JPanel {
 		public String status;
 		public String outboundAddress;
 		public String returnAddress;
-		public Calendar outBoundDate;
-		public Calendar returnDate;
+		public LocalDate outBoundDate;
+		public LocalDate returnDate;
 
 		public PowerBankDisplay(RentedPowerBank rentedPowerBank) {
 			depositedPowerBank = null;
@@ -178,7 +178,7 @@ public class UserList extends JPanel {
 		powerBankDisplayList.clear();
 		
 		// get data from rented power bank and deposited power bank table
-		ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID);
+		ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, showPastDue);
 		for (RentedPowerBank powerBank : rentedPowerBankList)
 			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
 		
@@ -274,13 +274,13 @@ public class UserList extends JPanel {
 
 		// OutBound Date
 		JLabel outBoundDate = createPageLabel(Font.BOLD, fontSize, componentAlignment);
-		outBoundDate.setText("วันที่ขาไป: " + Utils.getCalendarDateFormat(powerBank.outBoundDate, "dd/MM/yyyy"));
+		outBoundDate.setText("วันที่ขาไป: " + Utils.getDateFormat(powerBank.outBoundDate, "dd/MM/yyyy"));
 		displayPanel.add(outBoundDate);
 		displayPanel.add(Box.createVerticalStrut(margin));
 
 		// Return Date
 		JLabel returnDate = createPageLabel(Font.BOLD, fontSize, componentAlignment);
-		returnDate.setText("วันที่ขากลับ: " + Utils.getCalendarDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
+		returnDate.setText("วันที่ขากลับ: " + Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
 		displayPanel.add(returnDate);
 		displayPanel.add(Box.createVerticalStrut(margin));
 		

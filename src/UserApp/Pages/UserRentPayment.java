@@ -8,8 +8,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -115,9 +114,8 @@ public class UserRentPayment extends JPanel {
 	public UserRentPayment(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor, UserProcessStatus rentStatusPage, ForRentPowerBank powerBank) {
 		this(mainFrame, backgroundColor, mainColor, menuColor, rentStatusPage);
 		
-		Calendar pickUpDate = Calendar.getInstance();
-		Calendar returnDate = Calendar.getInstance();
-		returnDate.add(Calendar.DATE, 10);
+		LocalDate pickUpDate = LocalDate.now();
+		LocalDate returnDate = LocalDate.now().plusDays(10);
 		
 		this.powerBank = new RentedPowerBank(powerBank, "สนามบินสุวรรณภูมิ", pickUpDate, returnDate, 1000.0);
 		updateUserRentPaymentPage();
@@ -267,13 +265,10 @@ public class UserRentPayment extends JPanel {
 		placeHolderLabels[0].setText(mainFrame.userDetail.firstName + " " + mainFrame.userDetail.lastName);
 		
 		// Rent Date
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-		String rentDate = dateFormatter.format(powerBank.rentDate.getTime());
-		placeHolderLabels[1].setText(rentDate);
+		placeHolderLabels[1].setText(Utils.getDateFormat(powerBank.rentDate, "dd/MM/yyyy"));
 		
 		// Return Date
-		String returnDate = dateFormatter.format(powerBank.returnDate.getTime());
-		placeHolderLabels[2].setText(returnDate);
+		placeHolderLabels[2].setText(Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
 		
 		// Pick up address
 		placeHolderLabels[3].setText(powerBank.pickUpAddress);

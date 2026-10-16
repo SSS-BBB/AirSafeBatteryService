@@ -7,8 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -45,7 +44,7 @@ public class UserDeposit extends JPanel {
 	// Input Data
 	private String depositAddress;
 	private int depositLockerNumber;
-	private Calendar depositDate, returnDate;
+	private LocalDate depositDate, returnDate;
 	private double depositPrice, lateFeePerDay, depositPricePerDay;
 	
 	private UserDepositPayment paymentPage;
@@ -290,9 +289,8 @@ public class UserDeposit extends JPanel {
 					priceHolder.setValue("");
 					
 					depositDate = datePicker.selectedDate;
-					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-					String formattedDate = dateFormatter.format(depositDate.getTime());
-					depositDateHolder.setValue(formattedDate);
+
+					depositDateHolder.setValue(Utils.getDateFormat(depositDate, "dd/MM/yyyy"));
 				}
 				
 				else {
@@ -305,9 +303,8 @@ public class UserDeposit extends JPanel {
 					}
 					
 					returnDate = datePicker.selectedDate;
-					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-					String formattedDate = dateFormatter.format(returnDate.getTime());
-					returnDateHolder.setValue(formattedDate);
+
+					returnDateHolder.setValue(Utils.getDateFormat(returnDate, "dd/MM/yyyy"));
 					
 					updatePrice(priceHolder);
 				}

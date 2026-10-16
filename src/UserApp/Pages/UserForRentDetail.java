@@ -8,9 +8,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -57,7 +56,7 @@ public class UserForRentDetail extends JPanel {
 	private JLabel paymetPlaceHolderLabel;
 	private JLabel lateFeeLabel;
 	
-	private Calendar rentDate, returnDate;
+	private LocalDate rentDate, returnDate;
 	private int rentDuration;
 	private double totalPrice;
 	
@@ -167,9 +166,7 @@ public class UserForRentDetail extends JPanel {
 					if (returnDayPlaceHolderLabel != null) returnDayPlaceHolderLabel.setText("");
 					
 					rentDate = datePicker.selectedDate;
-					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-					String formattedDate = dateFormatter.format(rentDate.getTime());
-					rentDayPlaceHolderLabel.setText(formattedDate);
+					rentDayPlaceHolderLabel.setText(Utils.getDateFormat(rentDate, "dd/MM/yyyy"));
 				}
 
 			});
@@ -236,9 +233,7 @@ public class UserForRentDetail extends JPanel {
 					
 					returnDate = datePicker.selectedDate;
 					rentDuration = countDay;
-					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-					String formattedDate = dateFormatter.format(returnDate.getTime());
-					returnDayPlaceHolderLabel.setText(formattedDate);
+					returnDayPlaceHolderLabel.setText(Utils.getDateFormat(returnDate, "dd/MM/yyyy"));
 					
 					updatePayment();
 				}

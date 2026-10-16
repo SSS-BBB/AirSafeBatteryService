@@ -6,7 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Window;
-import java.util.Calendar;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -24,8 +25,8 @@ public class CustomDatePicker extends JDialog {
 
 	private JLabel monthLabel, yearLabel;
 
-	private Calendar currentCalendarPicked;
-	public Calendar selectedDate;
+	private LocalDate currentDatePicked;
+	public LocalDate selectedDate;
 	private String[] monthName;
 	private String[] dayName;
 	private JButton[][] dateButtons;
@@ -39,8 +40,8 @@ public class CustomDatePicker extends JDialog {
 		this.lineColor = lineColor;
 		this.fontColor = fontColor;
 
-		currentCalendarPicked = Calendar.getInstance();
-		currentCalendarPicked.set(Calendar.DATE, 1); // to make sure you can go forward and backward by one month
+		currentDatePicked = LocalDate.now();
+		currentDatePicked = currentDatePicked.withDayOfMonth(1); // to make sure you can go forward and backward by one month
 
 		monthName = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม",
 				"สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
@@ -49,7 +50,7 @@ public class CustomDatePicker extends JDialog {
 	}
 
 	public void createDatePicker() {
-		if (currentCalendarPicked == null) {
+		if (currentDatePicked == null) {
 			System.err.println("Null current calendar date. Unable to create date picker dialog.");
 			return;
 		}
@@ -66,7 +67,7 @@ public class CustomDatePicker extends JDialog {
 	}
 
 	private JPanel createGridDatePanel() {
-		if (currentCalendarPicked == null) {
+		if (currentDatePicked == null) {
 			System.err.println("Null current calendar date. Unable to create grid date panel.");
 			return new JPanel();
 		}
@@ -102,16 +103,16 @@ public class CustomDatePicker extends JDialog {
 			dateButtons[row][col] = Utils.createNoBackgroundButton("", fontColor, fontSize);
 
 			dateButtons[row][col].addActionListener(e -> {
-				selectedDate = Calendar.getInstance();
-				selectedDate.set(Calendar.YEAR, currentCalendarPicked.get(Calendar.YEAR));
-				selectedDate.set(Calendar.MONTH, currentCalendarPicked.get(Calendar.MONTH));
+				selectedDate = LocalDate.now();
+				selectedDate = selectedDate.withYear(currentDatePicked.getYear());
+				selectedDate = selectedDate.withMonth(currentDatePicked.getMonthValue());
 
 				// get date from button text
 				if (dateButtons[row][col].getText().isEmpty())
 					return;
 
 				int selectedDateOfMonth = Integer.parseInt(dateButtons[row][col].getText());
-				selectedDate.set(Calendar.DATE, selectedDateOfMonth);
+				selectedDate = selectedDate.withDayOfMonth(selectedDateOfMonth);
 
 				if (datePickerAction != null)
 					datePickerAction.onDatePicked();
@@ -130,7 +131,7 @@ public class CustomDatePicker extends JDialog {
 	}
 
 	private JPanel createMonthYearPanel() {
-		if (currentCalendarPicked == null) {
+		if (currentDatePicked == null) {
 			System.err.println("Null current calendar date. Unable to create month year panel.");
 			return new JPanel();
 		}
@@ -138,8 +139,8 @@ public class CustomDatePicker extends JDialog {
 		JPanel monthYearPanel = new JPanel(new BorderLayout());
 		monthYearPanel.setBackground(backgroundColor);
 
-		int currentYear = currentCalendarPicked.get(Calendar.YEAR);
-		int currentMonthIndex = currentCalendarPicked.get(Calendar.MONTH);
+		int currentYear = currentDatePicked.getYear();
+		int currentMonthIndex = currentDatePicked.getMonthValue() - 1;
 		String currentMonth = monthName[currentMonthIndex];
 
 		int fontSize = 18;
@@ -192,13 +193,13 @@ public class CustomDatePicker extends JDialog {
 
 		return monthYearPanel;
 	}
-
+	
 	private void updateDate(int monthUpdate, int yearUpdate) {
-		currentCalendarPicked.add(Calendar.MONTH, monthUpdate);
-		currentCalendarPicked.add(Calendar.YEAR, yearUpdate);
+		currentDatePicked = currentDatePicked.plusMonths(monthUpdate);
+		currentDatePicked = currentDatePicked.plusYears(yearUpdate);
 
-		int selectedYear = currentCalendarPicked.get(Calendar.YEAR);
-		int selectedMonthIndex = currentCalendarPicked.get(Calendar.MONTH);
+		int selectedYear = currentDatePicked.getYear();
+		int selectedMonthIndex = currentDatePicked.getMonthValue() - 1;
 		String selectedMonth = monthName[selectedMonthIndex];
 
 		// update month and year
@@ -206,13 +207,13 @@ public class CustomDatePicker extends JDialog {
 		yearLabel.setText(String.valueOf(selectedYear));
 
 		// update date
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.DAY_OF_MONTH, 1);
-		c.set(Calendar.MONTH, currentCalendarPicked.get(Calendar.MONTH));
-		c.set(Calendar.YEAR, currentCalendarPicked.get(Calendar.YEAR));
+		LocalDate c = LocalDate.now();
+		c = c.withDayOfMonth(1);
+		c = c.withMonth(currentDatePicked.getMonthValue());
+		c = c.withYear(currentDatePicked.getYear());
 
-		int firstDayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-		int lastDayOfMonth = currentCalendarPicked.getActualMaximum(Calendar.DAY_OF_MONTH);
+		int firstDayOfWeek = c.getDayOfWeek().getValue() % 7;
+		int lastDayOfMonth = c.lengthOfMonth();
 
 		// clear all buttons
 		for (int row = 0; row < 6; row++) {
@@ -224,7 +225,7 @@ public class CustomDatePicker extends JDialog {
 
 		// date
 		for (int date = 1; date <= lastDayOfMonth; date++) {
-			int index = firstDayOfWeek + date - 2;
+			int index = firstDayOfWeek + date - 1;
 			int row = index / 7;
 			int col = index % 7;
 

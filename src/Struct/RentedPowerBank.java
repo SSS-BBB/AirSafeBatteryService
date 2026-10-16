@@ -1,13 +1,13 @@
 package Struct;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 public class RentedPowerBank {
 	public PowerBank deviceInfo;
 	
 	public int rentID;
 	public String pickUpAddress, returnAddress;
-	public Calendar rentDate, returnDate;
+	public LocalDate rentDate, returnDate;
 	public String status;
 	public double lateFeePerDay, rentPrice;
 	public int lockerNumber;
@@ -18,7 +18,7 @@ public class RentedPowerBank {
 	}
 	
 	public RentedPowerBank(ForRentPowerBank forRent, String returnAddress, 
-			Calendar rentDate, Calendar returnDate,
+			LocalDate rentDate, LocalDate returnDate,
 			double rentPrice) {
 		
 		// Take some attributes from For Rent Power bank

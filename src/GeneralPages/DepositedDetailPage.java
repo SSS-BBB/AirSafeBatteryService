@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.time.LocalDate;
 import java.util.Calendar;
 
 import javax.swing.BorderFactory;
@@ -160,13 +161,13 @@ public class DepositedDetailPage extends JPanel {
 		depositAddressHolder.setValue(powerBank.address);
 		lockerNumberHolder.setValue(String.valueOf(powerBank.lockerNumber));
 		lockerPasswordHolder.setValue(powerBank.lockerPassword);
-		depositDateHolder.setValue(Utils.getCalendarDateFormat(powerBank.depositDate, "dd/MM/yyyy"));
-		returnDateHolder.setValue(Utils.getCalendarDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
+		depositDateHolder.setValue(Utils.getDateFormat(powerBank.depositDate, "dd/MM/yyyy"));
+		returnDateHolder.setValue(Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
 		depositPriceHolder.setValue(String.valueOf(powerBank.depositPrice) + " บาท");
 		lateFeePerDayHolder.setValue(String.valueOf(powerBank.lateFeePerDay) + " บาท/วัน");
 
 		// Late days
-		Calendar today = Calendar.getInstance();
+		LocalDate today = LocalDate.now();
 		int lateDay = Utils.countDays(powerBank.returnDate, today);
 		lateDay = (lateDay < 0) ? 0 : lateDay;
 		double totalLateFee = powerBank.lateFeePerDay * lateDay;

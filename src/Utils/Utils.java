@@ -18,9 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -181,13 +182,14 @@ public class Utils {
 		return r.nextInt(max - min + 1) + min;
 	}
 	
-	public static String getCalendarDateFormat(Calendar c) {
-		return getCalendarDateFormat(c, "yyyy-MM-dd");
+	public static String getDateFormat(LocalDate date) {
+		return getDateFormat(date, "yyyy-MM-dd");
 	}
 	
-	public static String getCalendarDateFormat(Calendar c, String format) {
-		SimpleDateFormat dateFormatter = new SimpleDateFormat(format);
-		String formattedDate = dateFormatter.format(c.getTime());
+	public static String getDateFormat(LocalDate date, String format) {
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(format);
+		String formattedDate = dateFormatter.format(date);
+		
 		return formattedDate;
 	}
 	
@@ -447,42 +449,15 @@ public class Utils {
 		return dropDown;
 	}
 	
-	public static Calendar dateToCalendar(java.util.Date date) {
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
+	public static boolean isDatePast(LocalDate date) {
+		LocalDate today = LocalDate.now();
 		
-		c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 543);
-		
-		return c;
+		return today.isAfter(date);
 	}
 	
-	public static boolean isDatePast(Calendar date) {
-		Calendar today = Calendar.getInstance();
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MILLISECOND, 0);
+	public static int countDays(LocalDate d1, LocalDate d2) {
 		
-		date.set(Calendar.HOUR_OF_DAY, 0);
-		date.set(Calendar.MINUTE, 0);
-		date.set(Calendar.SECOND, 0);
-		date.set(Calendar.MILLISECOND, 0);
-		
-		return date.before(today);
-	}
-	
-	public static int countDays(Calendar c1, Calendar c2) {
-		c1.set(Calendar.HOUR_OF_DAY, 0);
-		c1.set(Calendar.MINUTE, 0);
-		c1.set(Calendar.SECOND, 0);
-		c1.set(Calendar.MILLISECOND, 0);
-		
-		c2.set(Calendar.HOUR_OF_DAY, 0);
-		c2.set(Calendar.MINUTE, 0);
-		c2.set(Calendar.SECOND, 0);
-		c2.set(Calendar.MILLISECOND, 0);
-		
-		return (int) ChronoUnit.DAYS.between(c1.toInstant(), c2.toInstant());
+		return (int) ChronoUnit.DAYS.between(d1, d2);
 	}
 	
 	public static void showDialog(JFrame frame, String title, String detail) {

@@ -585,8 +585,8 @@ public class DatabaseConnector {
 				depositedPowerBank.depositId = resultSet.getInt("depposit_id");
 				depositedPowerBank.depositStatus = resultSet.getString("deposit_status");
 				depositedPowerBank.address = resultSet.getString("address");
-				depositedPowerBank.depositDate = Utils.dateToCalendar(resultSet.getTimestamp("deposit_date"));
-				depositedPowerBank.returnDate = Utils.dateToCalendar(resultSet.getTimestamp("return_date"));
+				depositedPowerBank.depositDate = resultSet.getDate("deposit_date").toLocalDate();
+				depositedPowerBank.returnDate = resultSet.getDate("return_date").toLocalDate();
 				depositedPowerBank.lockerNumber = resultSet.getInt("locker_number");
 				depositedPowerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
 				depositedPowerBank.depositPrice = resultSet.getDouble("deposit_price");
@@ -603,7 +603,7 @@ public class DatabaseConnector {
 		return depositedPowerBankList;
 	}
 	
-	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId) {
+	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean pastDueDate) {
 		if (!checkConnection("Unable to get rented power bank data.")) return null;
 		
 		ArrayList<RentedPowerBank> rentedPowerBankList = null;
@@ -651,9 +651,9 @@ public class DatabaseConnector {
 				rentedPowerBank.lockerPassword = resultSet.getString("locker_password");
 				rentedPowerBank.pickUpAddress = resultSet.getString("pick_up_address");
 				rentedPowerBank.returnAddress = resultSet.getString("return_address");
-				rentedPowerBank.rentDate = Utils.dateToCalendar(resultSet.getTimestamp("pick_up_date"));
+				rentedPowerBank.rentDate = resultSet.getDate("pick_up_date").toLocalDate();
 				rentedPowerBank.status = resultSet.getString("rent_status");
-				rentedPowerBank.returnDate = Utils.dateToCalendar(resultSet.getTimestamp("return_date"));
+				rentedPowerBank.returnDate = resultSet.getDate("return_date").toLocalDate();
 				rentedPowerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
 				rentedPowerBank.rentPrice = resultSet.getDouble("rent_price");
 				rentedPowerBank.lockerNumber = resultSet.getInt("locker_number");
@@ -1032,9 +1032,9 @@ public class DatabaseConnector {
 			ps.setString(2, lockerPassword);
 			ps.setString(3, powerBank.returnAddress);
 			ps.setString(4, powerBank.pickUpAddress);
-			ps.setString(5, Utils.getCalendarDateFormat(powerBank.rentDate));
+			ps.setString(5, Utils.getDateFormat(powerBank.rentDate));
 			ps.setString(6, "ยังไม่รับ");
-			ps.setString(7, Utils.getCalendarDateFormat(powerBank.returnDate));
+			ps.setString(7, Utils.getDateFormat(powerBank.returnDate));
 			ps.setDouble(8, powerBank.lateFeePerDay);
 			ps.setDouble(9, powerBank.rentPrice);
 			ps.setDouble(10, powerBank.lockerNumber);
@@ -1086,8 +1086,8 @@ public class DatabaseConnector {
 			ps.setInt(1, powerBankId);
 			ps.setString(2, "จองที่ฝากแล้ว");
 			ps.setString(3, depositInfo.address);
-			ps.setString(4, Utils.getCalendarDateFormat(depositInfo.depositDate));
-			ps.setString(5, Utils.getCalendarDateFormat(depositInfo.returnDate));
+			ps.setString(4, Utils.getDateFormat(depositInfo.depositDate));
+			ps.setString(5, Utils.getDateFormat(depositInfo.returnDate));
 			ps.setInt(6, depositInfo.lockerNumber);
 			ps.setDouble(7, depositInfo.lateFeePerDay);
 			ps.setDouble(8, depositInfo.depositPrice);

@@ -9,7 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -166,8 +166,8 @@ public class RentedDetailPage extends JPanel {
 		powerBankBox.updatePowerbankBox(powerBank.deviceInfo);
 		
 		// update rent details
-		rentDateHolder.setValue(Utils.getCalendarDateFormat(powerBank.rentDate, "dd/MM/yyyy"));
-		returnDateHolder.setValue(Utils.getCalendarDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
+		rentDateHolder.setValue(Utils.getDateFormat(powerBank.rentDate, "dd/MM/yyyy"));
+		returnDateHolder.setValue(Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
 		pickUpAddressHolder.setValue(powerBank.pickUpAddress);
 		lockerNumberHolder.setValue(String.valueOf(powerBank.lockerNumber));
 		lockerPasswordHolder.setValue(powerBank.lockerPassword);
@@ -176,7 +176,7 @@ public class RentedDetailPage extends JPanel {
 		lateFeePerDayHolder.setValue(String.valueOf(powerBank.lateFeePerDay) + " บาท/วัน");
 		
 		// Late Day
-		Calendar today = Calendar.getInstance();
+		LocalDate today = LocalDate.now();
 		int lateDay = Utils.countDays(powerBank.returnDate, today);
 		lateDay = (lateDay < 0) ? 0 : lateDay;
 		double totalLateFee = powerBank.lateFeePerDay * lateDay;

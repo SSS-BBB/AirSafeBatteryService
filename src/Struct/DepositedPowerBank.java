@@ -1,13 +1,13 @@
 package Struct;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 public class DepositedPowerBank {
 	
 	public PowerBank deviceInfo;
 	public int depositId;
 	public String depositStatus, address;
-	public Calendar depositDate, returnDate;
+	public LocalDate depositDate, returnDate;
 	public int lockerNumber;
 	public double lateFeePerDay, depositPrice;
 	public String lockerPassword;
@@ -18,7 +18,7 @@ public class DepositedPowerBank {
 	}
 	
 	public DepositedPowerBank(PowerBank deviceInfo, String address, 
-			Calendar depositDate, Calendar returnDate, int lockerNumber,
+			LocalDate depositDate, LocalDate returnDate, int lockerNumber,
 			double lateFeePerDay, double depositPrice) {
 		
 		this.deviceInfo = deviceInfo;

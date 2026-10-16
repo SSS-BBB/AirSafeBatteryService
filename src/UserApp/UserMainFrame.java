@@ -14,10 +14,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.Format;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Formatter;
 
 import javax.imageio.ImageIO;
@@ -149,6 +149,7 @@ public class UserMainFrame extends JFrame {
 		}
 
 		DatabaseConnector.connect();
+		Utils.getDateFormat(LocalDate.now());
 
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
@@ -308,7 +309,7 @@ public class UserMainFrame extends JFrame {
 		// List page
 		PowerBank tempPowerBank = DatabaseConnector.getPowerBank(2, true).get(0);
 		DepositedPowerBank tempDepositedPowerBank = new DepositedPowerBank(tempPowerBank, "สนามบินสุวรรณภูมิ",
-				Calendar.getInstance(), Calendar.getInstance(), 1, 50.0, 25.0);
+				LocalDate.now(), LocalDate.now(), 1, 50.0, 25.0);
 		tempDepositedPowerBank.depositStatus = "จองที่ฝากแล้ว";
 		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, rentedDetailPanel,
 				depositedDetailPanel);
@@ -318,9 +319,8 @@ public class UserMainFrame extends JFrame {
 		tempRentedPowerBank.deviceInfo = tempPowerBank;
 		tempRentedPowerBank.pickUpAddress = "สนามบินสุวรรณภูมิ";
 		tempRentedPowerBank.returnAddress = "สนามบินดอนเมือง";
-		tempRentedPowerBank.rentDate = Calendar.getInstance();
-		tempRentedPowerBank.returnDate = Calendar.getInstance();
-		tempRentedPowerBank.returnDate.add(Calendar.DATE, 10);
+		tempRentedPowerBank.rentDate = LocalDate.now();
+		tempRentedPowerBank.returnDate = LocalDate.now().plusDays(10);
 		tempRentedPowerBank.status = "ยังไม่รับ";
 		tempRentedPowerBank.lateFeePerDay = 50.0;
 		tempRentedPowerBank.rentPrice = 1000.0;
