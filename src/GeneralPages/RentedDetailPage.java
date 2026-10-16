@@ -87,13 +87,9 @@ public class RentedDetailPage extends JPanel {
 		JPanel rentDetailPanel = new JPanel();
 		rentDetailPanel.setLayout(new BoxLayout(rentDetailPanel, BoxLayout.Y_AXIS));
 		rentDetailPanel.setBackground(null);
-		rentDetailPanel.setAlignmentX(RIGHT_ALIGNMENT);
-		
-		int margin = 8;
-		int headingFontSize = 20;
+		rentDetailPanel.setAlignmentX(LEFT_ALIGNMENT);
+
 		int bodyFontSize = 18;
-		float componentAlignment = LEFT_ALIGNMENT;
-		Dimension boxSize = new Dimension(0, 0);
 		
 		// create value detail holder
 		
@@ -137,8 +133,19 @@ public class RentedDetailPage extends JPanel {
 		totalLateFeeHolder = new NameValueHolder("รวมค่าปรับ:", bodyFontSize, bodyFontSize);
 		rentDetailPanel.add(totalLateFeeHolder);
 		
-		// back button
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		// Inform user to return the power bank within a set date
+		JPanel informWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		informWrapper.setAlignmentX(LEFT_ALIGNMENT);
+		informWrapper.setBackground(null);
+		rentDetailPanel.add(informWrapper);
+		
+		JLabel informLabel = createPageLabel(Font.PLAIN, bodyFontSize);
+		informLabel.setText("นำ Power Bank ไปคืนที่สถานที่และวันที่กำหนด");
+		informWrapper.add(informLabel);
+		
+		// Back button
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		buttonPanel.setAlignmentX(LEFT_ALIGNMENT);
 		buttonPanel.setBackground(null);
 		rentDetailPanel.add(buttonPanel);
 		
@@ -165,16 +172,17 @@ public class RentedDetailPage extends JPanel {
 		lockerNumberHolder.setValue(String.valueOf(powerBank.lockerNumber));
 		lockerPasswordHolder.setValue(powerBank.lockerPassword);
 		returnAddressHolder.setValue(powerBank.returnAddress);
-		rentPriceHolder.setValue(String.valueOf(powerBank.rentPrice));
-		lateFeePerDayHolder.setValue(String.valueOf(powerBank.lateFeePerDay));
+		rentPriceHolder.setValue(String.valueOf(powerBank.rentPrice) + " บาท");
+		lateFeePerDayHolder.setValue(String.valueOf(powerBank.lateFeePerDay) + " บาท/วัน");
 		
 		// Late Day
 		Calendar today = Calendar.getInstance();
 		int lateDay = Utils.countDays(powerBank.returnDate, today);
+		lateDay = (lateDay < 0) ? 0 : lateDay;
 		double totalLateFee = powerBank.lateFeePerDay * lateDay;
 		
-		lateDayHolder.setValue(String.valueOf(lateDay));
-		totalLateFeeHolder.setValue(String.valueOf(totalLateFee));
+		lateDayHolder.setValue(String.valueOf(lateDay) + " วัน");
+		totalLateFeeHolder.setValue(String.valueOf(totalLateFee) + " บาท");
 		
 		
 		/*

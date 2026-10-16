@@ -85,7 +85,8 @@ public class UserMainFrame extends JFrame {
 			"DepositCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", 
 			"ForRentPayment", "ProcessStatus", "PowerBankPicker",
-			"PowerBankAdd", "DepositPayment", "RentedDetail" };
+			"PowerBankAdd", "DepositPayment", "RentedDetail",
+			"DepositedDetail" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel , storagePanel, listPanel, historyPanel, notificationPanel,
@@ -109,6 +110,7 @@ public class UserMainFrame extends JFrame {
 	
 	// TODO: List Display pages
 	private RentedDetailPage rentedDetailPanel;
+	private DepositedDetailPage depositedDetailPanel;
 	
 	public UserDetail userDetail;
 
@@ -189,7 +191,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(4, 14);
+		changeCard(4, 15);
 		/*
 		ArrayList<String> sampleInput = new ArrayList<String>();
 		sampleInput.add("USB-C");
@@ -310,7 +312,7 @@ public class UserMainFrame extends JFrame {
 		tempDepositedPowerBank.depositStatus = "จองที่ฝากแล้ว";
 		powerBankListPanel = new UserList(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
-		// TODO: Rented Detail page
+		// Rented Detail page
 		RentedPowerBank tempRentedPowerBank = new RentedPowerBank();
 		tempRentedPowerBank.deviceInfo = tempPowerBank;
 		tempRentedPowerBank.pickUpAddress = "สนามบินสุวรรณภูมิ";
@@ -326,6 +328,10 @@ public class UserMainFrame extends JFrame {
 		
 		rentedDetailPanel = new RentedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempRentedPowerBank);
 		
+		// TODO: Deposited Detail Page
+		tempDepositedPowerBank.lockerPassword = "BCD987";
+		depositedDetailPanel = new DepositedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, tempDepositedPowerBank);
+		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
@@ -339,6 +345,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(depositPaymentPanel, cardNames[13]);
 		cardPanel.add(powerBankListPanel, cardNames[4]);
 		cardPanel.add(rentedDetailPanel, cardNames[14]);
+		cardPanel.add(depositedDetailPanel, cardNames[15]);
 	}
 
 	
