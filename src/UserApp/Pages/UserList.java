@@ -177,14 +177,20 @@ public class UserList extends JPanel {
 	public void updateListDisplayPanel() {
 		powerBankDisplayList.clear();
 		
-		// get data from rented power bank and deposited power bank table
-		ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, showPastDue);
-		for (RentedPowerBank powerBank : rentedPowerBankList)
-			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
+		String selectedType = typeDropDownHolder.getValue();
 		
-		ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, showPastDue);
-		for (DepositedPowerBank powerBank : depositedPowerBankList)
-			powerBankDisplayList.add(new PowerBankDisplay(powerBank));
+		// get data from rented power bank and deposited power bank table
+		if (!selectedType.equals("การฝาก")) {
+			ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, showPastDue);
+			for (RentedPowerBank powerBank : rentedPowerBankList)
+				addPowerBankDisplay(new PowerBankDisplay(powerBank));
+		}
+		
+		if (!selectedType.equals("การเช่า")) {
+			ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, showPastDue);
+			for (DepositedPowerBank powerBank : depositedPowerBankList)
+				addPowerBankDisplay(new PowerBankDisplay(powerBank));
+		}
 		
 		listDisplayPanel.removeAll();
 
@@ -193,6 +199,103 @@ public class UserList extends JPanel {
 		
 		listDisplayPanel.revalidate();
 		listDisplayPanel.repaint();
+	}
+	
+	private boolean insertHere(LocalDate d1, LocalDate d2) {
+		if (orderAsc) {
+			return d1.isBefore(d2) || d1.equals(d2);
+		}
+		else {
+			return d1.isAfter(d2);
+		}
+	}
+	
+	private boolean insertHere(String s1, String s2) {
+		if (orderAsc) {
+			return s1.compareTo(s2) <= 0;
+		}
+		else {
+			return s1.compareTo(s2) > 0;
+		}
+	}
+	
+	private void addPowerBankDisplay(PowerBankDisplay powerBank) {
+		// sort from sorting filter
+		// { "ไม่มี", "ประเภท", "สถานะ", "สถานที่ขาไป", "สถานที่ขากลับ", "วันที่ขาไป", "วันที่ขากลับ" }
+		String sortBy = orderByDropDownHolder.getValue();
+		
+		int listSize = powerBankDisplayList.size();
+		int indexToInsert = listSize;
+		
+		// String compare
+		if (sortBy.equals("ประเภท")) {
+			for (int i = 0; i < listSize; i++) {
+				PowerBankDisplay powerBankToCompare = powerBankDisplayList.get(i);
+				if (insertHere(powerBank.type, powerBankToCompare.type)) {
+					// new value is less than the compared value in the list
+					indexToInsert = i;
+					break;
+				}
+			}
+		}
+		
+		else if (sortBy.equals("สถานะ")) {
+			for (int i = 0; i < listSize; i++) {
+				PowerBankDisplay powerBankToCompare = powerBankDisplayList.get(i);
+				if (insertHere(powerBank.status, powerBankToCompare.status)) {
+					// new value is less than the compared value in the list
+					indexToInsert = i;
+					break;
+				}
+			}
+		}
+		
+		else if (sortBy.equals("สถานที่ขาไป")) {
+			for (int i = 0; i < listSize; i++) {
+				PowerBankDisplay powerBankToCompare = powerBankDisplayList.get(i);
+				if (insertHere(powerBank.outboundAddress, powerBankToCompare.outboundAddress)) {
+					// new value is less than the compared value in the list
+					indexToInsert = i;
+					break;
+				}
+			}
+		}
+		
+		else if (sortBy.equals("สถานที่ขากลับ")) {
+			for (int i = 0; i < listSize; i++) {
+				PowerBankDisplay powerBankToCompare = powerBankDisplayList.get(i);
+				if (insertHere(powerBank.returnAddress, powerBankToCompare.returnAddress)) {
+					// new value is less than the compared value in the list
+					indexToInsert = i;
+					break;
+				}
+			}
+		}
+		
+		// Date Compare
+		else if (sortBy.equals("วันที่ขาไป")) {
+			for (int i = 0; i < listSize; i++) {
+				PowerBankDisplay powerBankToCompare = powerBankDisplayList.get(i);
+				if (insertHere(powerBank.outBoundDate, powerBankToCompare.outBoundDate)) {
+					// new value is less than the compared value in the list
+					indexToInsert = i;
+					break;
+				}
+			}
+		}
+		
+		else if (sortBy.equals("วันที่ขากลับ")) {
+			for (int i = 0; i < listSize; i++) {
+				PowerBankDisplay powerBankToCompare = powerBankDisplayList.get(i);
+				if (insertHere(powerBank.returnDate, powerBankToCompare.returnDate)) {
+					// new value is less than the compared value in the list
+					indexToInsert = i;
+					break;
+				}
+			}
+		}
+		
+		powerBankDisplayList.add(indexToInsert, powerBank);
 	}
 
 	private JPanel createListDisplayPanel() {
