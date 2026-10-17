@@ -18,27 +18,87 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import Database.DatabaseConnector;
+import Struct.PowerBankRule;
 import UserApp.UserMainFrame;
 import Utils.Utils;
 
 public class UserCheck extends JPanel {
+	
+	private class DetailContent extends JPanel {
+		
+		 private JLabel valueLabel;
+		
+		public DetailContent(String valueName) {
+			super(new GridBagLayout());
+			setBackground(backgroundColor);
+			setAlignmentX(LEFT_ALIGNMENT);
+			
+			JLabel valueNameLabel = new JLabel(valueName + " ");
+			valueNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+			valueNameLabel.setForeground(Color.BLACK);
 
+			GridBagConstraints valueNameGBC = new GridBagConstraints();
+			valueNameGBC.gridx = 0;
+			valueNameGBC.gridy = 0;
+			valueNameGBC.ipadx = 100;
+			valueNameGBC.weightx = 1;
+			valueNameGBC.anchor = GridBagConstraints.WEST;
+			this.add(valueNameLabel, valueNameGBC);
+
+			valueLabel = new JLabel();
+			valueLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+			valueLabel.setForeground(Color.BLACK);
+
+			GridBagConstraints valueGBC = new GridBagConstraints();
+			valueGBC.gridx = 1;
+			valueGBC.gridy = 0;
+			valueGBC.weightx = 0;
+			valueGBC.anchor = GridBagConstraints.EAST;
+			valueGBC.insets = new Insets(0, 0, 5, 0);
+			add(valueLabel, valueGBC);
+		}
+		
+		public void setValue(double value, String unit) {
+			if (value < 0) {
+				valueLabel.setText("- " + unit);
+			}
+			else {
+				valueLabel.setText(String.valueOf(value) + " " + unit);
+			}
+		}
+	}
+	
 	private UserMainFrame mainFrame;
 	private Color backgroundColor;
 	
 	private JPanel checkStatusPanel, statusPanel;
 	private JLabel statusIconLabel, statusLabelTitle, statusLabelDetail, whLabel;
+	
+	// detail after check
+	private DetailContent capacityPanel;
+	private DetailContent voltagePanel;
+	private DetailContent whPanel;
+	private DetailContent maximumPanel;
+	
+	private PowerBankRule rule;
 
 	public UserCheck(UserMainFrame mainFrame, Color backgroundColor) {
 		super();
 
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
-
+		this.rule = new PowerBankRule();
+		
+		loadRule();
 		createCheckPage();
 		createCheckStatusPage(false);
 	}
-
+	
+	private void loadRule() {
+		rule = DatabaseConnector.getValidRule();
+	}
+	
 	private void createCheckPage() {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setBackground(backgroundColor);
@@ -107,14 +167,31 @@ public class UserCheck extends JPanel {
 		checkButton.addActionListener(e -> {
 			// TODO: check conditions from database
 
-			double wh = Double.parseDouble(energyTextField.getText());
-
-			if (wh > 100) {
-				updateStatusPanel(wh, false);
+			double wh = Utils.getNumberFromTextField(energyTextField, -1);
+			double capacity = Utils.getNumberFromTextField(capacityTextField, -1);
+			double voltage = Utils.getNumberFromTextField(voltageTextField, -1);
+			
+			if (wh > 0 && capacity > 0 && voltage > 0) return;
+			
+			if (rule.maxWh < 0) {
+				System.err.println("Couldn't get max wh rule. Unable to check the power bank.");
+				return;
+			}
+			
+			if (wh < 0) {
+				if (capacity < 0 || voltage < 0) {
+					return;
+				}
+				
+				wh = (capacity * voltage) / 1000.0;
+			}
+			
+			if (wh > rule.maxWh) {
+				updateStatusPanel(wh, capacity, voltage, false);
 			}
 
 			else {
-				updateStatusPanel(wh, true);
+				updateStatusPanel(wh, capacity, voltage, true);
 			}
 
 			mainFrame.changeCard(1, 7);
@@ -152,8 +229,6 @@ public class UserCheck extends JPanel {
 		checkStatusPanel.add(statusContentPanel, BorderLayout.CENTER);
 
 		Color borderColor = new Color(166, 173, 168);
-
-		// TODO: get wh from the database
 
 		createStatusPanel(borderColor);
 		GridBagConstraints statusC = new GridBagConstraints();
@@ -245,7 +320,8 @@ public class UserCheck extends JPanel {
 		ruleStatusPanel.add(ruleTitleLabel);
 
 		// Rule 1
-		JLabel rule1 = new JLabel("- ความจุไม่เกิน 100 Wh สามารถนำขึ้นเครื่องได้โดยไม่ต้องขออนุญาต");
+		String rule1Text = "- พลังงานไม่เกิน " + String.valueOf(rule.maxWh) + " Wh สามารถนำขึ้นเครื่องได้โดยไม่ต้องขออนุญาต";
+		JLabel rule1 = new JLabel(rule1Text);
 		rule1.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		rule1.setForeground(Color.BLACK);
 		rule1.setAlignmentX(LEFT_ALIGNMENT);
@@ -253,7 +329,9 @@ public class UserCheck extends JPanel {
 		ruleStatusPanel.add(rule1);
 
 		// Rule 2
-		JLabel rule2 = new JLabel("- จะต้องถือเป็นสัมภาระขึ้นเครื่องเท่านั้น");
+		String rule2Text = "";
+		if (rule.carryOnBaggage && !rule.checkedBaggage) rule2Text = "- จะต้องถือเป็นสัมภาระขึ้นเครื่องเท่านั้น";
+		JLabel rule2 = new JLabel(rule2Text);
 		rule2.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		rule2.setForeground(Color.BLACK);
 		rule2.setAlignmentX(LEFT_ALIGNMENT);
@@ -261,7 +339,8 @@ public class UserCheck extends JPanel {
 		ruleStatusPanel.add(rule2);
 
 		// Rule 3
-		JLabel rule3 = new JLabel("- สามารถพกพาได้สูงสุดไม่เกิน 2 เครื่อง");
+		String rule3Text = "- สามารถพกพาได้สูงสุดไม่เกิน " + String.valueOf(rule.maxCarry) + " เครื่อง";
+		JLabel rule3 = new JLabel(rule3Text);
 		rule3.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		rule3.setForeground(Color.BLACK);
 		rule3.setAlignmentX(LEFT_ALIGNMENT);
@@ -272,11 +351,6 @@ public class UserCheck extends JPanel {
 	}
 
 	private JPanel createDetailStatusPanel(Color borderColor) {
-		// TODO: get data from database
-		double capacity = 20000;
-		double voltage = 3.7;
-		double wh = 74;
-		double maximumWh = 100;
 
 		JPanel detailPanel = new JPanel();
 		detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
@@ -292,53 +366,21 @@ public class UserCheck extends JPanel {
 		detailPanel.add(detailTitle);
 
 		// Detail Content
-		JPanel capacityPanel = createDetailContent("ความจุ", capacity, "mAh");
+		capacityPanel = new DetailContent("ความจุ");
 		detailPanel.add(capacityPanel);
-
-		JPanel voltagePanel = createDetailContent("แรงดันไฟฟ้า", voltage, "V");
+		
+		voltagePanel = new DetailContent("แรงดันไฟฟ้า");
 		detailPanel.add(voltagePanel);
-
-		JPanel whPanel = createDetailContent("พลังงาน", wh, "Wh");
+		
+		whPanel = new DetailContent("พลังงาน");
 		detailPanel.add(whPanel);
-
-		JPanel maximumPanel = createDetailContent("เกณฑ์พลังงานไม่เกิน", maximumWh, "Wh");
+		
+		maximumPanel = new DetailContent("เกณฑ์พลังงานไม่เกิน");
 		detailPanel.add(maximumPanel);
 
 		detailPanel.add(Box.createVerticalGlue());
 
 		return detailPanel;
-	}
-
-	private JPanel createDetailContent(String valueName, double value, String unit) {
-		JPanel contentPanel = new JPanel(new GridBagLayout());
-		contentPanel.setBackground(backgroundColor);
-		contentPanel.setAlignmentX(LEFT_ALIGNMENT);
-
-		JLabel valueNameLabel = new JLabel(valueName + " ");
-		valueNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		valueNameLabel.setForeground(Color.BLACK);
-
-		GridBagConstraints valueNameGBC = new GridBagConstraints();
-		valueNameGBC.gridx = 0;
-		valueNameGBC.gridy = 0;
-		valueNameGBC.ipadx = 100;
-		valueNameGBC.weightx = 1;
-		valueNameGBC.anchor = GridBagConstraints.WEST;
-		contentPanel.add(valueNameLabel, valueNameGBC);
-
-		JLabel valueLabel = new JLabel(String.valueOf(value) + " " + unit);
-		valueLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		valueLabel.setForeground(Color.BLACK);
-
-		GridBagConstraints valueGBC = new GridBagConstraints();
-		valueGBC.gridx = 1;
-		valueGBC.gridy = 0;
-		valueGBC.weightx = 0;
-		valueGBC.anchor = GridBagConstraints.EAST;
-		valueGBC.insets = new Insets(0, 0, 5, 0);
-		contentPanel.add(valueLabel, valueGBC);
-
-		return contentPanel;
 	}
 
 	private void createStatusPanel(Color borderColor) {
@@ -373,8 +415,7 @@ public class UserCheck extends JPanel {
 
 	}
 
-	private void updateStatusPanel(double wh, boolean approve) {
-
+	private void updateStatusPanel(double wh, double capacity, double voltage, boolean approve) {
 		String statusTitle = "สามารถนำขึ้นเครื่องได้";
 		String statusDetail = "Power Bank ของคุณเป็นไปตามกฎระเบียบ";
 		String statusImagePath = "/icons/check_green_icon_128.png";
@@ -388,7 +429,10 @@ public class UserCheck extends JPanel {
 			backgroundColor = new Color(247, 188, 188);
 			statusTextColor = new Color(176, 4, 4);
 		}
-
+		
+		// TODO: insert into check history
+		DatabaseConnector.insertIntoCheckHistory(capacity, wh, mainFrame.userDetail.userID, rule.ruleId);
+		
 		statusPanel.setBackground(backgroundColor);
 
 		// status icon
@@ -405,6 +449,13 @@ public class UserCheck extends JPanel {
 		// wh label
 		whLabel.setText("พลังงาน: " + String.valueOf(wh) + " Wh");
 		whLabel.setForeground(statusTextColor);
+		
+		// set value in detail content
+		capacityPanel.setValue(capacity, "mAh");
+		voltagePanel.setValue(voltage, "V");
+		whPanel.setValue(wh, "Wh");
+		maximumPanel.setValue(rule.maxWh, "Wh");
+		
 	}
 
 }

@@ -187,7 +187,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(4, 4);
+		changeCard(1, 1);
 		/*
 		 * ArrayList<String> sampleInput = new ArrayList<String>();
 		 * sampleInput.add("USB-C"); sampleInput.add("USB-A");

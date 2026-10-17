@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -26,6 +27,7 @@ import javax.swing.ImageIcon;
 import Struct.DepositedPowerBank;
 import Struct.ForRentPowerBank;
 import Struct.PowerBank;
+import Struct.PowerBankRule;
 import Struct.RentedPowerBank;
 import Utils.Utils;
 
@@ -71,7 +73,7 @@ public class DatabaseConnector {
 		}
 
 	}
-
+	
 	public static int insertIntoTransaction(double paymentAmount, int userID) {
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into transaction table.");
@@ -150,11 +152,38 @@ public class DatabaseConnector {
 			while (resultSet.next())
 				count++;
 			return count;
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return -1;
+	}
+	
+	public static PowerBankRule getValidRule() {
+		if (!checkConnection("Unable to get a valid power bank rule.")) return null;
+		
+		PowerBankRule rule = new PowerBankRule();
+		
+		String query = "SELECT * FROM POWERBANKRULE " + 
+					   "WHERE EFFECTIVE_DATE = (SELECT MAX(EFFECTIVE_DATE) FROM POWERBANKRULE) " +
+					   "AND NOW() >= EFFECTIVE_DATE AND NOW() < END_DATE";
+		
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				rule.ruleId = resultSet.getInt("rule_id");
+				rule.maxCarry = resultSet.getInt("max_carry");
+				rule.maxWh = resultSet.getInt("max_wh");
+				rule.checkedBaggage = resultSet.getBoolean("checked_baggage");
+				rule.carryOnBaggage = resultSet.getBoolean("carry_on_baggage");
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return rule;
 	}
 
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
@@ -811,7 +840,35 @@ public class DatabaseConnector {
 
 		return null;
 	}
-
+	
+	public static boolean insertIntoCheckHistory(double capacity, double wh, int userId, int ruleId) {
+		if (!checkConnection("Insert Into Check History Table.")) return false;
+		
+		if (userId < 0) return false;
+		
+		String query = "INSERT INTO CHECKHISTORY (CHECK_TIMESTAMP, CAPACITY, WH, USER_ID, RULE_ID) " +
+					   "VALUES (NOW(), ?, ?, ?, ?)";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			if (capacity < 0) {
+				ps.setNull(1, Types.DOUBLE);
+			}
+			else {
+				ps.setDouble(1, capacity);
+			}
+			
+			ps.setDouble(2, wh);
+			ps.setInt(3, userId);
+			ps.setInt(4, ruleId);
+			
+			boolean result = ps.executeUpdate() > 0;
+			return result;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	public static boolean insertIntoCharger(int powerBankId, ArrayList<String> chargerList, boolean isInput) {
 		// insert into input and output
 		if (chargerList.isEmpty()) {
