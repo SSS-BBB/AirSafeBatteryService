@@ -84,7 +84,8 @@ public class UserMainFrame extends JFrame {
 	private JPanel[] menuPanels;
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", "DepositCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", "ForRentPayment", "ProcessStatus",
-			"PowerBankPicker", "PowerBankAdd", "DepositPayment", "RentedDetail", "DepositedDetail" };
+			"PowerBankPicker", "PowerBankAdd", "DepositPayment", "RentedDetail", "DepositedDetail",
+			"HistoryDetail" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel, storagePanel, listPanel, notificationPanel, checkStatusPanel;
@@ -111,7 +112,7 @@ public class UserMainFrame extends JFrame {
 	
 	// TODO: History pages
 	private UserHistory historyPanel;
-	
+	private UserHistoryDetail historyDetailPanel;
 	
 	
 	public UserDetail userDetail;
@@ -192,13 +193,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(5, 5);
-		/*
-		 * ArrayList<String> sampleInput = new ArrayList<String>();
-		 * sampleInput.add("USB-C"); sampleInput.add("USB-A");
-		 * sampleInput.add("Lightning"); DatabaseConnector.insertIntoCharger(100,
-		 * sampleInput, true);
-		 */
+		changeCard(5, 16);
 
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -335,7 +330,8 @@ public class UserMainFrame extends JFrame {
 		tempDepositedPowerBank.lockerPassword = "BCD987";
 		
 		// History Page
-		historyPanel = new UserHistory(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		historyDetailPanel = new UserHistoryDetail(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		historyPanel = new UserHistory(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, historyDetailPanel);
 
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -352,6 +348,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(rentedDetailPanel, cardNames[14]);
 		cardPanel.add(depositedDetailPanel, cardNames[15]);
 		cardPanel.add(historyPanel, cardNames[5]);
+		cardPanel.add(historyDetailPanel, cardNames[16]);
 	}
 	
 	public void refreshListPage() {

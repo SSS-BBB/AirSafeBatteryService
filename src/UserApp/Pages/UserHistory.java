@@ -36,18 +36,21 @@ public class UserHistory extends JPanel {
 
 	private UserMainFrame mainFrame;
 	private Color backgroundColor, menuColor, mainColor;
-
+	
+	private UserHistoryDetail detailPage;
+	
 	// Filter components
-	JButton allFilterButton, rentFilterButton, depositFilterButton, checkFilterButton;
+	private JButton allFilterButton, rentFilterButton, depositFilterButton, checkFilterButton;
 
-	public UserHistory(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
+	public UserHistory(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor, UserHistoryDetail detailPage) {
 		super(new BorderLayout());
 
 		this.mainFrame = mainFrame;
 		this.backgroundColor = backgroundColor;
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
-
+		this.detailPage = detailPage;
+		
 		setBackground(backgroundColor);
 
 		// Top Panel
@@ -78,7 +81,9 @@ public class UserHistory extends JPanel {
 		JPanel historyContentPanel = createHistoryContentPanel();
 		CustomScrollPane historyScrollPane = new CustomScrollPane(historyContentPanel, menuColor, backgroundColor);
 		this.add(historyScrollPane, BorderLayout.CENTER);
-
+		
+		ArrayList<CheckHistory> checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		detailPage.updatePage(checkHistoryList.get(0));
 	}
 	
 	private JPanel createHistoryContentPanel() {
