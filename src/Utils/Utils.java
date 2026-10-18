@@ -264,6 +264,20 @@ public class Utils {
 		return button;
 	}
 	
+	public static JButton createColorBackgroundButton(String text, Color backgroundColor, Color fontColor, int fontSize, int padding) {
+		JButton button = new JButton(text);
+		button.setFont(new Font("Tahoma", Font.BOLD, fontSize));
+		button.setBackground(backgroundColor);
+		button.setForeground(fontColor);
+		button.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
+		button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		button.setFocusPainted(false);
+		button.setContentAreaFilled(false);
+		button.setOpaque(true);
+		
+		return button;
+	}
+	
 	public static JButton createBorderButton(String text, Color borderColor, Color textColor, int fontSize) {
 		return createBorderButton(text, borderColor, textColor, fontSize, 1);
 	}

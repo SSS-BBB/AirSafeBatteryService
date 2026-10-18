@@ -87,7 +87,7 @@ public class UserMainFrame extends JFrame {
 			"PowerBankPicker", "PowerBankAdd", "DepositPayment", "RentedDetail", "DepositedDetail" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel, storagePanel, listPanel, historyPanel, notificationPanel, checkStatusPanel;
+	private JPanel homePanel, checkPanel, storagePanel, listPanel, notificationPanel, checkStatusPanel;
 
 	private UserProcessStatus processStatusPanel;
 	private PowerBankPickerPage powerBankPickerPanel;
@@ -105,10 +105,15 @@ public class UserMainFrame extends JFrame {
 	// List page
 	private UserList powerBankListPanel;
 
-	// TODO: List Display pages
+	// List Display pages
 	private RentedDetailPage rentedDetailPanel;
 	private DepositedDetailPage depositedDetailPanel;
-
+	
+	// TODO: History pages
+	private UserHistory historyPanel;
+	
+	
+	
 	public UserDetail userDetail;
 
 	// colors
@@ -187,7 +192,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(1, 1);
+		changeCard(5, 5);
 		/*
 		 * ArrayList<String> sampleInput = new ArrayList<String>();
 		 * sampleInput.add("USB-C"); sampleInput.add("USB-A");
@@ -301,7 +306,7 @@ public class UserMainFrame extends JFrame {
 		powerBankPickerPanel.updateTitleLabel("ฝาก Power Bank");
 		powerBankAddPanel = new PowerBankAddPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, depositPanel);
 
-		// TODO: List Detail pages
+		// List Detail pages
 		rentedDetailPanel = new RentedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		depositedDetailPanel = new DepositedDetailPage(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 
@@ -328,6 +333,9 @@ public class UserMainFrame extends JFrame {
 
 		// Deposited Detail Page
 		tempDepositedPowerBank.lockerPassword = "BCD987";
+		
+		// History Page
+		historyPanel = new UserHistory(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -343,6 +351,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(powerBankListPanel, cardNames[4]);
 		cardPanel.add(rentedDetailPanel, cardNames[14]);
 		cardPanel.add(depositedDetailPanel, cardNames[15]);
+		cardPanel.add(historyPanel, cardNames[5]);
 	}
 	
 	public void refreshListPage() {

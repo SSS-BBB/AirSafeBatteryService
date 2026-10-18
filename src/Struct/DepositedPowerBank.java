@@ -1,6 +1,7 @@
 package Struct;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class DepositedPowerBank {
 	
@@ -12,6 +13,7 @@ public class DepositedPowerBank {
 	public double lateFeePerDay, depositPrice;
 	public String lockerPassword;
 	public int paymentId;
+	public LocalDateTime transactionTime;
 	
 	public DepositedPowerBank() {
 		deviceInfo = new PowerBank();

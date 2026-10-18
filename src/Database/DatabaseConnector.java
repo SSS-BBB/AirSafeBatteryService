@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import Struct.CheckHistory;
 import Struct.DepositedPowerBank;
 import Struct.ForRentPowerBank;
 import Struct.PowerBank;
@@ -184,6 +185,38 @@ public class DatabaseConnector {
 		}
 		
 		return rule;
+	}
+	
+	public static ArrayList<CheckHistory> getCheckHistory(int userId) {
+		if (!checkConnection("Unable to get check history data.")) return null;
+		
+		ArrayList<CheckHistory> checkHistoryList = new ArrayList<CheckHistory>();
+		
+		String query = "SELECT * FROM CHECKHISTORY NATURAL JOIN POWERBANKRULE " +
+					   "WHERE USER_ID = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, userId);
+			ResultSet resultSet = ps.executeQuery();
+			while (resultSet.next()) {
+				CheckHistory checkHistory = new CheckHistory();
+				checkHistory.checkId = resultSet.getInt("check_id");
+				checkHistory.checkTime = resultSet.getTimestamp("check_timestamp").toLocalDateTime();
+				checkHistory.capacity = resultSet.getDouble("capacity");
+				checkHistory.wh = resultSet.getDouble("wh");
+				checkHistory.ruleId = resultSet.getInt("rule_id");
+				
+				// status
+				double maxWh = resultSet.getDouble("max_wh");
+				checkHistory.approve = checkHistory.wh <= maxWh;
+				
+				checkHistoryList.add(checkHistory);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return checkHistoryList;
 	}
 
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
@@ -625,6 +658,7 @@ public class DatabaseConnector {
 				depositedPowerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
 				depositedPowerBank.depositPrice = resultSet.getDouble("deposit_price");
 				depositedPowerBank.lockerPassword = resultSet.getString("locker_password");
+				depositedPowerBank.transactionTime = resultSet.getTimestamp("payment_timestamp").toLocalDateTime();
 				
 				depositedPowerBankList.add(depositedPowerBank);
 			}
@@ -696,6 +730,7 @@ public class DatabaseConnector {
 				rentedPowerBank.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
 				rentedPowerBank.rentPrice = resultSet.getDouble("rent_price");
 				rentedPowerBank.lockerNumber = resultSet.getInt("locker_number");
+				rentedPowerBank.transactionTime = resultSet.getTimestamp("payment_timestamp").toLocalDateTime();
 				
 				rentedPowerBankList.add(rentedPowerBank);
 			}

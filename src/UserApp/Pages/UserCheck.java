@@ -430,7 +430,7 @@ public class UserCheck extends JPanel {
 			statusTextColor = new Color(176, 4, 4);
 		}
 		
-		// TODO: insert into check history
+		// insert into check history
 		DatabaseConnector.insertIntoCheckHistory(capacity, wh, mainFrame.userDetail.userID, rule.ruleId);
 		
 		statusPanel.setBackground(backgroundColor);
