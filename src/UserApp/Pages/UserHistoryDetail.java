@@ -351,17 +351,6 @@ public class UserHistoryDetail extends JPanel {
 			detailValueLabel[4].setForeground(Color.BLACK);
 			detailValueLabel[5].setForeground(Color.BLACK);
 		}
-		 
-		
-		/*
-		// North Components
-		typeIconLabel, typeTitleLabel, transactionDateLabel
-		statusIconLabel, statusLabel
-		
-		// Detail Components (CENTER)
-		JLabel detailTitleLabel
-		JLabel[] columnNameLabel, detailValueLabel
-		*/
 	}
 	
 	private void createPageSeparator(JPanel gridBagContainerPanel, int row, int columnSpan) {

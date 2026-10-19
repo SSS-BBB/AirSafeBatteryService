@@ -85,7 +85,7 @@ public class UserMainFrame extends JFrame {
 	private String[] cardNames = { "HomeCard", "CheckCard", "RentCard", "DepositCard", "ListCard", "HistoryCard",
 			"NotificationCard", "CheckStatusCard", "ForRentDetail", "ForRentPayment", "ProcessStatus",
 			"PowerBankPicker", "PowerBankAdd", "DepositPayment", "RentedDetail", "DepositedDetail",
-			"HistoryDetail" };
+			"HistoryDetail", "UserInformation" };
 
 	// cards (app pages)
 	private JPanel homePanel, checkPanel;
@@ -114,8 +114,11 @@ public class UserMainFrame extends JFrame {
 	private UserHistory historyPanel;
 	private UserHistoryDetail historyDetailPanel;
 	
-	// TODO: notification page
+	// Notification page
 	private UserNotification notificationPanel;
+	
+	// TODO: User Information page
+	private UserInformation userInformationPanel;
 	
 	public UserDetail userDetail;
 
@@ -195,7 +198,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(6, 6);
+		changeCard(7, 17);
 
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -277,7 +280,7 @@ public class UserMainFrame extends JFrame {
 		createMenuButton(4, "/icons/list_icon.png", "List Icon", "รายการของฉัน", 4, 8);
 		createMenuButton(5, "/icons/history_icon.png", "History Icon", "ประวัติการใช้งาน", 5, 8);
 		createMenuButton(6, "/icons/noti_white_icon.png", "Notification Icon", "แจ้งเตือน", 6, 8);
-		createMenuButton(7, "/icons/user_icon.png", "User Icon", "ผู้ใช้", 0, 8);
+		createMenuButton(7, "/icons/user_icon.png", "User Icon", "ผู้ใช้", 17, 8);
 
 	}
 
@@ -335,8 +338,11 @@ public class UserMainFrame extends JFrame {
 		historyDetailPanel = new UserHistoryDetail(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		historyPanel = new UserHistory(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, historyDetailPanel);
 		
-		// TODO: Notification Page
+		// Notification Page
 		notificationPanel = new UserNotification(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		
+		// TODO: User Information Page
+		userInformationPanel = new UserInformation(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
@@ -355,6 +361,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(historyPanel, cardNames[5]);
 		cardPanel.add(historyDetailPanel, cardNames[16]);
 		cardPanel.add(notificationPanel, cardNames[6]);
+		cardPanel.add(userInformationPanel, cardNames[17]);
 	}
 	
 	public void refreshNotificationPage() {
