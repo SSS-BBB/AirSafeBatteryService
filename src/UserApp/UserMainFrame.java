@@ -193,7 +193,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(5, 16);
+		changeCard(5, 5);
 
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

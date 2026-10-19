@@ -202,12 +202,15 @@ public class DatabaseConnector {
 				checkHistory.checkId = resultSet.getInt("check_id");
 				checkHistory.checkTime = resultSet.getTimestamp("check_timestamp").toLocalDateTime();
 				checkHistory.capacity = resultSet.getDouble("capacity");
+				if (resultSet.wasNull()) checkHistory.capacity = -1;
 				checkHistory.wh = resultSet.getDouble("wh");
 				checkHistory.ruleId = resultSet.getInt("rule_id");
 				
 				// status
 				double maxWh = resultSet.getDouble("max_wh");
 				checkHistory.approve = checkHistory.wh <= maxWh;
+				checkHistory.maxWh = maxWh;
+				checkHistory.endDate = resultSet.getDate("end_date").toLocalDate();
 				
 				checkHistoryList.add(checkHistory);
 			}

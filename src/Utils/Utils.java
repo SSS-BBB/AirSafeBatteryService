@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -189,8 +190,13 @@ public class Utils {
 	public static String getDateFormat(LocalDate date, String format) {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(format);
 		String formattedDate = dateFormatter.format(date);
-		
 		return formattedDate;
+	}
+	
+	public static String getTimeFormat(LocalTime time, String format) {
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(format);
+		String formattedTime = timeFormatter.format(time);
+		return formattedTime;
 	}
 	
 	public static Border createPaddingBorder(Color color, int thickness, Insets paddings, Insets margins) {

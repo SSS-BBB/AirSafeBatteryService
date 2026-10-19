@@ -2,9 +2,12 @@ package UserApp.Pages;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -17,6 +20,8 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import Struct.CheckHistory;
+import Struct.DepositedPowerBank;
+import Struct.RentedPowerBank;
 import UserApp.UserMainFrame;
 import Utils.Utils;
 
@@ -25,9 +30,13 @@ public class UserHistoryDetail extends JPanel {
 	private UserMainFrame mainFrame;
 	private Color backgroundColor, menuColor, mainColor;
 
-	// TODO: North Components
+	// North Components
 	private JLabel typeIconLabel, typeTitleLabel, transactionDateLabel;
 	private JLabel statusIconLabel, statusLabel;
+	
+	// Detail Components (CENTER)
+	private JLabel detailTitleLabel;
+	private JLabel[] columnNameLabel, detailValueLabel;
 
 	public UserHistoryDetail(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor) {
 		super(new BorderLayout());
@@ -42,7 +51,68 @@ public class UserHistoryDetail extends JPanel {
 		// Top Panel
 		JPanel topPanel = createTopPanel();
 		this.add(topPanel, BorderLayout.NORTH);
+		
+		// Center Panel
+		JPanel detailPanel = createDetailPanel();
+		this.add(detailPanel, BorderLayout.CENTER);
 
+	}
+	
+	private JPanel createDetailPanel() {
+		JPanel detailPanel = new JPanel();
+		detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
+		detailPanel.setBackground(null);
+		detailPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		
+		int fontSize = 18;
+		int margin = 10;
+		
+		// Detail Title
+		detailTitleLabel = createPageLabel(Font.BOLD, fontSize);
+		detailPanel.add(detailTitleLabel);
+		detailPanel.add(Box.createVerticalStrut(20));
+		
+		// add history content
+		// 6 columns
+		int columnSize = 6;
+		
+		JPanel historyDetailPanel = new JPanel(new GridBagLayout());
+		historyDetailPanel.setBackground(null);
+		historyDetailPanel.setAlignmentX(LEFT_ALIGNMENT);
+		detailPanel.add(historyDetailPanel);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.insets = new Insets(margin / 2, margin / 2, margin / 2, margin / 2);
+		
+		// Column Name
+		gbc.gridy = 0;
+		columnNameLabel = new JLabel[columnSize];
+		for (int i = 0; i < columnSize; i++) {
+			columnNameLabel[i] = createPageLabel("a", Font.BOLD, fontSize);
+			gbc.gridx = i;
+			historyDetailPanel.add(columnNameLabel[i], gbc);
+		}
+		
+		// Detail Value
+		gbc.gridy = 1;
+		detailValueLabel = new JLabel[columnSize];
+		for (int i = 0; i < columnSize; i++) {
+			detailValueLabel[i] = createPageLabel("a", Font.PLAIN, fontSize);
+			gbc.gridx = i;
+			historyDetailPanel.add(detailValueLabel[i], gbc);
+		}
+		
+		
+		historyDetailPanel.setMaximumSize(new Dimension(
+				historyDetailPanel.getMaximumSize().width,
+				historyDetailPanel.getPreferredSize().height
+		));
+		
+		
+		return detailPanel;
 	}
 
 	private JPanel createTopPanel() {
@@ -129,8 +199,102 @@ public class UserHistoryDetail extends JPanel {
 		
 		return topPanel;
 	}
-
+	
+	public void updatePage(DepositedPowerBank powerBank) {
+		resetPage();
+		
+		// update top panel
+		String imagePath = "/icons/download_icon_56.png";
+		ImageIcon depositIcon = Utils.createImageIcon(imagePath, "Deposit Icon");
+		typeIconLabel.setIcon(depositIcon);
+		
+		typeTitleLabel.setText("ฝาก Power Bank");
+		transactionDateLabel.setText(Utils.getDateFormat(powerBank.transactionTime.toLocalDate(), "dd/MM/yyyy"));
+		
+		String statusText = powerBank.depositStatus;
+		Color statusColor = new Color(128, 0, 128);
+		statusLabel.setText(statusText);
+		statusLabel.setForeground(statusColor);
+		
+		// update center panel
+		detailTitleLabel.setText("รายละเอียดการฝาก");
+		
+		if (columnNameLabel.length >= 6) {
+			columnNameLabel[0].setText("สถานที่ฝาก");
+			columnNameLabel[1].setText("หมายเลข Locker");
+			columnNameLabel[2].setText("Power Bank");
+			columnNameLabel[3].setText("วันที่ฝาก");
+			columnNameLabel[4].setText("วันที่รับคืน");
+			columnNameLabel[5].setText("สถานะ");
+		}
+		else {
+			System.err.println("Column Name Label is too small. Unable to create column name label.");
+		}
+		
+		if (detailValueLabel.length >= 6) {
+			detailValueLabel[0].setText(powerBank.address);
+			detailValueLabel[1].setText(String.valueOf(powerBank.lockerNumber));
+			detailValueLabel[2].setText(powerBank.deviceInfo.brand + " " + powerBank.deviceInfo.model);
+			detailValueLabel[3].setText(Utils.getDateFormat(powerBank.depositDate, "dd/MM/yyyy"));
+			detailValueLabel[4].setText(Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
+			detailValueLabel[4].setForeground(Color.BLACK);
+			detailValueLabel[5].setText(statusText);
+			detailValueLabel[5].setForeground(statusColor);
+		}
+		else {
+			System.err.println("Detail Value Label is too small. Unable to create detail value label.");
+		}
+	}
+	
+	public void updatePage(RentedPowerBank powerBank) {
+		resetPage();
+		
+		// update top panel
+		String imagePath = "/icons/package_icon_56.png";
+		ImageIcon rentIcon = Utils.createImageIcon(imagePath, "Rent Icon");
+		typeIconLabel.setIcon(rentIcon);
+		
+		typeTitleLabel.setText("เช่า Power Bank");
+		transactionDateLabel.setText(Utils.getDateFormat(powerBank.transactionTime.toLocalDate(), "dd/MM/yyyy"));
+		
+		String statusText = powerBank.status;
+		Color statusColor = new Color(255, 165, 0);
+		statusLabel.setText(statusText);
+		statusLabel.setForeground(statusColor);
+		
+		// update center panel
+		detailTitleLabel.setText("รายละเอียดการเช่า");
+		
+		if (columnNameLabel.length >= 6) {
+			columnNameLabel[0].setText("สถานที่รับเครื่อง");
+			columnNameLabel[1].setText("สถานที่คืนเครื่อง");
+			columnNameLabel[2].setText("Power Bank");
+			columnNameLabel[3].setText("วันที่เช่า");
+			columnNameLabel[4].setText("วันที่คืน");
+			columnNameLabel[5].setText("สถานะ");
+		}
+		else {
+			System.err.println("Column Name Label is too small. Unable to create column name label.");
+		}
+		
+		if (detailValueLabel.length >= 6) {
+			detailValueLabel[0].setText(powerBank.pickUpAddress);
+			detailValueLabel[1].setText(powerBank.returnAddress);
+			detailValueLabel[2].setText(powerBank.deviceInfo.brand + " " + powerBank.deviceInfo.model);
+			detailValueLabel[3].setText(Utils.getDateFormat(powerBank.rentDate, "dd/MM/yyyy"));
+			detailValueLabel[4].setText(Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy"));
+			detailValueLabel[4].setForeground(Color.BLACK);
+			detailValueLabel[5].setText(statusText);
+			detailValueLabel[5].setForeground(statusColor);
+		}
+		else {
+			System.err.println("Detail Value Label is too small. Unable to create detail value label.");
+		}
+	}
+	
 	public void updatePage(CheckHistory checkHistory) {
+		resetPage();
+		
 		// update top panel
 		String imagePath = (checkHistory.approve) ? "/icons/search_icon_56.png" : "/icons/warning_icon_56.png";
 		ImageIcon checkIcon = Utils.createImageIcon(imagePath, "Check Icon");
@@ -147,6 +311,57 @@ public class UserHistoryDetail extends JPanel {
 		Color statusColor = (checkHistory.approve) ? new Color(45, 172, 51) : new Color(255, 51, 51);
 		statusLabel.setText(statusText);
 		statusLabel.setForeground(statusColor);
+		
+		// update center panel
+		detailTitleLabel.setText("ข้อมูลการตรวจสอบ Power Bank");
+		
+		if (columnNameLabel.length >= 6) {
+			columnNameLabel[0].setText("เวลาที่ตรวจสอบ");
+			columnNameLabel[1].setText("Capacity");
+			columnNameLabel[2].setText("Wh สูงสุดไม่เกิน");
+			columnNameLabel[3].setText("Wh");
+			columnNameLabel[4].setText("ผลการตรวจสอบ");
+			columnNameLabel[5].setText("กฎมีผลถึงวันที่");
+		}
+		else {
+			System.err.println("Column Name Label is too small. Unable to create column name label.");
+		}
+		
+		if (detailValueLabel.length >= 6) {
+			detailValueLabel[0].setText(Utils.getTimeFormat(checkHistory.checkTime.toLocalTime(), "HH:mm:ss"));
+			
+			String capacityText = (checkHistory.capacity < 0) ? "-" : String.valueOf(checkHistory.capacity);
+			detailValueLabel[1].setText(capacityText);
+			detailValueLabel[2].setText(String.valueOf(checkHistory.maxWh));
+			detailValueLabel[3].setText(String.valueOf(checkHistory.wh));
+			detailValueLabel[4].setText((checkHistory.approve) ? "ผ่าน" : "ไม่ผ่าน");
+			detailValueLabel[4].setForeground(statusColor);
+			detailValueLabel[5].setText(Utils.getDateFormat(checkHistory.endDate, "dd/MM/yyyy"));
+			detailValueLabel[5].setForeground(Color.BLACK);
+		}
+		else {
+			System.err.println("Detail Value Label is too small. Unable to create detail value label.");
+		}
+	}
+	
+	private void resetPage() {
+		statusIconLabel.setIcon(null);
+		
+		if (detailValueLabel.length >= 6) {
+			detailValueLabel[4].setForeground(Color.BLACK);
+			detailValueLabel[5].setForeground(Color.BLACK);
+		}
+		 
+		
+		/*
+		// North Components
+		typeIconLabel, typeTitleLabel, transactionDateLabel
+		statusIconLabel, statusLabel
+		
+		// Detail Components (CENTER)
+		JLabel detailTitleLabel
+		JLabel[] columnNameLabel, detailValueLabel
+		*/
 	}
 	
 	private void createPageSeparator(JPanel gridBagContainerPanel, int row, int columnSpan) {

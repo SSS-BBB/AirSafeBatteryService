@@ -36,13 +36,21 @@ public class UserHistory extends JPanel {
 
 	private UserMainFrame mainFrame;
 	private Color backgroundColor, menuColor, mainColor;
-	
+
 	private UserHistoryDetail detailPage;
-	
+
 	// Filter components
 	private JButton allFilterButton, rentFilterButton, depositFilterButton, checkFilterButton;
 
-	public UserHistory(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor, UserHistoryDetail detailPage) {
+	// History list
+	private JPanel historyContentPanel;
+
+	private ArrayList<CheckHistory> checkHistoryList;
+	private ArrayList<DepositedPowerBank> depositList;
+	private ArrayList<RentedPowerBank> rentList;
+
+	public UserHistory(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor,
+			UserHistoryDetail detailPage) {
 		super(new BorderLayout());
 
 		this.mainFrame = mainFrame;
@@ -50,7 +58,7 @@ public class UserHistory extends JPanel {
 		this.menuColor = menuColor;
 		this.mainColor = mainColor;
 		this.detailPage = detailPage;
-		
+
 		setBackground(backgroundColor);
 
 		// Top Panel
@@ -76,57 +84,50 @@ public class UserHistory extends JPanel {
 		filterSeparator.setOrientation(SwingConstants.HORIZONTAL);
 		filterSeparator.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		topPanel.add(filterSeparator);
-		
+
 		// History content
-		JPanel historyContentPanel = createHistoryContentPanel();
+		createHistoryContentPanel();
 		CustomScrollPane historyScrollPane = new CustomScrollPane(historyContentPanel, menuColor, backgroundColor);
 		this.add(historyScrollPane, BorderLayout.CENTER);
-		
-		ArrayList<CheckHistory> checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
-		detailPage.updatePage(checkHistoryList.get(0));
 	}
-	
-	private JPanel createHistoryContentPanel() {
-		JPanel historyContentPanel = new JPanel(new GridBagLayout());
-		// historyContentPanel.setLayout(new BoxLayout(historyContentPanel, BoxLayout.Y_AXIS));
-		historyContentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-		historyContentPanel.setAlignmentX(LEFT_ALIGNMENT);
-		historyContentPanel.setBackground(backgroundColor);
-		
-		int margin = 30;
-		
+
+	public void refreshPage() {		
 		// get history data
-		ArrayList<CheckHistory> checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		 		
+		// get rented and deposited data
+		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
+		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
+		
+		addHistoryList("all");
+	}
+
+	private void addHistoryList(String filter) {
+		if (checkHistoryList == null || rentList == null || depositList == null) {
+			System.err.println("Null history list. Unable to update history page.");
+			return;
+		}
+
+		if (historyContentPanel == null) {
+			System.err.println("Null history content panel. Unable to update history page.");
+			return;
+		}
+
+		historyContentPanel.removeAll();
+
+		// filter history list
+		// filter values: all, rent, deposit, check
 		int row = 0;
-		if (checkHistoryList != null) {
+		if (filter.equals("check") || filter.equals("all")) {
 			for (CheckHistory checkHistory : checkHistoryList) {
 				createHistoryBox(historyContentPanel, row, checkHistory);
 				row++;
 				createPageSeparator(historyContentPanel, row, 5);
 				row++;
-				
 			}
 		}
-		else {
-			System.err.println("Null check history list. Unable to show check history data.");
-		}
- 		
-		// get rented and deposited data
-		ArrayList<DepositedPowerBank> depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
-		if (depositList != null) {
-			for (DepositedPowerBank powerBank : depositList) {
-				createHistoryBox(historyContentPanel, row, powerBank);
-				row++;
-				createPageSeparator(historyContentPanel, row, 5);
-				row++;
-			}
-		}
-		else {
-			System.err.println("Null deposit list. Unable to show deposit history data.");
-		}
-		
-		ArrayList<RentedPowerBank> rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
-		if (rentList != null) {
+
+		if (filter.equals("rent") || filter.equals("all")) {
 			for (RentedPowerBank powerBank : rentList) {
 				createHistoryBox(historyContentPanel, row, powerBank);
 				row++;
@@ -134,124 +135,169 @@ public class UserHistory extends JPanel {
 				row++;
 			}
 		}
-		else {
-			System.err.println("Null rent list. Unable to show rent history data.");
+
+		if (filter.equals("deposit") || filter.equals("all")) {
+			for (DepositedPowerBank powerBank : depositList) {
+				createHistoryBox(historyContentPanel, row, powerBank);
+				row++;
+				createPageSeparator(historyContentPanel, row, 5);
+				row++;
+			}
 		}
 		
-		return historyContentPanel;
-	}
-	
-	private void createHistoryBox(JPanel gridBagContainerPanel, int row, RentedPowerBank powerBank) {
-		String imagePath = "/icons/package_icon_56.png";
-		
-		String[] c2Content = new String[3];
-		c2Content[0] = "เช่า Power Bank";
-		c2Content[1] = powerBank.deviceInfo.brand + " " + powerBank.deviceInfo.model + " (" + String.valueOf(powerBank.deviceInfo.capacity) + " mAh)";
-		c2Content[2] = "ระยะเวลาเช่า: " + Utils.getDateFormat(powerBank.rentDate, "dd/MM/yyyy") + " - " +
-									 Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy");
-		
-		LocalDate toShowDate = powerBank.transactionTime.toLocalDate();
-		
-		String status = powerBank.status;
-		Color statusColor = new Color(255, 165, 0);
-		
-		ActionListener onNextClicked = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO: go to rent history detail page
-			}
-			
-		};
-		
-		createHistoryBox(gridBagContainerPanel, row, imagePath, c2Content, toShowDate, status, statusColor, onNextClicked);
-		
-	}
-	
-	private void createHistoryBox(JPanel gridBagContainerPanel, int row, DepositedPowerBank powerBank) {
-		String imagePath = "/icons/download_icon_56.png";
-		
-		String[] c2Content = new String[3];
-		c2Content[0] = "ฝาก Power Bank";
-		c2Content[1] = powerBank.address + " Locker: " + String.valueOf(powerBank.lockerNumber);
-		c2Content[2] = "ระยะเวลาฝาก: " + Utils.getDateFormat(powerBank.depositDate, "dd/MM/yyyy") + " - " +
-									 Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy");
-		
-		LocalDate toShowDate = powerBank.transactionTime.toLocalDate();
-		
-		String status = powerBank.depositStatus;
-		Color statusColor = new Color(128, 0, 128);
-		
-		ActionListener onNextClicked = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO: go to deposit history detail page
-			}
-			
-		};
-		
-		createHistoryBox(gridBagContainerPanel, row, imagePath, c2Content, toShowDate, status, statusColor, onNextClicked);
-		
-	}
-	
-	private void createHistoryBox(JPanel gridBagContainerPanel, int row, CheckHistory checkHistory) {
-		String imagePath = (checkHistory.approve) ? "/icons/search_icon_56.png" : "/icons/warning_icon_56.png";
-		
-		String[] c2Content = new String[3];
-		c2Content[0] = "ตรวจสอบ Power Bank";
-		c2Content[1] = String.valueOf(checkHistory.wh) + " wh";
-		c2Content[2] = "ผลการตรวจสอบ: " + ((checkHistory.approve) ? "นำขึ้นเครื่องได้" : "ไม่สามารถนำขึ้นเครื่องได้");
-		
-		LocalDate toShowDate = checkHistory.checkTime.toLocalDate();
-		
-		String status = (checkHistory.approve) ? "ผ่าน" : "ไม่ผ่าน";
-		Color statusColor = (checkHistory.approve) ? new Color(45, 172, 51) : new Color(255, 51, 51);
-		
-		ActionListener onNextClicked = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO: go to check detail page
-			}
-			
-		};
-		
-		createHistoryBox(gridBagContainerPanel, row, imagePath, c2Content, toShowDate, status, statusColor, onNextClicked);
-		
-	}
-	
-	private void createHistoryBox(JPanel gridBagContainerPanel, int row,
-			String imagePath, String[] c2Content, 
-			LocalDate toShowDate, String status, Color statusColor,
-			ActionListener onNextClicked) {
-		
-		/*
-		JPanel historyBoxPanel = new JPanel(new GridBagLayout());
-		historyBoxPanel.setAlignmentX(LEFT_ALIGNMENT);
-		historyBoxPanel.setBackground(null);
-		*/
-		
-		int headingFontSize = 18;
-		int bodyFontSize = 16;
-		
+		// make components go from top to bottom
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridy = row;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(15, 0, 15, 0);
 		
+		gbc.gridx = 0;
+		historyContentPanel.add(Box.createGlue(), gbc);
+		
+		historyContentPanel.setMaximumSize(new Dimension(
+				historyContentPanel.getMaximumSize().width,
+				historyContentPanel.getPreferredSize().height
+		));
+		
+		historyContentPanel.revalidate();
+		historyContentPanel.repaint();
+	}
+
+	private void createHistoryContentPanel() {
+		historyContentPanel = new JPanel(new GridBagLayout());
+		// historyContentPanel.setLayout(new BoxLayout(historyContentPanel,
+		// BoxLayout.Y_AXIS));
+		historyContentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+		historyContentPanel.setAlignmentX(LEFT_ALIGNMENT);
+		historyContentPanel.setBackground(backgroundColor);
+
+		// get history data
+		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+
+		// get rented and deposited data
+		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
+		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
+
+		addHistoryList("all");
+	}
+
+	private void createHistoryBox(JPanel gridBagContainerPanel, int row, RentedPowerBank powerBank) {
+		String imagePath = "/icons/package_icon_56.png";
+
+		String[] c2Content = new String[3];
+		c2Content[0] = "เช่า Power Bank";
+		c2Content[1] = powerBank.deviceInfo.brand + " " + powerBank.deviceInfo.model + " ("
+				+ String.valueOf(powerBank.deviceInfo.capacity) + " mAh)";
+		c2Content[2] = "ระยะเวลาเช่า: " + Utils.getDateFormat(powerBank.rentDate, "dd/MM/yyyy") + " - "
+				+ Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy");
+
+		LocalDate toShowDate = powerBank.transactionTime.toLocalDate();
+
+		String status = powerBank.status;
+		Color statusColor = new Color(255, 165, 0);
+
+		ActionListener onNextClicked = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// go to rent history detail page
+				detailPage.updatePage(powerBank);
+				mainFrame.changeCard(5, 16);
+			}
+
+		};
+
+		createHistoryBox(gridBagContainerPanel, row, imagePath, c2Content, toShowDate, status, statusColor,
+				onNextClicked);
+
+	}
+
+	private void createHistoryBox(JPanel gridBagContainerPanel, int row, DepositedPowerBank powerBank) {
+		String imagePath = "/icons/download_icon_56.png";
+
+		String[] c2Content = new String[3];
+		c2Content[0] = "ฝาก Power Bank";
+		c2Content[1] = powerBank.address + " Locker: " + String.valueOf(powerBank.lockerNumber);
+		c2Content[2] = "ระยะเวลาฝาก: " + Utils.getDateFormat(powerBank.depositDate, "dd/MM/yyyy") + " - "
+				+ Utils.getDateFormat(powerBank.returnDate, "dd/MM/yyyy");
+
+		LocalDate toShowDate = powerBank.transactionTime.toLocalDate();
+
+		String status = powerBank.depositStatus;
+		Color statusColor = new Color(128, 0, 128);
+
+		ActionListener onNextClicked = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// go to deposit history detail page
+				detailPage.updatePage(powerBank);
+				mainFrame.changeCard(5, 16);
+			}
+
+		};
+
+		createHistoryBox(gridBagContainerPanel, row, imagePath, c2Content, toShowDate, status, statusColor,
+				onNextClicked);
+
+	}
+
+	private void createHistoryBox(JPanel gridBagContainerPanel, int row, CheckHistory checkHistory) {
+		String imagePath = (checkHistory.approve) ? "/icons/search_icon_56.png" : "/icons/warning_icon_56.png";
+
+		String[] c2Content = new String[3];
+		c2Content[0] = "ตรวจสอบ Power Bank";
+		c2Content[1] = String.valueOf(checkHistory.wh) + " wh";
+		c2Content[2] = "ผลการตรวจสอบ: " + ((checkHistory.approve) ? "นำขึ้นเครื่องได้" : "ไม่สามารถนำขึ้นเครื่องได้");
+
+		LocalDate toShowDate = checkHistory.checkTime.toLocalDate();
+
+		String status = (checkHistory.approve) ? "ผ่าน" : "ไม่ผ่าน";
+		Color statusColor = (checkHistory.approve) ? new Color(45, 172, 51) : new Color(255, 51, 51);
+
+		ActionListener onNextClicked = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// go to check detail page
+				detailPage.updatePage(checkHistory);
+				mainFrame.changeCard(5, 16);
+			}
+
+		};
+
+		createHistoryBox(gridBagContainerPanel, row, imagePath, c2Content, toShowDate, status, statusColor,
+				onNextClicked);
+
+	}
+
+	private void createHistoryBox(JPanel gridBagContainerPanel, int row, String imagePath, String[] c2Content,
+			LocalDate toShowDate, String status, Color statusColor, ActionListener onNextClicked) {
+
+		int headingFontSize = 18;
+		int bodyFontSize = 16;
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridy = row;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(15, 0, 15, 0);
+
 		// Image
 		ImageIcon icon = Utils.createImageIcon(imagePath, "");
 		JLabel iconLabel = new JLabel(icon);
 		gbc.gridx = 0;
 		gridBagContainerPanel.add(iconLabel, gbc);
-		
+
 		// Content for column 2
 		JPanel c2Panel = new JPanel();
 		c2Panel.setLayout(new BoxLayout(c2Panel, BoxLayout.Y_AXIS));
 		c2Panel.setBackground(null);
 		gbc.gridx = 1;
 		gridBagContainerPanel.add(c2Panel, gbc);
-		
+
 		int c2Margin = 2;
 		if (c2Content.length > 0) {
 			// Title
@@ -260,51 +306,46 @@ public class UserHistory extends JPanel {
 			c2Panel.add(titleLabel);
 			c2Panel.add(Box.createVerticalStrut(c2Margin));
 		}
-		
+
 		for (int i = 1; i < c2Content.length; i++) {
 			JLabel detailLabel = createPageLabel(c2Content[i], Font.PLAIN, bodyFontSize);
 			detailLabel.setAlignmentX(CENTER_ALIGNMENT);
 			c2Panel.add(detailLabel);
 			c2Panel.add(Box.createVerticalStrut(c2Margin));
 		}
-		
+
 		// Date
 		JPanel datePanel = new JPanel();
 		datePanel.setLayout(new BoxLayout(datePanel, BoxLayout.Y_AXIS));
 		datePanel.setBackground(null);
 		gbc.gridx = 2;
 		gridBagContainerPanel.add(datePanel, gbc);
-		
+
 		JLabel transactionLabel = createPageLabel("วันที่ทำรายการ", Font.BOLD, bodyFontSize);
 		transactionLabel.setAlignmentX(CENTER_ALIGNMENT);
 		datePanel.add(transactionLabel);
 		datePanel.add(Box.createVerticalStrut(2));
-		
+
 		String dateText = Utils.getDateFormat(toShowDate, "dd/MM/yyyy");
 		JLabel dateLabel = createPageLabel(dateText, Font.PLAIN, bodyFontSize);
 		dateLabel.setAlignmentX(CENTER_ALIGNMENT);
 		datePanel.add(dateLabel);
-		
+
 		// Status
 		JLabel statusLabel = createPageLabel(status, Font.BOLD, headingFontSize);
 		statusLabel.setForeground(statusColor);
 		gbc.gridx = 3;
 		gridBagContainerPanel.add(statusLabel, gbc);
-		
-		/*
-		historyBoxPanel.setMaximumSize(new Dimension(historyBoxPanel.getMaximumSize().width,
-													historyBoxPanel.getPreferredSize().height));
-													*/
-		
+
 		// Next
 		ImageIcon nextIcon = Utils.createImageIcon("/icons/next_icon_36.png", "Next Icon");
 		JButton nextButton = Utils.createIconButton(nextIcon);
 		gbc.gridx = 4;
 		gridBagContainerPanel.add(nextButton, gbc);
-		
+
 		nextButton.addActionListener(onNextClicked);
 	}
-	
+
 	private JPanel createFilterPanel() {
 		JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		filterPanel.setAlignmentX(LEFT_ALIGNMENT);
@@ -367,42 +408,42 @@ public class UserHistory extends JPanel {
 		if (filter.equals("all")) {
 			allFilterButton.setBackground(mainColor);
 			allFilterButton.setForeground(Color.WHITE);
-		} 
-		else if (filter.equals("rent")) {
+		} else if (filter.equals("rent")) {
 			rentFilterButton.setBackground(mainColor);
 			rentFilterButton.setForeground(Color.WHITE);
-		}
-		else if (filter.equals("deposit")) {
+		} else if (filter.equals("deposit")) {
 			depositFilterButton.setBackground(mainColor);
 			depositFilterButton.setForeground(Color.WHITE);
-		} 
-		else if (filter.equals("check")) {
+		} else if (filter.equals("check")) {
 			checkFilterButton.setBackground(mainColor);
 			checkFilterButton.setForeground(Color.WHITE);
 		}
+		
+		addHistoryList(filter);
 	}
-	
+
 	private void createPageSeparator(JPanel gridBagContainerPanel, int row, int columnSpan) {
 		JSeparator separator = createPageSeparator();
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = row;
 		gbc.gridwidth = columnSpan;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
+		gbc.weighty = 0.0;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+
 		gridBagContainerPanel.add(separator, gbc);
 	}
-	
+
 	private JSeparator createPageSeparator() {
 		JSeparator separator = new JSeparator();
 		separator.setOrientation(SwingConstants.HORIZONTAL);
 		separator.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		return separator;
 	}
-	
+
 	private JLabel createPageLabel(String text, int fontStyle, int fontSize) {
 		JLabel pageLabel = new JLabel(text);
 		pageLabel.setFont(new Font("Tahoma", fontStyle, fontSize));
@@ -411,7 +452,7 @@ public class UserHistory extends JPanel {
 
 		return pageLabel;
 	}
-	
+
 	private JLabel createPageLabel(int fontStyle, int fontSize) {
 		return createPageLabel("", fontStyle, fontSize);
 	}
