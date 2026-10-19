@@ -88,7 +88,7 @@ public class UserMainFrame extends JFrame {
 			"HistoryDetail" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel, storagePanel, listPanel, notificationPanel, checkStatusPanel;
+	private JPanel homePanel, checkPanel;
 
 	private UserProcessStatus processStatusPanel;
 	private PowerBankPickerPage powerBankPickerPanel;
@@ -110,10 +110,12 @@ public class UserMainFrame extends JFrame {
 	private RentedDetailPage rentedDetailPanel;
 	private DepositedDetailPage depositedDetailPanel;
 	
-	// TODO: History pages
+	// History pages
 	private UserHistory historyPanel;
 	private UserHistoryDetail historyDetailPanel;
 	
+	// TODO: notification page
+	private UserNotification notificationPanel;
 	
 	public UserDetail userDetail;
 
@@ -193,7 +195,7 @@ public class UserMainFrame extends JFrame {
 		menuPanel.add(menuSelectPanel, BorderLayout.CENTER);
 		mainPanel.add(menuPanel, BorderLayout.WEST);
 
-		changeCard(5, 5);
+		changeCard(6, 6);
 
 		// On App Close
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -332,7 +334,10 @@ public class UserMainFrame extends JFrame {
 		// History Page
 		historyDetailPanel = new UserHistoryDetail(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		historyPanel = new UserHistory(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR, historyDetailPanel);
-
+		
+		// TODO: Notification Page
+		notificationPanel = new UserNotification(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
+		
 		// add panels to card
 		cardPanel.add(homePanel, cardNames[0]);
 		cardPanel.add(checkPanel, cardNames[1]);
@@ -349,6 +354,7 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(depositedDetailPanel, cardNames[15]);
 		cardPanel.add(historyPanel, cardNames[5]);
 		cardPanel.add(historyDetailPanel, cardNames[16]);
+		cardPanel.add(notificationPanel, cardNames[6]);
 	}
 	
 	public void refreshListPage() {
