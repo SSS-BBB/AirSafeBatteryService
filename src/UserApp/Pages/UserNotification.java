@@ -88,8 +88,8 @@ public class UserNotification extends JPanel {
 	}
 	
 	private int createNotificationDetail(int startingRow) {
-		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
-		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
+		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, true);
+		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, true);
 
 		return updateNotificationDisplay(startingRow);
 	}

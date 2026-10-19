@@ -134,8 +134,8 @@ public class UserHistory extends JPanel {
 		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
 
 		// get rented and deposited data
-		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
-		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
+		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, false);
+		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, false);
 		
 		historyDisplayList.clear();
 		addAndSortHistoryDisplayList();
@@ -283,8 +283,8 @@ public class UserHistory extends JPanel {
 		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
 
 		// get rented and deposited data
-		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
-		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
+		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, false);
+		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, false);
 
 		// initialize history display list
 		historyDisplayList = new ArrayList<HistoryDisplay>();

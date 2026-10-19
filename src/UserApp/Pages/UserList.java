@@ -181,13 +181,13 @@ public class UserList extends JPanel {
 		
 		// get data from rented power bank and deposited power bank table
 		if (!selectedType.equals("การฝาก")) {
-			ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, showPastDue);
+			ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, showPastDue, true);
 			for (RentedPowerBank powerBank : rentedPowerBankList)
 				addPowerBankDisplay(new PowerBankDisplay(powerBank));
 		}
 		
 		if (!selectedType.equals("การเช่า")) {
-			ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, showPastDue);
+			ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, showPastDue, true);
 			for (DepositedPowerBank powerBank : depositedPowerBankList)
 				addPowerBankDisplay(new PowerBankDisplay(powerBank));
 		}

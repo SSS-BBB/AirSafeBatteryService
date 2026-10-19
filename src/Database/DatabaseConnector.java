@@ -55,20 +55,6 @@ public class DatabaseConnector {
 			connection = DriverManager.getConnection(properties.getProperty("db.url"),
 					properties.getProperty("db.username"), properties.getProperty("db.password"));
 
-			// Get query result test
-			/*
-			 * Statement statement = connection.createStatement(); ResultSet resultSet =
-			 * statement.executeQuery("SELECT * FROM USER");
-			 * 
-			 * while (resultSet.next()) { String firstName =
-			 * resultSet.getString("first_name"); String lastName =
-			 * resultSet.getString("last_name"); String email =
-			 * resultSet.getString("email"); System.out.println(firstName + " " + lastName +
-			 * " " + email); }
-			 * 
-			 * try { connection.close(); } catch (SQLException e) { e.printStackTrace(); }
-			 */
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -603,7 +589,7 @@ public class DatabaseConnector {
 		return powerBankList;
 	}
 	
-	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId, boolean showPastDue) {
+	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId, boolean showPastDue, boolean showOnlyInprogress) {
 		if (!checkConnection("Unable to get deposited power bank data.")) return null;
 		
 		ArrayList<DepositedPowerBank> depositedPowerBankList = null;
@@ -611,6 +597,10 @@ public class DatabaseConnector {
 		StringBuilder queryBuilder = new StringBuilder("SELECT * FROM DEPOSITEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
 		if (showPastDue) {
 			queryBuilder.append(" AND NOW() > RETURN_DATE");
+		}
+		
+		if (showOnlyInprogress) {
+			queryBuilder.append(" AND DEPOSIT_STATUS != 'รับคืนแล้ว'");
 		}
 		
 		String query = queryBuilder.toString();
@@ -674,7 +664,7 @@ public class DatabaseConnector {
 		return depositedPowerBankList;
 	}
 	
-	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue) {
+	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue, boolean showOnlyInprogress) {
 		if (!checkConnection("Unable to get rented power bank data.")) return null;
 		
 		ArrayList<RentedPowerBank> rentedPowerBankList = null;
@@ -682,6 +672,10 @@ public class DatabaseConnector {
 		StringBuilder queryBuilder = new StringBuilder("SELECT * FROM RENTEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
 		if (showPastDue) {
 			queryBuilder.append(" AND NOW() > RETURN_DATE");
+		}
+		
+		if (showOnlyInprogress) {
+			queryBuilder.append(" AND RENT_STATUS != 'คืนแล้ว'");
 		}
 		
 		String query = queryBuilder.toString();
