@@ -218,9 +218,11 @@ public class UserRentPayment extends JPanel {
 				return;
 			}
 			
-			// refresh rent and list page
+			// refresh pages
 			mainFrame.refreshRentPage();
 			mainFrame.refreshListPage();
+			mainFrame.refreshHistoryPage();
+			mainFrame.refreshNotificationPage();
 			
 			// change to rent success page
 			String lockerNumberText = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);

@@ -165,7 +165,7 @@ public class UserCheck extends JPanel {
 		checkButton.setAlignmentX(LEFT_ALIGNMENT);
 		checkButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		checkButton.addActionListener(e -> {
-			// TODO: check conditions from database
+			// check conditions from database
 
 			double wh = Utils.getNumberFromTextField(energyTextField, -1);
 			double capacity = Utils.getNumberFromTextField(capacityTextField, -1);
@@ -193,7 +193,7 @@ public class UserCheck extends JPanel {
 			else {
 				updateStatusPanel(wh, capacity, voltage, true);
 			}
-
+			
 			mainFrame.changeCard(1, 7);
 		});
 		infoPanel.add(checkButton);
@@ -432,6 +432,7 @@ public class UserCheck extends JPanel {
 		
 		// insert into check history
 		DatabaseConnector.insertIntoCheckHistory(capacity, wh, mainFrame.userDetail.userID, rule.ruleId);
+		mainFrame.refreshHistoryPage();
 		
 		statusPanel.setBackground(backgroundColor);
 

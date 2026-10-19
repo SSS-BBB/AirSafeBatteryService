@@ -357,6 +357,24 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(notificationPanel, cardNames[6]);
 	}
 	
+	public void refreshNotificationPage() {
+		if (historyPanel == null) {
+			System.err.println("Null Notification Panel. Unable to refresh notification page");
+			return;
+		}
+		
+		notificationPanel.refreshPage();
+	}
+	
+	public void refreshHistoryPage() {
+		if (historyPanel == null) {
+			System.err.println("Null History Panel. Unable to refresh history page");
+			return;
+		}
+		
+		historyPanel.refreshPage();
+	}
+	
 	public void refreshListPage() {
 		if (powerBankListPanel == null) {
 			System.err.println("Null Power Bank List Panel. Unable to refresh list page");

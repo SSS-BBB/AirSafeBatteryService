@@ -12,6 +12,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -34,6 +35,37 @@ import Utils.Utils;
 
 public class UserHistory extends JPanel {
 
+	private class HistoryDisplay {
+		public LocalDateTime transactionDateTime;
+		public CheckHistory checkHistory;
+		public RentedPowerBank rentedPowerBank;
+		public DepositedPowerBank depositedPowerBank;
+
+		public HistoryDisplay(CheckHistory checkHistory) {
+			this.checkHistory = checkHistory;
+			this.rentedPowerBank = null;
+			this.depositedPowerBank = null;
+
+			this.transactionDateTime = checkHistory.checkTime;
+		}
+
+		public HistoryDisplay(RentedPowerBank rentedPowerBank) {
+			this.checkHistory = null;
+			this.rentedPowerBank = rentedPowerBank;
+			this.depositedPowerBank = null;
+
+			this.transactionDateTime = rentedPowerBank.transactionTime;
+		}
+
+		public HistoryDisplay(DepositedPowerBank depositedPowerBank) {
+			this.checkHistory = null;
+			this.rentedPowerBank = null;
+			this.depositedPowerBank = depositedPowerBank;
+
+			this.transactionDateTime = depositedPowerBank.transactionTime;
+		}
+	}
+
 	private UserMainFrame mainFrame;
 	private Color backgroundColor, menuColor, mainColor;
 
@@ -48,6 +80,7 @@ public class UserHistory extends JPanel {
 	private ArrayList<CheckHistory> checkHistoryList;
 	private ArrayList<DepositedPowerBank> depositList;
 	private ArrayList<RentedPowerBank> rentList;
+	private ArrayList<HistoryDisplay> historyDisplayList;
 
 	public UserHistory(UserMainFrame mainFrame, Color backgroundColor, Color mainColor, Color menuColor,
 			UserHistoryDetail detailPage) {
@@ -91,17 +124,63 @@ public class UserHistory extends JPanel {
 		this.add(historyScrollPane, BorderLayout.CENTER);
 	}
 
-	public void refreshPage() {		
+	public void refreshPage() {
+		if (historyDisplayList == null) {
+			System.err.println("Null history display list. Unable to refresh history page.");
+			return;
+		}
+
 		// get history data
 		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
-		 		
+
 		// get rented and deposited data
 		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
 		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
 		
+		historyDisplayList.clear();
+		addAndSortHistoryDisplayList();
+		
 		addHistoryList("all");
 	}
-
+	
+	private void addAndSortHistoryDisplayList() {
+		if (checkHistoryList == null || rentList == null || depositList == null) {
+			System.err.println("Null history list. Unable to add data to history display list.");
+			return;
+		}
+		
+		if (historyDisplayList == null) {
+			System.err.println("Null history display list. Unable to add data to history display list.");
+			return;
+		}
+		
+		for (CheckHistory checkHistory : checkHistoryList) {
+			addAndSortHistoryDisplayList(new HistoryDisplay(checkHistory));
+		}
+		
+		for (RentedPowerBank powerBank : rentList) {
+			addAndSortHistoryDisplayList(new HistoryDisplay(powerBank));
+		}
+		
+		for (DepositedPowerBank powerBank : depositList) {
+			addAndSortHistoryDisplayList(new HistoryDisplay(powerBank));
+		}
+	}
+	
+	private void addAndSortHistoryDisplayList(HistoryDisplay history) {
+		int indexToInsert = historyDisplayList.size();
+		
+		for (int i = 0; i < historyDisplayList.size(); i++) {
+			HistoryDisplay compare = historyDisplayList.get(i);
+			if (history.transactionDateTime.isAfter(compare.transactionDateTime)) {
+				indexToInsert = i;
+				break;
+			}
+		}
+		
+		historyDisplayList.add(indexToInsert, history);
+	}
+	
 	private void addHistoryList(String filter) {
 		if (checkHistoryList == null || rentList == null || depositList == null) {
 			System.err.println("Null history list. Unable to update history page.");
@@ -113,11 +192,40 @@ public class UserHistory extends JPanel {
 			return;
 		}
 
+		if (historyDisplayList == null) {
+			System.err.println("Null history display list. Unable to update history page.");
+			return;
+		}
+
 		historyContentPanel.removeAll();
 
+		// add data from history display list
+		int row = 0;
+		for (HistoryDisplay historyDisplay : historyDisplayList) {
+			if (historyDisplay.checkHistory != null) {
+				if (filter.equals("check") || filter.equals("all")) {
+					createHistoryBox(historyContentPanel, row++, historyDisplay.checkHistory);
+					createPageSeparator(historyContentPanel, row++, 5);
+				}
+			}
+			else if (historyDisplay.rentedPowerBank != null) {
+				if (filter.equals("rent") || filter.equals("all")) {
+					createHistoryBox(historyContentPanel, row++, historyDisplay.rentedPowerBank);
+					createPageSeparator(historyContentPanel, row++, 5);
+				}
+			}
+			else if (historyDisplay.depositedPowerBank != null) {
+				if (filter.equals("deposit") || filter.equals("all")) {
+					createHistoryBox(historyContentPanel, row++, historyDisplay.depositedPowerBank);
+					createPageSeparator(historyContentPanel, row++, 5);
+				}
+			}
+		}
+		
 		// filter history list
 		// filter values: all, rent, deposit, check
-		int row = 0;
+		
+		/*
 		if (filter.equals("check") || filter.equals("all")) {
 			for (CheckHistory checkHistory : checkHistoryList) {
 				createHistoryBox(historyContentPanel, row, checkHistory);
@@ -144,32 +252,29 @@ public class UserHistory extends JPanel {
 				row++;
 			}
 		}
-		
+		*/
+
 		// make components go from top to bottom
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridy = row;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.NONE;
 		gbc.insets = new Insets(15, 0, 15, 0);
-		
+
 		gbc.gridx = 0;
 		historyContentPanel.add(Box.createGlue(), gbc);
-		
-		historyContentPanel.setMaximumSize(new Dimension(
-				historyContentPanel.getMaximumSize().width,
-				historyContentPanel.getPreferredSize().height
-		));
-		
+
+		historyContentPanel.setMaximumSize(new Dimension(historyContentPanel.getMaximumSize().width,
+				historyContentPanel.getPreferredSize().height));
+
 		historyContentPanel.revalidate();
 		historyContentPanel.repaint();
 	}
 
 	private void createHistoryContentPanel() {
 		historyContentPanel = new JPanel(new GridBagLayout());
-		// historyContentPanel.setLayout(new BoxLayout(historyContentPanel,
-		// BoxLayout.Y_AXIS));
 		historyContentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		historyContentPanel.setAlignmentX(LEFT_ALIGNMENT);
 		historyContentPanel.setBackground(backgroundColor);
@@ -180,6 +285,10 @@ public class UserHistory extends JPanel {
 		// get rented and deposited data
 		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false);
 		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false);
+
+		// initialize history display list
+		historyDisplayList = new ArrayList<HistoryDisplay>();
+		addAndSortHistoryDisplayList();
 
 		addHistoryList("all");
 	}
@@ -281,7 +390,7 @@ public class UserHistory extends JPanel {
 		gbc.gridy = row;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(15, 0, 15, 0);
 
@@ -418,7 +527,7 @@ public class UserHistory extends JPanel {
 			checkFilterButton.setBackground(mainColor);
 			checkFilterButton.setForeground(Color.WHITE);
 		}
-		
+
 		addHistoryList(filter);
 	}
 

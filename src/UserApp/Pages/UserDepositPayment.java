@@ -192,8 +192,10 @@ public class UserDepositPayment extends JPanel {
 				return;
 			}
 			
-			// refresh list page
+			// refresh pages
 			mainFrame.refreshListPage();
+			mainFrame.refreshHistoryPage();
+			mainFrame.refreshNotificationPage();
 			
 			String lockerNumberText = "Locker หมายเลข " + String.valueOf(powerBank.lockerNumber);
 			String lockerPassWordText = "รหัสสำหรับปลดล็อก " + lockerPassword;
