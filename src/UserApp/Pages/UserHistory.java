@@ -441,10 +441,14 @@ public class UserHistory extends JPanel {
 		datePanel.add(dateLabel);
 
 		// Status
+		JPanel statusPanel = new JPanel();
+		statusPanel.setBackground(null);
+		gbc.gridx = 3;
+		gridBagContainerPanel.add(statusPanel, gbc);
+		
 		JLabel statusLabel = createPageLabel(status, Font.BOLD, headingFontSize);
 		statusLabel.setForeground(statusColor);
-		gbc.gridx = 3;
-		gridBagContainerPanel.add(statusLabel, gbc);
+		statusPanel.add(statusLabel);
 
 		// Next
 		ImageIcon nextIcon = Utils.createImageIcon("/icons/next_icon_36.png", "Next Icon");
