@@ -25,9 +25,11 @@ public class LockerUnlockMainFrame extends JFrame {
 	public static final Color BACKGROUND_COLOR = Color.decode("#0B226C");
 	public static final Color PRIMARY_COLOR = Color.decode("#0AB6FB");
 	public static final Color PRIMARY_FONT_COLOR = Color.WHITE;
+	public static final Color FAILED_COLOR = new Color(255, 40, 40);
 
 	// Page names
 	public static final String HOME_PAGE = "Home";
+	public static final String LOGIN_PAGE = "Login";
 	
 	// Locker types
 	public static final int RENT_LOCKER = 0;
@@ -47,7 +49,10 @@ public class LockerUnlockMainFrame extends JFrame {
 
 	// Home page
 	private LockerHome homePage;
-
+	
+	// Login page
+	private LockerLogin loginPage;
+	
 	// Create the frame
 	public LockerUnlockMainFrame(String address) {
 		DatabaseConnector.connect();
@@ -88,15 +93,17 @@ public class LockerUnlockMainFrame extends JFrame {
 
 		addCard();
 		
-		changeCard(HOME_PAGE);
+		changeCard(LOGIN_PAGE);
 	}
 
 	private void addCard() {
 		// Create Pages
 		homePage = new LockerHome(this);
+		loginPage = new LockerLogin(this);
 
 		// Add pages to card
 		mainPanel.add(homePage, HOME_PAGE);
+		mainPanel.add(loginPage, LOGIN_PAGE);
 	}
 
 	public void changeCard(String cardName) {

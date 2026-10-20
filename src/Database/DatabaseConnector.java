@@ -30,6 +30,7 @@ import Struct.ForRentPowerBank;
 import Struct.PowerBank;
 import Struct.PowerBankRule;
 import Struct.RentedPowerBank;
+import Struct.UserDetail;
 import Utils.Utils;
 
 public class DatabaseConnector {
@@ -91,7 +92,47 @@ public class DatabaseConnector {
 
 		return -1;
 	}
-
+	
+	public static int insertIntoUser(UserDetail user, String passowrd) {
+		if (!checkConnection("Unable to insert into user.")) return -1;
+		
+		// TODO: Hash the password
+		
+		return -1;
+	}
+	
+	public static UserDetail getUserInfoFromLogin(String userIdentifier, String hashedPassword) {
+		// try login with email first, if fail login with phone
+		if (!checkConnection("Unable to get user info from login.")) return null;
+		
+		UserDetail user = null;
+		
+		// Email
+		String query = "SELECT * FROM USER WHERE (EMAIL = ? OR PHONE = ?) AND HASHED_PASSWORD = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, userIdentifier);
+			ps.setString(2, userIdentifier);
+			ps.setString(3, hashedPassword);
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				user = new UserDetail();
+				user.userID = resultSet.getInt("user_id");
+				user.firstName = resultSet.getString("first_name");
+				user.lastName = resultSet.getString("last_name");
+				user.email = resultSet.getString("email");
+				user.phone = resultSet.getString("phone");
+				
+				return user;
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return user;
+		
+	}
+	
 	public static int getUserIdCount(int userId) {
 		try {
 			if (connection == null || connection.isClosed()) {
