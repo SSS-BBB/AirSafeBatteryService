@@ -184,7 +184,6 @@ public class UserMainFrame extends JFrame {
 		setLocationRelativeTo(null);
 
 		mainPanel = new JPanel(new BorderLayout());
-		// mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		mainPanel.setBackground(BACKGROUND_COLOR);
 		setContentPane(mainPanel);
 

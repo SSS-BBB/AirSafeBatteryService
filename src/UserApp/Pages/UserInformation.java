@@ -141,22 +141,6 @@ public class UserInformation extends JPanel {
 			mainFrame.changeCard(4, 4);
 		});
 
-		/*
-		 * // Log out JPanel logOutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5,
-		 * 0)); logOutPanel.setBackground(null); gbc.gridy = row++;
-		 * userInformationPanel.add(logOutPanel, gbc);
-		 * 
-		 * ImageIcon logOutIcon = Utils.createImageIcon("/icons/logout_icon_56.png",
-		 * "Log Out Icon"); JButton logOutButton = Utils.createIconButton(logOutIcon);
-		 * logOutPanel.add(logOutButton);
-		 * 
-		 * JLabel logOutLabel = createPageLabel("Log Out", Font.PLAIN, fontSize);
-		 * logOutLabel.setForeground(new Color(178, 59, 59));
-		 * logOutPanel.add(logOutLabel);
-		 * 
-		 * logOutButton.addActionListener(e -> { // TODO: Log Out });
-		 */
-
 		createGridBagBottomGlue(userInformationPanel, row);
 
 		return userInformationPanel;
@@ -177,13 +161,6 @@ public class UserInformation extends JPanel {
 		gbc.gridx = 0;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		topPanel.add(titleLabel, gbc);
-
-		/*
-		 * // User Icon ImageIcon userIcon =
-		 * Utils.createImageIcon("/icons/user_icon_120.png", "User Icon"); JLabel
-		 * userIconLabel = new JLabel(userIcon); gbc.gridx = 1; gbc.anchor =
-		 * GridBagConstraints.NORTHEAST; topPanel.add(userIconLabel, gbc);
-		 */
 
 		return topPanel;
 	}

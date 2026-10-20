@@ -302,6 +302,17 @@ public class Utils {
 		return button;
 	}
 	
+	public static JButton createBorderBackgroundButton(String text, 
+			Color backgroundColor, Color borderColor, Color textColor, 
+			int fontSize, int lineThickness, Dimension buttonSize) {
+		JButton button = createBorderButton(text, borderColor, textColor, fontSize, lineThickness);
+		button.setBackground(backgroundColor);
+		button.setMaximumSize(buttonSize);
+		button.setPreferredSize(buttonSize);
+		
+		return button;
+	}
+	
 	
 	public static JTextField createAppTextField(Color backgroundColor, int size, int fontSize) {
 		JTextField textField = new JTextField(size);
