@@ -89,12 +89,15 @@ public class UserMainFrame extends JFrame {
 			"HistoryDetail", "UserInformation" };
 
 	// cards (app pages)
-	private JPanel homePanel, checkPanel;
+	private JPanel checkPanel;
 
 	private UserProcessStatus processStatusPanel;
 	private PowerBankPickerPage powerBankPickerPanel;
 	private PowerBankAddPage powerBankAddPanel;
-
+	
+	// Home page
+	private UserHome homePanel;
+	
 	// Rent pages
 	private UserRent rentPanel;
 	private UserForRentDetail forRentDetailPanel;
@@ -367,6 +370,15 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(userInformationPanel, cardNames[17]);
 	}
 	
+	public void refreshHomePage() {
+		if (homePanel == null) {
+			System.err.println("Null Home Panel. Unable to refresh home page");
+			return;
+		}
+		
+		homePanel.refreshPage();
+	}
+	
 	public void refreshNotificationPage() {
 		if (historyPanel == null) {
 			System.err.println("Null Notification Panel. Unable to refresh notification page");
@@ -399,9 +411,7 @@ public class UserMainFrame extends JFrame {
 			System.err.println("Null Rent Panel. Unable to refresh rent page");
 			return;
 		}
-		
-		// rentPanel.clearFilter();
-		// rentPanel.applyFilter();
+
 		rentPanel.refreshPage();
 
 	}

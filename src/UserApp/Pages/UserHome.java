@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
+import Database.DataContainer;
 import Utils.Utils;
 import UserApp.UserMainFrame;
 
@@ -45,6 +46,8 @@ public class UserHome extends JPanel {
 				  rentBuyDetailLabel2, storageTitleLabel, storageDetailLabel1,
 				  storageDetailLabel2, currentRentIconLabel;
 	
+	private JLabel rentNumberLabel, storageNumberLabel;
+	
 	private JButton checkButton, rentBuyButton, storageButton;
 	
 	public UserHome(UserMainFrame mainFrame, Color backgroundColor, Color detailFontColor, String appName) {
@@ -55,6 +58,11 @@ public class UserHome extends JPanel {
 		this.appName = appName;
 		
 		createHomePage();
+	}
+	
+	public void refreshPage() {
+		rentNumberLabel.setText(String.valueOf(DataContainer.getInProgressRentList().size()));
+		storageNumberLabel.setText(String.valueOf(DataContainer.getInProgressDepositList().size()));
 	}
 	
 	private void createHomePage() {
@@ -306,12 +314,12 @@ public class UserHome extends JPanel {
 		currentRentTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
 		currentRentTextPanel.add(currentRentTitleLabel);
 
-		int rentNumber = 1;
+		int rentCount = DataContainer.getInProgressRentList().size();
 		JPanel rentNumberPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		rentNumberPanel.setBackground(backgroundColor);
 		rentNumberPanel.setAlignmentX(LEFT_ALIGNMENT);
 		currentRentTextPanel.add(rentNumberPanel);
-		JLabel rentNumberLabel = new JLabel(String.valueOf(rentNumber));
+		rentNumberLabel = new JLabel(String.valueOf(rentCount));
 		rentNumberLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
 		rentNumberPanel.add(rentNumberLabel);
 		JLabel listLabel = new JLabel(" รายการ");
@@ -355,12 +363,12 @@ public class UserHome extends JPanel {
 		currentStorageTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
 		currentStorageTextPanel.add(currentStorageTitleLabel);
 
-		int storageNumber = 1;
+		int storageNumber = DataContainer.getInProgressDepositList().size();
 		JPanel storageNumberPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		storageNumberPanel.setBackground(backgroundColor);
 		storageNumberPanel.setAlignmentX(LEFT_ALIGNMENT);
 		currentStorageTextPanel.add(storageNumberPanel);
-		JLabel storageNumberLabel = new JLabel(String.valueOf(storageNumber));
+		storageNumberLabel = new JLabel(String.valueOf(storageNumber));
 		storageNumberLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
 		storageNumberPanel.add(storageNumberLabel);
 		JLabel storageListLabel = new JLabel(" รายการ");
