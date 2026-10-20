@@ -26,7 +26,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import CustomGUI.CustomScrollPane;
-import Database.DatabaseConnector;
+import Database.DataContainer;
 import Struct.CheckHistory;
 import Struct.DepositedPowerBank;
 import Struct.RentedPowerBank;
@@ -131,11 +131,14 @@ public class UserHistory extends JPanel {
 		}
 
 		// get history data
-		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		// checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		checkHistoryList = DataContainer.getCheckHistoryList();
 
 		// get rented and deposited data
-		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, false);
-		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, false);
+		// depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, false);
+		// rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, false);
+		depositList = DataContainer.getAllDepositList();
+		rentList = DataContainer.getAllRentList();
 		
 		historyDisplayList.clear();
 		addAndSortHistoryDisplayList();
@@ -280,12 +283,15 @@ public class UserHistory extends JPanel {
 		historyContentPanel.setBackground(backgroundColor);
 
 		// get history data
-		checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		// checkHistoryList = DatabaseConnector.getCheckHistory(mainFrame.userDetail.userID);
+		checkHistoryList = DataContainer.getCheckHistoryList();
 
 		// get rented and deposited data
-		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, false);
-		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, false);
-
+		// depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, false);
+		// rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, false);
+		depositList = DataContainer.getAllDepositList();
+		rentList = DataContainer.getAllRentList();
+		
 		// initialize history display list
 		historyDisplayList = new ArrayList<HistoryDisplay>();
 		addAndSortHistoryDisplayList();

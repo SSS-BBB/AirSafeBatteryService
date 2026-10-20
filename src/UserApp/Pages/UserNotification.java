@@ -19,7 +19,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import CustomGUI.CustomScrollPane;
-import Database.DatabaseConnector;
+import Database.DataContainer;
 import Struct.DepositedPowerBank;
 import Struct.PowerBank;
 import Struct.RentedPowerBank;
@@ -88,9 +88,12 @@ public class UserNotification extends JPanel {
 	}
 	
 	private int createNotificationDetail(int startingRow) {
-		depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, true);
-		rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, true);
-
+		// depositList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, false, true);
+		// rentList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, false, true);
+		
+		depositList = DataContainer.getInProgressDepositList();
+		rentList = DataContainer.getInProgressRentList();
+		
 		return updateNotificationDisplay(startingRow);
 	}
 

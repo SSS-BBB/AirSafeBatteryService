@@ -210,21 +210,6 @@ public class DatabaseConnector {
 
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank() {
 
-		/*
-		 * Dictionary<String, Double> numberMinFilterList = new Hashtable<String,
-		 * Double>(); Dictionary<String, Double> numberMaxFilterList = new
-		 * Hashtable<String, Double>(); Dictionary<String, String> textFilterList = new
-		 * Hashtable<String, String>();
-		 * 
-		 * numberMinFilterList.put("wh", 38.0); numberMinFilterList.put("max_duration",
-		 * 5.0);
-		 * 
-		 * numberMaxFilterList.put("price_per_day", 120.0);
-		 * numberMaxFilterList.put("late_fee_per_day", 70.0);
-		 * 
-		 * textFilterList.put("address", "สนามบินดอนเมือง");
-		 */
-
 		return getForRentPowerBank("", "", "", "", -1, -1, -1, -1, -1, -1, "", true);
 	}
 

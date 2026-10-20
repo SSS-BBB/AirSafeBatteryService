@@ -35,6 +35,7 @@ import javax.swing.SwingConstants;
 
 import CustomGUI.CustomDropDown;
 import CustomGUI.CustomScrollPane;
+import Database.DataContainer;
 import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
 import UserApp.UserMainFrame;
@@ -70,7 +71,7 @@ public class UserRent extends JPanel {
 		this.mainColor = mainColor;
 		this.detailPage = detailPage;
 
-		forRentPowerBankList = DatabaseConnector.getForRentPowerBank();
+		forRentPowerBankList = DataContainer.getForRentList();
 
 		if (forRentPowerBankList == null) {
 			forRentPowerBankList = new ArrayList<ForRentPowerBank>();
@@ -269,12 +270,18 @@ public class UserRent extends JPanel {
 		return wrapperPanel;
 	}
 	
+	public void refreshPage() {
+		forRentPowerBankList = DataContainer.getForRentList();
+		updatePowerBankPanel();
+	}
+	
 	private void updatePowerBankPanel() {
 		if (powerbankPanel == null) {
 			System.err.println("Null Power Bank Panel. Unable to update.");
 			return;
 		}
 		
+		powerbankPanel.removeAll();
 		for (int i = 0; i < forRentPowerBankList.size(); i++)
 			powerbankPanel.add(createPowerbankDisplayPanel(forRentPowerBankList.get(i)));
 		

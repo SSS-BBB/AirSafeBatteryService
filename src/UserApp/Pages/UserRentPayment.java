@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import CustomGUI.CustomScrollPane;
+import Database.DataContainer;
 import Database.DatabaseConnector;
 import Struct.ForRentPowerBank;
 import Struct.RentedPowerBank;
@@ -219,6 +220,8 @@ public class UserRentPayment extends JPanel {
 			}
 			
 			// refresh pages
+			DataContainer.refreshEveryRentList(mainFrame.userDetail.userID);
+			DataContainer.refreshForRentList();
 			mainFrame.refreshRentPage();
 			mainFrame.refreshListPage();
 			mainFrame.refreshHistoryPage();

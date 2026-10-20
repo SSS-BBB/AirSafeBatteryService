@@ -43,6 +43,7 @@ import javax.swing.text.NumberFormatter;
 
 import Database.InsertSample;
 import GeneralPages.*;
+import Database.DataContainer;
 import Database.DatabaseConnector;
 import Struct.DepositedPowerBank;
 import Struct.ForRentPowerBank;
@@ -75,8 +76,8 @@ public class UserMainFrame extends JFrame {
 	private JPanel menuSelectPanel;
 	private JPanel cardPanel;
 
-	JPanel statusPanel;
-	JLabel statusIconLabel, statusLabelTitle, statusLabelDetail, whLabel;
+	private JPanel statusPanel;
+	private JLabel statusIconLabel, statusLabelTitle, statusLabelDetail, whLabel;
 
 	// menus
 	private JPanel logoMenuPanel;
@@ -117,7 +118,7 @@ public class UserMainFrame extends JFrame {
 	// Notification page
 	private UserNotification notificationPanel;
 	
-	// TODO: User Information page
+	// User Information page
 	private UserInformation userInformationPanel;
 	
 	public UserDetail userDetail;
@@ -160,7 +161,7 @@ public class UserMainFrame extends JFrame {
 		}
 
 		DatabaseConnector.connect();
-
+		
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
 
@@ -171,6 +172,8 @@ public class UserMainFrame extends JFrame {
 		userDetail.lastName = "User";
 		userDetail.email = "firstemail@something.cool";
 		userDetail.phone = "0000000000";
+		
+		DataContainer.refreshAll(userDetail.userID);
 
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -341,7 +344,7 @@ public class UserMainFrame extends JFrame {
 		// Notification Page
 		notificationPanel = new UserNotification(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
-		// TODO: User Information Page
+		// User Information Page
 		userInformationPanel = new UserInformation(this, BACKGROUND_COLOR, MAIN_COLOR, MENU_COLOR);
 		
 		// add panels to card
@@ -397,8 +400,9 @@ public class UserMainFrame extends JFrame {
 			return;
 		}
 		
-		rentPanel.clearFilter();
-		rentPanel.applyFilter();
+		// rentPanel.clearFilter();
+		// rentPanel.applyFilter();
+		rentPanel.refreshPage();
 
 	}
 

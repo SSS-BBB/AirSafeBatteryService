@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 import CustomGUI.CustomScrollPane;
 import CustomGUI.NameDropDownHolder;
-import Database.DatabaseConnector;
+import Database.DataContainer;
 import GeneralPages.DepositedDetailPage;
 import GeneralPages.RentedDetailPage;
 import Struct.DepositedPowerBank;
@@ -181,13 +181,13 @@ public class UserList extends JPanel {
 		
 		// get data from rented power bank and deposited power bank table
 		if (!selectedType.equals("การฝาก")) {
-			ArrayList<RentedPowerBank> rentedPowerBankList = DatabaseConnector.getRentedPowerBank(mainFrame.userDetail.userID, showPastDue, true);
+			ArrayList<RentedPowerBank> rentedPowerBankList = DataContainer.getRentList(showPastDue, true);
 			for (RentedPowerBank powerBank : rentedPowerBankList)
 				addPowerBankDisplay(new PowerBankDisplay(powerBank));
 		}
 		
 		if (!selectedType.equals("การเช่า")) {
-			ArrayList<DepositedPowerBank> depositedPowerBankList = DatabaseConnector.getDepositedPowerBank(mainFrame.userDetail.userID, showPastDue, true);
+			ArrayList<DepositedPowerBank> depositedPowerBankList = DataContainer.getDepositList(showPastDue, true);
 			for (DepositedPowerBank powerBank : depositedPowerBankList)
 				addPowerBankDisplay(new PowerBankDisplay(powerBank));
 		}

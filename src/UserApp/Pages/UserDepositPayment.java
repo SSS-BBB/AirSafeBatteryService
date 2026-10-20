@@ -19,6 +19,7 @@ import CustomGUI.CustomScrollPane;
 import CustomGUI.NameValueHolder;
 import CustomGUI.PowerBankBox;
 import Database.DatabaseConnector;
+import Database.DataContainer;
 import Struct.DepositedPowerBank;
 import UserApp.UserMainFrame;
 import Utils.Utils;
@@ -193,6 +194,7 @@ public class UserDepositPayment extends JPanel {
 			}
 			
 			// refresh pages
+			DataContainer.refreshEveryDepositList(mainFrame.userDetail.userID);
 			mainFrame.refreshListPage();
 			mainFrame.refreshHistoryPage();
 			mainFrame.refreshNotificationPage();

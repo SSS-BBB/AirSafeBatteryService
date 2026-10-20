@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import Database.DatabaseConnector;
+import Database.DataContainer;
 import Struct.PowerBankRule;
 import UserApp.UserMainFrame;
 import Utils.Utils;
@@ -432,6 +433,7 @@ public class UserCheck extends JPanel {
 		
 		// insert into check history
 		DatabaseConnector.insertIntoCheckHistory(capacity, wh, mainFrame.userDetail.userID, rule.ruleId);
+		DataContainer.refreshCheckHistoryList(mainFrame.userDetail.userID);
 		mainFrame.refreshHistoryPage();
 		
 		statusPanel.setBackground(backgroundColor);
