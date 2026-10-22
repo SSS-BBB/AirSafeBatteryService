@@ -84,7 +84,8 @@ public class LockerHome extends JPanel {
 	private void onTypeButtonClicked(int lockerType) {
 		mainFrame.lockerType = lockerType;
 		
-		// TODO: change to login page
+		// change to login page
+		mainFrame.changeCard(LockerUnlockMainFrame.LOGIN_PAGE);
 	}
 	
 	private JPanel createTopPanel() {

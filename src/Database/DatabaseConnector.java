@@ -63,6 +63,10 @@ public class DatabaseConnector {
 		}
 
 	}
+	
+	public static Connection getConnection() {
+		return connection;
+	}
 
 	public static int insertIntoTransaction(double paymentAmount, int userID) {
 		if (connection == null) {
@@ -93,38 +97,6 @@ public class DatabaseConnector {
 		}
 
 		return -1;
-	}
-
-	public static UserDetail getUserInfoFromLogin(String userIdentifier, String hashedPassword) {
-		// try login with email first, if fail login with phone
-		if (!checkConnection("Unable to get user info from login."))
-			return null;
-
-		UserDetail user = null;
-
-		// Email
-		String query = "SELECT * FROM USER WHERE (EMAIL = ? OR PHONE = ?) AND HASHED_PASSWORD = ?";
-		try (PreparedStatement ps = connection.prepareStatement(query)) {
-			ps.setString(1, userIdentifier);
-			ps.setString(2, userIdentifier);
-			ps.setString(3, hashedPassword);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				user = new UserDetail();
-				user.userID = resultSet.getInt("user_id");
-				user.firstName = resultSet.getString("first_name");
-				user.lastName = resultSet.getString("last_name");
-				user.email = resultSet.getString("email");
-				user.phone = resultSet.getString("phone");
-
-				return user;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return user;
-
 	}
 
 	public static int getUserIdCount(int userId) {
@@ -735,7 +707,61 @@ public class DatabaseConnector {
 
 		return depositedPowerBankList;
 	}
-
+	
+	public static DepositedPowerBank getDepositLockerNumberAndStatus(int userId, String lockerPassword, String address) {
+		if (!checkConnection("Unable to get deposit locker number and status."))
+			return null;
+		
+		String query = "SELECT LOCKER_NUMBER, DEPOSIT_STATUS FROM DEPOSITEDPOWERBANK NATURAL JOIN TRANSACTION" +
+					   " WHERE USER_ID = ? AND LOCKER_PASSWORD = ? AND ADDRESS = ?" + 
+					   " AND CURDATE() >= DEPOSIT_DATE AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'";
+		
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, userId);
+			ps.setString(2, lockerPassword);
+			ps.setString(3, address);
+			
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				DepositedPowerBank depositInfo = new DepositedPowerBank();
+				depositInfo.lockerNumber = resultSet.getInt("locker_number");
+				depositInfo.depositStatus = resultSet.getString("deposit_status");
+				return depositInfo;
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public static int getRentLockerNumber(int userId, String lockerPassword, String pickUpAddress) {
+		if (!checkConnection("Unable to get rent locker number."))
+			return -1;
+		
+		String query = "SELECT LOCKER_NUMBER FROM RENTEDPOWERBANK NATURAL JOIN TRANSACTION" +
+					  " WHERE USER_ID = ? AND LOCKER_PASSWORD = ? AND PICK_UP_ADDRESS = ?" +
+					  " AND CURDATE() >= PICK_UP_DATE AND CURDATE() <= RETURN_DATE" +
+					  " AND RENT_STATUS = 'ยังไม่รับ'";
+		
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setInt(1, userId);
+			ps.setString(2, lockerPassword);
+			ps.setString(3, pickUpAddress);
+			
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				return resultSet.getInt("locker_number");
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+	
 	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue,
 			boolean showOnlyInprogress) {
 		if (!checkConnection("Unable to get rented power bank data."))
@@ -808,7 +834,8 @@ public class DatabaseConnector {
 				rentedPowerBankList.add(rentedPowerBank);
 			}
 
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 
@@ -894,7 +921,7 @@ public class DatabaseConnector {
 		}
 	}
 
-	private static boolean checkConnection(String errorMessage) {
+	public static boolean checkConnection(String errorMessage) {
 		if (connection == null) {
 			System.err.println("Null connection. " + errorMessage);
 			return false;
@@ -946,41 +973,6 @@ public class DatabaseConnector {
 		}
 
 		return null;
-	}
-
-	public static int insertIntoUser(UserDetail user, String passowrd) {
-		if (!checkConnection("Unable to insert into user."))
-			return -1;
-
-		// TODO: Hash the password
-		try {
-			String hashedPassword = PasswordHasher.hashPassword(passowrd.toCharArray());
-
-			String query = "INSERT INTO USER (FIRST_NAME, LAST_NAME, EMAIL, PHONE, HASHED_PASSWORD) "
-					+ "VALUES (?, ?, ?, ?, ?)";
-			try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-				ps.setString(1, user.firstName);
-				ps.setString(2, user.lastName);
-				ps.setString(3, user.email);
-				ps.setString(4, user.phone);
-				ps.setString(5, hashedPassword);
-
-				boolean success = ps.executeUpdate() > 0;
-
-				if (success) {
-					ResultSet resultSet = ps.getGeneratedKeys();
-					if (resultSet.next())
-						return resultSet.getInt(1);
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
-		}
-
-		return -1;
 	}
 
 	public static boolean insertIntoCheckHistory(double capacity, double wh, int userId, int ruleId) {

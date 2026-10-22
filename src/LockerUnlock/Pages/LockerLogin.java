@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,10 +17,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import CustomGUI.NameTextFieldHolder;
 import LockerUnlock.LockerUnlockMainFrame;
+import Struct.UserDetail;
+import Utils.Authentication;
 import Utils.Utils;
 
 public class LockerLogin extends JPanel {
@@ -27,8 +31,9 @@ public class LockerLogin extends JPanel {
 	private LockerUnlockMainFrame mainFrame;
 
 	// Input components
-	private JTextField userIdentifierTextField, passwordTextField;
-	private JLabel failLogin;
+	private JTextField userIdentifierTextField;
+	private JPasswordField passwordField;
+	private JLabel failLoginLabel;
 
 	public LockerLogin(LockerUnlockMainFrame mainFrame) {
 		super();
@@ -91,7 +96,35 @@ public class LockerLogin extends JPanel {
 	}
 	
 	private void loginCheck() {
+		if (userIdentifierTextField == null || passwordField == null) {
+			System.err.println("Null Text field. Unable to proceed login check.");
+			return;
+		}
 		
+		// check valid login
+		char[] passwordInput = passwordField.getPassword();
+		UserDetail user = Authentication.userLogin(userIdentifierTextField.getText(), passwordInput);
+		Arrays.fill(passwordInput, '0');
+		if (user != null) {
+			userIdentifierTextField.setText("");
+			passwordField.setText("");
+			failLoginLabel.setText("");
+			
+			mainFrame.userDetail = user;
+			
+			// change to locker password enter page
+			mainFrame.changeCard(LockerUnlockMainFrame.PASSWORD_ENTER_PAGE);
+			
+		}
+		else {
+			if (failLoginLabel != null) {
+				String failMessage = "กรอก Email/เบอร์โทรหรือรหัสผ่านผิดพลาด โปรดลองอีกครั้ง";
+				failLoginLabel.setText(failMessage);
+			}
+			else {
+				System.err.println("Null fail login label. Unable to show fail login message.");
+			}
+		}
 	}
 	
 	private JPanel createUserInputPanel() {
@@ -100,8 +133,9 @@ public class LockerLogin extends JPanel {
 		inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 		inputPanel.setAlignmentX(CENTER_ALIGNMENT);
 
-		int fontSize = 28;
+		int fontSize = 24;
 		int textFieldSize = 14;
+		int textFieldFontSize = 16;
 		int verticleMargin = 30;
 		int horizontalMargin = 30;
 		
@@ -115,7 +149,7 @@ public class LockerLogin extends JPanel {
 		gbc.gridy = row;
 		inputPanel.add(userIdentifierLabel, gbc);
 		
-		userIdentifierTextField = Utils.createAppTextField(LockerUnlockMainFrame.PRIMARY_FONT_COLOR, textFieldSize, fontSize);
+		userIdentifierTextField = Utils.createAppTextField(LockerUnlockMainFrame.PRIMARY_FONT_COLOR, textFieldSize, textFieldFontSize);
 		gbc.gridx = 1;
 		gbc.gridy = row++;
 		inputPanel.add(userIdentifierTextField, gbc);
@@ -127,19 +161,20 @@ public class LockerLogin extends JPanel {
 		gbc.gridy = row;
 		inputPanel.add(passwordLabel, gbc);
 		
-		passwordTextField = Utils.createAppTextField(LockerUnlockMainFrame.PRIMARY_FONT_COLOR, textFieldSize, fontSize);
+		passwordField = new JPasswordField(textFieldSize);
+		passwordField.setFont(new Font("Tahoma", Font.PLAIN, textFieldFontSize));
 		gbc.gridx = 1;
 		gbc.gridy = row++;
-		inputPanel.add(passwordTextField, gbc);
+		inputPanel.add(passwordField, gbc);
 		
 		// Fail login
-		failLogin = createPageLabel("กรอก Email/เบอร์โทรหรือรหัสผ่านผิดพลาด โปรดลองอีกครั้ง", Font.PLAIN, fontSize - 2);
-		failLogin.setForeground(LockerUnlockMainFrame.FAILED_COLOR);
+		failLoginLabel = createPageLabel("", Font.PLAIN, fontSize - 2);
+		failLoginLabel.setForeground(LockerUnlockMainFrame.FAILED_COLOR);
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridwidth = 2;
 		gbc.gridx = 0;
 		gbc.gridy = row++;
-		inputPanel.add(failLogin, gbc);
+		inputPanel.add(failLoginLabel, gbc);
 		
 		createGridBagBottomGlue(inputPanel, row++, verticleMargin, horizontalMargin);
 		

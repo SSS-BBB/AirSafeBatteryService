@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import Database.DataContainer;
 import Database.DatabaseConnector;
+import Database.InsertSample;
 import LockerUnlock.Pages.*;
 import Struct.UserDetail;
 
@@ -30,20 +31,22 @@ public class LockerUnlockMainFrame extends JFrame {
 	// Page names
 	public static final String HOME_PAGE = "Home";
 	public static final String LOGIN_PAGE = "Login";
+	public static final String PASSWORD_ENTER_PAGE = "Password Enter";
 	
 	// Locker types
 	public static final int RENT_LOCKER = 0;
 	public static final int DEPOSIT_LOCKER = 1;
 
 	public static void main(String[] args) {
-		LockerUnlockMainFrame frame = new LockerUnlockMainFrame("สนามบินสุวรรณภูมิ");
+		LockerUnlockMainFrame frame = new LockerUnlockMainFrame("สนามบินดอนเมือง");
 		frame.setVisible(true);
 	}
 
 	// Locker Unlock Main Frame
 	private String address;
-	private UserDetail userDetail;
+	public UserDetail userDetail;
 	public int lockerType; // rent or deposit;
+	public int lockerNumber;
 
 	private JPanel mainPanel;
 
@@ -53,12 +56,16 @@ public class LockerUnlockMainFrame extends JFrame {
 	// Login page
 	private LockerLogin loginPage;
 	
+	// Password Enter page
+	private LockerPasswordEnter passwordEnterPage;
+	
 	// Create the frame
 	public LockerUnlockMainFrame(String address) {
 		DatabaseConnector.connect();
 		
 		this.address = address;
 		this.lockerType = -1;
+		this.lockerNumber = -1;
 		
 		// Sample User Data
 		userDetail = new UserDetail();
@@ -67,7 +74,7 @@ public class LockerUnlockMainFrame extends JFrame {
 		userDetail.lastName = "User";
 		userDetail.email = "firstemail@something.cool";
 		userDetail.phone = "0000000000";
-
+		
 		DataContainer.refreshAll(userDetail.userID);
 
 		setTitle(APP_NAME);
@@ -93,17 +100,20 @@ public class LockerUnlockMainFrame extends JFrame {
 
 		addCard();
 		
-		changeCard(LOGIN_PAGE);
+		this.lockerType = DEPOSIT_LOCKER;
+		changeCard(PASSWORD_ENTER_PAGE);
 	}
 
 	private void addCard() {
 		// Create Pages
 		homePage = new LockerHome(this);
 		loginPage = new LockerLogin(this);
+		passwordEnterPage = new LockerPasswordEnter(this);
 
 		// Add pages to card
 		mainPanel.add(homePage, HOME_PAGE);
 		mainPanel.add(loginPage, LOGIN_PAGE);
+		mainPanel.add(passwordEnterPage, PASSWORD_ENTER_PAGE);
 	}
 
 	public void changeCard(String cardName) {
