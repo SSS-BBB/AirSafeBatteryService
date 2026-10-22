@@ -153,10 +153,12 @@ public class UserForRentDetail extends JPanel {
 			datePicker.addDatePickerAction(new DatePickerAction() {
 				@Override
 				public void onDatePicked() {
+					/*
 					if (Utils.isDatePast(datePicker.selectedDate)) {
 						Utils.showDialog(mainFrame, "เลือกวันในอดีตไม่ได้!", "คุณไม่สามารถเลือกวันในอดีตได้ โปรดเลือกวันนี้หรือวันข้างหน้า");
 						return;
 					}
+					*/
 					
 					returnDate = null;
 					rentDuration = -1;

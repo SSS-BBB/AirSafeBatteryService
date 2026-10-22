@@ -63,7 +63,13 @@ public class DataContainer {
 		forRentList = DatabaseConnector.getForRentPowerBank();
 	}
 	
+	public static void refreshLateStatus() {
+		DatabaseConnector.updateLateStatus();
+	}
+	
 	public static void refreshAll(int userId) {
+		refreshLateStatus();
+		
 		refreshInprogressRentList(userId);
 		refreshAllRentList(userId);
 		refreshRentPastDueList(userId);
@@ -79,9 +85,8 @@ public class DataContainer {
 	
 	// Get Deposit List
 	public static ArrayList<DepositedPowerBank> getDepositList(boolean showPastDue, boolean showOnlyInprogress) {
-		if (!showPastDue && showOnlyInprogress) return inProgressDepositList;
-		else if (showPastDue && !showOnlyInprogress) return depositPastDueList;
-		
+		if (showPastDue) return depositPastDueList;
+		else if (showOnlyInprogress) return inProgressDepositList;
 		return allDepositList;
 	}
 	
@@ -103,9 +108,8 @@ public class DataContainer {
 	
 	// Get Rent List
 	public static ArrayList<RentedPowerBank> getRentList(boolean showPastDue, boolean showOnlyInprogress) {
-		if (!showPastDue && showOnlyInprogress) return inProgressRentList;
-		else if (showPastDue && !showOnlyInprogress) return rentPastDueList;
-		
+		if (showPastDue) return rentPastDueList;
+		else if (showOnlyInprogress) return inProgressRentList;
 		return allRentList;
 	}
 	

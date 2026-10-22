@@ -63,7 +63,7 @@ public class DatabaseConnector {
 		}
 
 	}
-	
+
 	public static int insertIntoTransaction(double paymentAmount, int userID) {
 		if (connection == null) {
 			System.err.println("Database is not connected, unable to insert into transaction table.");
@@ -94,13 +94,14 @@ public class DatabaseConnector {
 
 		return -1;
 	}
-	
+
 	public static UserDetail getUserInfoFromLogin(String userIdentifier, String hashedPassword) {
 		// try login with email first, if fail login with phone
-		if (!checkConnection("Unable to get user info from login.")) return null;
-		
+		if (!checkConnection("Unable to get user info from login."))
+			return null;
+
 		UserDetail user = null;
-		
+
 		// Email
 		String query = "SELECT * FROM USER WHERE (EMAIL = ? OR PHONE = ?) AND HASHED_PASSWORD = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -115,18 +116,17 @@ public class DatabaseConnector {
 				user.lastName = resultSet.getString("last_name");
 				user.email = resultSet.getString("email");
 				user.phone = resultSet.getString("phone");
-				
+
 				return user;
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return user;
-		
+
 	}
-	
+
 	public static int getUserIdCount(int userId) {
 		try {
 			if (connection == null || connection.isClosed()) {
@@ -174,23 +174,23 @@ public class DatabaseConnector {
 			while (resultSet.next())
 				count++;
 			return count;
-		} 
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return -1;
 	}
-	
+
 	public static PowerBankRule getValidRule() {
-		if (!checkConnection("Unable to get a valid power bank rule.")) return null;
-		
+		if (!checkConnection("Unable to get a valid power bank rule."))
+			return null;
+
 		PowerBankRule rule = new PowerBankRule();
-		
-		String query = "SELECT * FROM POWERBANKRULE " + 
-					   "WHERE EFFECTIVE_DATE = (SELECT MAX(EFFECTIVE_DATE) FROM POWERBANKRULE) " +
-					   "AND NOW() >= EFFECTIVE_DATE AND NOW() < END_DATE";
-		
+
+		String query = "SELECT * FROM POWERBANKRULE "
+				+ "WHERE EFFECTIVE_DATE = (SELECT MAX(EFFECTIVE_DATE) FROM POWERBANKRULE) "
+				+ "AND NOW() >= EFFECTIVE_DATE AND NOW() < END_DATE";
+
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ResultSet resultSet = ps.executeQuery();
 			if (resultSet.next()) {
@@ -200,21 +200,20 @@ public class DatabaseConnector {
 				rule.checkedBaggage = resultSet.getBoolean("checked_baggage");
 				rule.carryOnBaggage = resultSet.getBoolean("carry_on_baggage");
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return rule;
 	}
-	
+
 	public static ArrayList<CheckHistory> getCheckHistory(int userId) {
-		if (!checkConnection("Unable to get check history data.")) return null;
-		
+		if (!checkConnection("Unable to get check history data."))
+			return null;
+
 		ArrayList<CheckHistory> checkHistoryList = new ArrayList<CheckHistory>();
-		
-		String query = "SELECT * FROM CHECKHISTORY NATURAL JOIN POWERBANKRULE " +
-					   "WHERE USER_ID = ?";
+
+		String query = "SELECT * FROM CHECKHISTORY NATURAL JOIN POWERBANKRULE " + "WHERE USER_ID = ?";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
 			ResultSet resultSet = ps.executeQuery();
@@ -223,23 +222,23 @@ public class DatabaseConnector {
 				checkHistory.checkId = resultSet.getInt("check_id");
 				checkHistory.checkTime = resultSet.getTimestamp("check_timestamp").toLocalDateTime();
 				checkHistory.capacity = resultSet.getDouble("capacity");
-				if (resultSet.wasNull()) checkHistory.capacity = -1;
+				if (resultSet.wasNull())
+					checkHistory.capacity = -1;
 				checkHistory.wh = resultSet.getDouble("wh");
 				checkHistory.ruleId = resultSet.getInt("rule_id");
-				
+
 				// status
 				double maxWh = resultSet.getDouble("max_wh");
 				checkHistory.approve = checkHistory.wh <= maxWh;
 				checkHistory.maxWh = maxWh;
 				checkHistory.endDate = resultSet.getDate("end_date").toLocalDate();
-				
+
 				checkHistoryList.add(checkHistory);
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return checkHistoryList;
 	}
 
@@ -518,6 +517,56 @@ public class DatabaseConnector {
 		return false;
 	}
 
+	public static int updateLateStatus() {
+		// Note: This function should be on the back end server
+		// but since we don't have that we put it on the front end '-'
+		// In fact this entire class should be on the server lol
+
+		if (!checkConnection("Unable to update late status."))
+			return -1;
+
+		// Update Rent
+		// have not received -> didn't receive the device
+		String query = "UPDATE RENTEDPOWERBANK SET RENT_STATUS = 'ไม่ได้รับ' "
+				+ "WHERE CURDATE() > RETURN_DATE AND RENT_STATUS = 'ยังไม่รับ'";
+		int rowChanged = 0;
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			rowChanged += ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// activated -> late return
+		query = "UPDATE RENTEDPOWERBANK SET RENT_STATUS = 'ส่งคืนสาย' "
+				+ "WHERE CURDATE() > RETURN_DATE AND RENT_STATUS = 'ใช้งานได้'";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			rowChanged += ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// Update Deposit
+		// locker reserved -> didn't deposit
+		query = "UPDATE DEPOSITEDPOWERBANK SET DEPOSIT_STATUS = 'ไม่ได้ฝาก' "
+				+ "WHERE CURDATE() > RETURN_DATE AND DEPOSIT_STATUS = 'จองที่ฝากแล้ว'";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			rowChanged += ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// is being deposited -> late pick up
+		query = "UPDATE DEPOSITEDPOWERBANK SET DEPOSIT_STATUS = 'รับคืนสาย' "
+				+ "WHERE CURDATE() > RETURN_DATE AND DEPOSIT_STATUS = 'กำลังฝาก'";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			rowChanged += ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return rowChanged;
+	}
+
 	public static PowerBank getPowerBank(String brand, String model, boolean getChargerType) {
 		if (!checkConnection("Unable to get data from power bank table."))
 			return null;
@@ -608,25 +657,29 @@ public class DatabaseConnector {
 
 		return powerBankList;
 	}
-	
-	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId, boolean showPastDue, boolean showOnlyInprogress) {
-		if (!checkConnection("Unable to get deposited power bank data.")) return null;
-		
+
+	public static ArrayList<DepositedPowerBank> getDepositedPowerBank(int userId, boolean showPastDue,
+			boolean showOnlyInprogress) {
+		if (!checkConnection("Unable to get deposited power bank data."))
+			return null;
+
 		ArrayList<DepositedPowerBank> depositedPowerBankList = null;
-		
-		StringBuilder queryBuilder = new StringBuilder("SELECT * FROM DEPOSITEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
+
+		StringBuilder queryBuilder = new StringBuilder(
+				"SELECT * FROM DEPOSITEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
 		if (showPastDue) {
-			queryBuilder.append(" AND NOW() > RETURN_DATE");
+			queryBuilder.append(" AND CURDATE() > RETURN_DATE");
+			queryBuilder.append(" AND DEPOSIT_STATUS != 'รับคืนแล้ว' AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'");
 		}
-		
-		if (showOnlyInprogress) {
-			queryBuilder.append(" AND DEPOSIT_STATUS != 'รับคืนแล้ว'");
+
+		else if (showOnlyInprogress) {
+			queryBuilder.append(" AND DEPOSIT_STATUS != 'รับคืนแล้ว' AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'");
 		}
-		
+
 		String query = queryBuilder.toString();
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
-			
+
 			depositedPowerBankList = new ArrayList<DepositedPowerBank>();
 			ResultSet resultSet = ps.executeQuery();
 			while (resultSet.next()) {
@@ -642,7 +695,7 @@ public class DatabaseConnector {
 				deviceInfo.length = resultSet.getDouble("length");
 				deviceInfo.height = resultSet.getDouble("height");
 				deviceInfo.weight = resultSet.getDouble("weight");
-				
+
 				// get device image
 				try {
 					deviceInfo.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
@@ -651,14 +704,14 @@ public class DatabaseConnector {
 					e.printStackTrace();
 				}
 				deviceInfo.imageFormat = resultSet.getString("image_format");
-				
+
 				// get input
 				deviceInfo.input = getPowerBankChargerType(deviceInfo.powerBankId, true);
-				
+
 				// get output
 				// get input
 				deviceInfo.output = getPowerBankChargerType(deviceInfo.powerBankId, false);
-				
+
 				// get deposit information
 				DepositedPowerBank depositedPowerBank = new DepositedPowerBank();
 				depositedPowerBank.deviceInfo = deviceInfo;
@@ -672,36 +725,39 @@ public class DatabaseConnector {
 				depositedPowerBank.depositPrice = resultSet.getDouble("deposit_price");
 				depositedPowerBank.lockerPassword = resultSet.getString("locker_password");
 				depositedPowerBank.transactionTime = resultSet.getTimestamp("payment_timestamp").toLocalDateTime();
-				
+
 				depositedPowerBankList.add(depositedPowerBank);
 			}
-			
-		}
-		catch (SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return depositedPowerBankList;
 	}
-	
-	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue, boolean showOnlyInprogress) {
-		if (!checkConnection("Unable to get rented power bank data.")) return null;
-		
+
+	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue,
+			boolean showOnlyInprogress) {
+		if (!checkConnection("Unable to get rented power bank data."))
+			return null;
+
 		ArrayList<RentedPowerBank> rentedPowerBankList = null;
-		
-		StringBuilder queryBuilder = new StringBuilder("SELECT * FROM RENTEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
+
+		StringBuilder queryBuilder = new StringBuilder(
+				"SELECT * FROM RENTEDPOWERBANK NATURAL JOIN POWERBANK NATURAL JOIN TRANSACTION WHERE USER_ID = ?");
 		if (showPastDue) {
-			queryBuilder.append(" AND NOW() > RETURN_DATE");
+			queryBuilder.append(" AND CURDATE() > RETURN_DATE");
+			queryBuilder.append(" AND RENT_STATUS != 'คืนแล้ว' AND RENT_STATUS != 'ไม่ได้รับ'");
 		}
-		
-		if (showOnlyInprogress) {
-			queryBuilder.append(" AND RENT_STATUS != 'คืนแล้ว'");
+
+		else if (showOnlyInprogress) {
+			queryBuilder.append(" AND RENT_STATUS != 'คืนแล้ว' AND RENT_STATUS != 'ไม่ได้รับ'");
 		}
-		
+
 		String query = queryBuilder.toString();
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
-			
+
 			rentedPowerBankList = new ArrayList<RentedPowerBank>();
 			ResultSet resultSet = ps.executeQuery();
 			while (resultSet.next()) {
@@ -717,7 +773,7 @@ public class DatabaseConnector {
 				deviceInfo.length = resultSet.getDouble("length");
 				deviceInfo.height = resultSet.getDouble("height");
 				deviceInfo.weight = resultSet.getDouble("weight");
-				
+
 				// get device image
 				try {
 					deviceInfo.image = ImageIO.read(new ByteArrayInputStream(resultSet.getBytes("image")));
@@ -726,14 +782,14 @@ public class DatabaseConnector {
 					e.printStackTrace();
 				}
 				deviceInfo.imageFormat = resultSet.getString("image_format");
-				
+
 				// get input
 				deviceInfo.input = getPowerBankChargerType(deviceInfo.powerBankId, true);
-				
+
 				// get output
 				// get input
 				deviceInfo.output = getPowerBankChargerType(deviceInfo.powerBankId, false);
-				
+
 				// get rent information
 				RentedPowerBank rentedPowerBank = new RentedPowerBank();
 				rentedPowerBank.deviceInfo = deviceInfo;
@@ -748,18 +804,17 @@ public class DatabaseConnector {
 				rentedPowerBank.rentPrice = resultSet.getDouble("rent_price");
 				rentedPowerBank.lockerNumber = resultSet.getInt("locker_number");
 				rentedPowerBank.transactionTime = resultSet.getTimestamp("payment_timestamp").toLocalDateTime();
-				
+
 				rentedPowerBankList.add(rentedPowerBank);
 			}
-			
-		}
-		catch (SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return rentedPowerBankList;
 	}
-	
+
 	public static ArrayList<ForRentPowerBank> getForRentPowerBank(String addressFilter, String brandFilter,
 			String inputFilter, String outputFilter, double minPrice, double maxPrice, double minCap, double maxCap,
 			double minWeight, double maxWeight, String orderByAttribute, boolean ascending) {
@@ -892,72 +947,70 @@ public class DatabaseConnector {
 
 		return null;
 	}
-	
+
 	public static int insertIntoUser(UserDetail user, String passowrd) {
-		if (!checkConnection("Unable to insert into user.")) return -1;
-		
+		if (!checkConnection("Unable to insert into user."))
+			return -1;
+
 		// TODO: Hash the password
 		try {
 			String hashedPassword = PasswordHasher.hashPassword(passowrd.toCharArray());
-			
-			String query = "INSERT INTO USER (FIRST_NAME, LAST_NAME, EMAIL, PHONE, HASHED_PASSWORD) " +
-						   "VALUES (?, ?, ?, ?, ?)";
+
+			String query = "INSERT INTO USER (FIRST_NAME, LAST_NAME, EMAIL, PHONE, HASHED_PASSWORD) "
+					+ "VALUES (?, ?, ?, ?, ?)";
 			try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 				ps.setString(1, user.firstName);
 				ps.setString(2, user.lastName);
 				ps.setString(3, user.email);
 				ps.setString(4, user.phone);
 				ps.setString(5, hashedPassword);
-				
+
 				boolean success = ps.executeUpdate() > 0;
-				
+
 				if (success) {
 					ResultSet resultSet = ps.getGeneratedKeys();
 					if (resultSet.next())
 						return resultSet.getInt(1);
 				}
-			}
-			catch (SQLException e) {
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
-			
-		} 
-		catch (GeneralSecurityException e) {
+
+		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 		}
-		
+
 		return -1;
 	}
-	
+
 	public static boolean insertIntoCheckHistory(double capacity, double wh, int userId, int ruleId) {
-		if (!checkConnection("Insert Into Check History Table.")) return false;
-		
-		if (userId < 0) return false;
-		
-		String query = "INSERT INTO CHECKHISTORY (CHECK_TIMESTAMP, CAPACITY, WH, USER_ID, RULE_ID) " +
-					   "VALUES (NOW(), ?, ?, ?, ?)";
+		if (!checkConnection("Insert Into Check History Table."))
+			return false;
+
+		if (userId < 0)
+			return false;
+
+		String query = "INSERT INTO CHECKHISTORY (CHECK_TIMESTAMP, CAPACITY, WH, USER_ID, RULE_ID) "
+				+ "VALUES (NOW(), ?, ?, ?, ?)";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			if (capacity < 0) {
 				ps.setNull(1, Types.DOUBLE);
-			}
-			else {
+			} else {
 				ps.setDouble(1, capacity);
 			}
-			
+
 			ps.setDouble(2, wh);
 			ps.setInt(3, userId);
 			ps.setInt(4, ruleId);
-			
+
 			boolean result = ps.executeUpdate() > 0;
 			return result;
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
-	
+
 	public static boolean insertIntoCharger(int powerBankId, ArrayList<String> chargerList, boolean isInput) {
 		// insert into input and output
 		if (chargerList.isEmpty()) {
@@ -971,7 +1024,7 @@ public class DatabaseConnector {
 		for (int i = 1; i < chargerList.size(); i++) {
 			queryBuilder.append(", (?, ?)");
 		}
-		
+
 		String query = queryBuilder.toString();
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			for (int i = 1; i <= chargerList.size(); i++) {
@@ -1014,9 +1067,9 @@ public class DatabaseConnector {
 			ps.setDouble(8, powerBank.height);
 			ps.setDouble(9, powerBank.weight);
 			ps.setBinaryStream(10, bais, imageBytes.length);
-			ps.setString(11, powerBank.imageFormat);			
+			ps.setString(11, powerBank.imageFormat);
 			ps.executeUpdate();
-			
+
 			ResultSet resultSet = ps.getGeneratedKeys();
 			if (resultSet.next())
 				powerBankId = resultSet.getInt(1);
@@ -1222,7 +1275,7 @@ public class DatabaseConnector {
 		String numRand2 = String.valueOf(Utils.randRange(0, 9));
 		String numRand3 = String.valueOf(Utils.randRange(0, 9));
 		lockerPassword = lockerPassword + numRand1 + numRand2 + numRand3;
-		
+
 		return lockerPassword;
 	}
 
@@ -1250,12 +1303,12 @@ public class DatabaseConnector {
 			String lockerPassword = generateRandomPassword();
 			ps.setString(9, lockerPassword);
 			ps.setInt(10, paymentId);
-			
+
 			boolean success = ps.executeUpdate() > 0;
-			if (success) return lockerPassword;
-			
-		} 
-		catch (SQLException e) {
+			if (success)
+				return lockerPassword;
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 

@@ -84,6 +84,10 @@ public class UserList extends JPanel {
 					return Color.GRAY;
 				case "กำลังฝาก":
 					return new Color(0, 100, 0);
+				case "ไม่ได้ฝาก":
+					return new Color(255, 95, 21);
+				case "รับคืนสาย":
+					return Color.RED;
 				default:
 					return Color.BLACK;
 				}
@@ -93,8 +97,12 @@ public class UserList extends JPanel {
 				switch (status) {
 				case "ยังไม่รับ":
 					return Color.GRAY;
-				case "สามารถใช้งานได้":
+				case "ใช้งานได้":
 					return new Color(0, 100, 0);
+				case "ไม่ได้รับ":
+					return new Color(255, 95, 21);
+				case "ส่งคืนสาย":
+					return Color.RED;
 				default:
 					return Color.BLACK;
 				}
