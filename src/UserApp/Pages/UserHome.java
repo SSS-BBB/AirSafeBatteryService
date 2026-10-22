@@ -280,7 +280,7 @@ public class UserHome extends JPanel {
 		storageButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mainFrame.changeCard(3, 3);
+				mainFrame.changeCard(3, 11);
 			}
 		});
 		storagePanel.add(storageButton);
