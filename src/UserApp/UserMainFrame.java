@@ -167,6 +167,7 @@ public class UserMainFrame extends JFrame {
 		
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
+		// InsertSample.insertUser();
 
 		// Sample User Data
 		userDetail = new UserDetail();

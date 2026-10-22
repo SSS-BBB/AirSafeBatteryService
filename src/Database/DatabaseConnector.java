@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
@@ -31,6 +32,7 @@ import Struct.PowerBank;
 import Struct.PowerBankRule;
 import Struct.RentedPowerBank;
 import Struct.UserDetail;
+import Utils.PasswordHasher;
 import Utils.Utils;
 
 public class DatabaseConnector {
@@ -90,14 +92,6 @@ public class DatabaseConnector {
 			e.printStackTrace();
 		}
 
-		return -1;
-	}
-	
-	public static int insertIntoUser(UserDetail user, String passowrd) {
-		if (!checkConnection("Unable to insert into user.")) return -1;
-		
-		// TODO: Hash the password
-		
 		return -1;
 	}
 	
@@ -668,7 +662,7 @@ public class DatabaseConnector {
 				// get deposit information
 				DepositedPowerBank depositedPowerBank = new DepositedPowerBank();
 				depositedPowerBank.deviceInfo = deviceInfo;
-				depositedPowerBank.depositId = resultSet.getInt("depposit_id");
+				depositedPowerBank.depositId = resultSet.getInt("deposit_id");
 				depositedPowerBank.depositStatus = resultSet.getString("deposit_status");
 				depositedPowerBank.address = resultSet.getString("address");
 				depositedPowerBank.depositDate = resultSet.getDate("deposit_date").toLocalDate();
@@ -897,6 +891,43 @@ public class DatabaseConnector {
 		}
 
 		return null;
+	}
+	
+	public static int insertIntoUser(UserDetail user, String passowrd) {
+		if (!checkConnection("Unable to insert into user.")) return -1;
+		
+		// TODO: Hash the password
+		try {
+			String hashedPassword = PasswordHasher.hashPassword(passowrd.toCharArray());
+			
+			String query = "INSERT INTO USER (FIRST_NAME, LAST_NAME, EMAIL, PHONE, HASHED_PASSWORD) " +
+						   "VALUES (?, ?, ?, ?, ?)";
+			try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+				ps.setString(1, user.firstName);
+				ps.setString(2, user.lastName);
+				ps.setString(3, user.email);
+				ps.setString(4, user.phone);
+				ps.setString(5, hashedPassword);
+				
+				boolean success = ps.executeUpdate() > 0;
+				
+				if (success) {
+					ResultSet resultSet = ps.getGeneratedKeys();
+					if (resultSet.next())
+						return resultSet.getInt(1);
+				}
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			
+		} 
+		catch (GeneralSecurityException e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
 	}
 	
 	public static boolean insertIntoCheckHistory(double capacity, double wh, int userId, int ruleId) {
