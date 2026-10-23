@@ -171,11 +171,11 @@ public class UserMainFrame extends JFrame {
 
 		// Sample User Data
 		userDetail = new UserDetail();
-		userDetail.userID = 1;
-		userDetail.firstName = "First";
-		userDetail.lastName = "User";
-		userDetail.email = "firstemail@something.cool";
-		userDetail.phone = "0000000000";
+		userDetail.userID = 5;
+		userDetail.firstName = "John";
+		userDetail.lastName = "Doe";
+		userDetail.email = "johndoe@somemail.somedomain";
+		userDetail.phone = "0000000004";
 		
 		DataContainer.refreshAll(userDetail.userID);
 
@@ -368,6 +368,15 @@ public class UserMainFrame extends JFrame {
 		cardPanel.add(historyDetailPanel, cardNames[16]);
 		cardPanel.add(notificationPanel, cardNames[6]);
 		cardPanel.add(userInformationPanel, cardNames[17]);
+	}
+	
+	public void refreshDepositPage() {
+		if (depositPanel == null) {
+			System.err.println("Null Deposit Panel. Unable to refresh deposit page");
+			return;
+		}
+		
+		depositPanel.refreshUserInput();
 	}
 	
 	public void refreshHomePage() {

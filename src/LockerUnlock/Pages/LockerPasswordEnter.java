@@ -95,6 +95,7 @@ public class LockerPasswordEnter extends JPanel {
 
 		nextButton.addActionListener(e -> {
 			checkLocker();
+			passwordTextField.setText("");
 		});
 	}
 

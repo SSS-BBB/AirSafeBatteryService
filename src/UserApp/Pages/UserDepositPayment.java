@@ -153,6 +153,7 @@ public class UserDepositPayment extends JPanel {
 		// change to successful payment page
 
 		paymentConfirmButton.addActionListener(e -> {
+			mainFrame.refreshDepositPage();
 			// Transaction Process
 			int paymentId = DatabaseConnector.insertIntoTransaction(powerBank.depositPrice, mainFrame.userDetail.userID);
 

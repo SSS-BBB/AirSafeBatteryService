@@ -85,7 +85,7 @@ public class LockerUnlockMainFrame extends JFrame {
 		userDetail.phone = "0000000000";
 		*/
 		
-		DataContainer.refreshAll(userDetail.userID);
+		DataContainer.refreshLateStatus();
 
 		setTitle(APP_NAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -110,7 +110,7 @@ public class LockerUnlockMainFrame extends JFrame {
 
 		addCard();
 		
-		changeCard(PASSWORD_ENTER_PAGE);
+		changeCard(HOME_PAGE);
 	}
 
 	private void addCard() {

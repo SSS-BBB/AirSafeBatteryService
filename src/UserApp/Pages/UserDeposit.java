@@ -38,6 +38,7 @@ public class UserDeposit extends JPanel {
 	
 	// User Input Components
 	private CustomDropDown<String> addressDropDown;
+	private NameValueHolder lockerHolder, depositDateHolder, returnDateHolder, depositPriceHolder;
 	
 	private PowerBank deviceInfo;
 	
@@ -90,6 +91,20 @@ public class UserDeposit extends JPanel {
 		updatePage(tempPowerBank);
 	}
 	
+	public void refreshUserInput() {
+		depositAddress = "";
+		depositLockerNumber = -1;
+		depositDate = null;
+		returnDate = null;
+		depositPrice = -1.0;
+		
+		addressDropDown.setSelectedIndex(0);
+		lockerHolder.setValue("");
+		depositDateHolder.setValue("");
+		returnDateHolder.setValue("");
+		depositPriceHolder.setValue("");
+	}
+	
 	public void updatePage(PowerBank powerBank) {
 		if (powerBankBox == null) {
 			System.err.println("Null Power Bank Box. Unable to update deposit page.");
@@ -124,7 +139,7 @@ public class UserDeposit extends JPanel {
 		Dimension boxSize = new Dimension(addressDropDown.getMinimumSize().width, 30);
 		
 		// Locker Number
-		NameValueHolder lockerHolder = new NameValueHolder("หมายเลข Locker:", bodyFontSize, bodyFontSize, boxSize);
+		lockerHolder = new NameValueHolder("หมายเลข Locker:", bodyFontSize, bodyFontSize, boxSize);
 		userInputPanel.add(lockerHolder);
 		
 		ImageIcon lockerImage = Utils.createImageIcon("/icons/locker_icon_24.png", "Locker Icon");
@@ -154,7 +169,7 @@ public class UserDeposit extends JPanel {
 		});
 		
 		// Deposit Date
-		NameValueHolder depositDateHolder = new NameValueHolder("วันที่ฝาก:", bodyFontSize, bodyFontSize, boxSize);
+		depositDateHolder = new NameValueHolder("วันที่ฝาก:", bodyFontSize, bodyFontSize, boxSize);
 		userInputPanel.add(depositDateHolder);
 		
 		ImageIcon calendarIcon = Utils.createImageIcon("/icons/calendar_icon_24.png", "Calendar Icon");
@@ -162,7 +177,7 @@ public class UserDeposit extends JPanel {
 		depositDateHolder.add(calendarDepositButton);
 		
 		// Return Date
-		NameValueHolder returnDateHolder = new NameValueHolder("วันที่คืน:", bodyFontSize, bodyFontSize, boxSize);
+		returnDateHolder = new NameValueHolder("วันที่คืน:", bodyFontSize, bodyFontSize, boxSize);
 		userInputPanel.add(returnDateHolder);
 				
 		ImageIcon calendarReturnIcon = Utils.createImageIcon("/icons/calendar_icon_24.png", "Calendar Icon");
@@ -170,7 +185,7 @@ public class UserDeposit extends JPanel {
 		returnDateHolder.add(calendarReturnButton);
 		
 		// Deposit Price
-		NameValueHolder depositPriceHolder = new NameValueHolder("ค่าฝาก:", bodyFontSize, bodyFontSize, boxSize);
+		depositPriceHolder = new NameValueHolder("ค่าฝาก:", bodyFontSize, bodyFontSize, boxSize);
 		userInputPanel.add(depositPriceHolder);
 		
 		// action listener
