@@ -1,5 +1,7 @@
 package LockerUnlock.Pages;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -7,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -32,6 +35,9 @@ public class LockerStatus extends JPanel {
 	}
 
 	public void updateStatusPage(int lockerNumber, String instruction, String warning) {
+		
+		mainFrame.userDetail = null;
+		
 		// JLabel lockerNumberLabel, instructionLabel, warningLabel;
 		
 		// Locker Number
@@ -104,8 +110,16 @@ public class LockerStatus extends JPanel {
 		gbc.gridy = row++;
 		this.add(warningLabel, gbc);
 		
-		// TODO: Back Button
-
+		// Back Button
+		Dimension buttonSize = new Dimension(200, 60);
+		JButton backButton = Utils.createBorderBackgroundButton("กลับ", LockerUnlockMainFrame.PRIMARY_FONT_COLOR,
+				Color.BLACK, LockerUnlockMainFrame.PRIMARY_COLOR, bodyFontSize, 2, buttonSize);
+		gbc.gridy = row++;
+		this.add(backButton, gbc);
+		
+		backButton.addActionListener(e -> {
+			mainFrame.changeCard(LockerUnlockMainFrame.HOME_PAGE);
+		});
 	}
 
 	private GridBagConstraints getDefaultGridBagConstraints(int verticleMargin, int horizontalMargin) {

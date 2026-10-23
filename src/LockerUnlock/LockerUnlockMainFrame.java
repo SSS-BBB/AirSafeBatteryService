@@ -49,7 +49,6 @@ public class LockerUnlockMainFrame extends JFrame {
 	private String address;
 	public UserDetail userDetail;
 	public int lockerType; // rent or deposit;
-	public int lockerNumber;
 
 	private JPanel mainPanel;
 
@@ -74,15 +73,17 @@ public class LockerUnlockMainFrame extends JFrame {
 		
 		this.address = address;
 		this.lockerType = -1;
-		this.lockerNumber = -1;
 		
 		// Sample User Data
+		userDetail = null;
+		/*
 		userDetail = new UserDetail();
 		userDetail.userID = 1;
 		userDetail.firstName = "First";
 		userDetail.lastName = "User";
 		userDetail.email = "firstemail@something.cool";
 		userDetail.phone = "0000000000";
+		*/
 		
 		DataContainer.refreshAll(userDetail.userID);
 
@@ -109,7 +110,6 @@ public class LockerUnlockMainFrame extends JFrame {
 
 		addCard();
 		
-		this.lockerType = RENT_LOCKER;
 		changeCard(PASSWORD_ENTER_PAGE);
 	}
 

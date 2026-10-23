@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -25,6 +26,7 @@ public class LockerFeePayment extends JPanel {
 	
 	// Components
 	private JLabel feeLabel;
+	private JButton paymentConfirmButton;
 	
 	public LockerFeePayment(LockerUnlockMainFrame mainFrame) {
 		super(new GridBagLayout());
@@ -100,7 +102,7 @@ public class LockerFeePayment extends JPanel {
 		
 		// Payment confirm
 		Dimension buttonSize = new Dimension(225, 50);
-		JButton paymentConfirmButton = Utils.createColorBackgroundButton("ยืนยันการชำระเงิน", 
+		paymentConfirmButton = Utils.createColorBackgroundButton("ยืนยันการชำระเงิน", 
 				LockerUnlockMainFrame.PRIMARY_COLOR, LockerUnlockMainFrame.PRIMARY_FONT_COLOR, 
 				bodyFontSize);
 		paymentConfirmButton.setPreferredSize(buttonSize);
@@ -113,6 +115,15 @@ public class LockerFeePayment extends JPanel {
 		glueGBC.weighty = 3.0;
 		this.add(Box.createVerticalGlue(), glueGBC);
 		
+	}
+	
+	public void addPaymentConfirmActionListener(ActionListener action) {
+		if (paymentConfirmButton != null) {
+			paymentConfirmButton.addActionListener(action);			
+		}
+		else {
+			System.err.println("Null Payment Confirm Button. Unable to add action listener.");
+		}
 	}
 	
 	private GridBagConstraints getVerticleGlueGridBagConstraints(int verticleMargin, int horizontalMargin) {

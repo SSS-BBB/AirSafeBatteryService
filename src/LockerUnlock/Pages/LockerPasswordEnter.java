@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import Database.DatabaseConnector;
 import LockerUnlock.LockerUnlockMainFrame;
 import Struct.DepositedPowerBank;
+import Struct.RentedPowerBank;
 import Utils.Utils;
 
 public class LockerPasswordEnter extends JPanel {
@@ -118,39 +119,42 @@ public class LockerPasswordEnter extends JPanel {
 		String address = mainFrame.getAddress();
 		
 		if (mainFrame.lockerType == LockerUnlockMainFrame.RENT_LOCKER) {
-			int lockerNumber = DatabaseConnector.getRentLockerNumber(userId, enteredPassword, address);
-			if (lockerNumber < 0) {
+			RentedPowerBank rentInfo = DatabaseConnector.getRentInfoFromLocker(userId, enteredPassword, address);
+			if (rentInfo == null) {
 				showFailLabel();
 				return;
 			}
 			
 			failLabel.setText("");
-			mainFrame.lockerNumber = lockerNumber;
-			System.out.println("Rent Locker: " + String.valueOf(mainFrame.lockerNumber));
 			
 			// update locker status page and change to that page
 			if (statusPage == null) {
 				System.err.println("Null Status Page. Unable to update and change to status page.");
 				return;
 			}
-			statusPage.updateStatusPage(lockerNumber, "สามารถรับ Power Bank ที่เช่าไว้ได้", "");
+			statusPage.updateStatusPage(rentInfo.lockerNumber, "สามารถรับ Power Bank ที่เช่าไว้ได้", "");
 			
-			// TODO: update rent status to activate
-			
-			mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
-			return;
+			// update rent status to activate
+			boolean success = DatabaseConnector.updateRentStatus(rentInfo.rentID, "ใช้งานได้");
+			if (success) {
+				mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
+				return;
+			}
+			else {
+				System.err.println("Something went wrong when trying to update rent status. Unable to change to the status page");
+				return;
+			}
 		}
 
 		else if (mainFrame.lockerType == LockerUnlockMainFrame.DEPOSIT_LOCKER) {
 			// only locker number, deposit status, late fee per day, and return date is returned
-			DepositedPowerBank depositInfo = DatabaseConnector.getDepositLockerNumberAndStatus(userId, enteredPassword, address);
+			DepositedPowerBank depositInfo = DatabaseConnector.getDepositInfoFromLocker(userId, enteredPassword, address);
 			if (depositInfo == null) {
 				showFailLabel();
 				return;
 			}
 			
 			failLabel.setText("");
-			mainFrame.lockerNumber = depositInfo.lockerNumber;
 			
 			// if the status is 'รับคืนสาย' change to fee payment page
 			// otherwise update locker status page and change to that page
@@ -169,24 +173,19 @@ public class LockerPasswordEnter extends JPanel {
 				
 				double fee = depositInfo.lateFeePerDay * lateDayCount;
 				feePaymentPage.updateFee(fee);
+				
+				feePaymentPage.addPaymentConfirmActionListener(e -> {
+					unlockDepositLocker(depositInfo, "สามารถรับ Power Bank ที่ฝากไว้ได้", "", "รับคืนแล้ว");
+				});
+				
 				mainFrame.changeCard(LockerUnlockMainFrame.FEE_PAYMENT_PAGE);
 				return;
 			}
 			else if (depositInfo.depositStatus.equals("จองที่ฝากแล้ว")) {
-				statusPage.updateStatusPage(depositInfo.lockerNumber, "โปรดนำ Power Bank ที่ท่านต้องการฝากเก็บไว้ใน Locker นี้", "อย่าลืมปิดตู้ Locker หลังใส่ Power Bank ใน Locker");
-				
-				// TODO: update deposit status to is being deposited
-				
-				mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
-				return;
+				unlockDepositLocker(depositInfo, "โปรดนำ Power Bank ที่ท่านต้องการฝากเก็บไว้ใน Locker นี้", "อย่าลืมปิดตู้ Locker หลังใส่ Power Bank ใน Locker", "กำลังฝาก");
 			}
 			else if (depositInfo.depositStatus.equals("กำลังฝาก")) {
-				statusPage.updateStatusPage(depositInfo.lockerNumber, "สามารถรับ Power Bank ที่ฝากไว้ได้", "");
-				
-				// TODO: update deposit status to received back
-				
-				mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
-				return;
+				unlockDepositLocker(depositInfo, "สามารถรับ Power Bank ที่ฝากไว้ได้", "", "รับคืนแล้ว");
 			}
 		}
 		
@@ -195,7 +194,23 @@ public class LockerPasswordEnter extends JPanel {
 		}
 
 	}
-
+	
+	private void unlockDepositLocker(DepositedPowerBank depositInfo, String instruction, String warning, String changedStatus) {
+		statusPage.updateStatusPage(depositInfo.lockerNumber, instruction, warning);
+		
+		// update deposit status to received back
+		// update deposit status to is being deposited
+		boolean success = DatabaseConnector.updateDepositStatus(depositInfo.depositId, changedStatus);
+		if (success) {
+			mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
+			return;
+		}
+		else {
+			System.err.println("Something went wrong when trying to update deposit status. Unable to change to the status page");
+			return;
+		}
+	}
+	
 	private void showFailLabel() {
 		if (failLabel != null) {
 			String failMessage = "กรอกรหัส Locker ผิดพลาด โปรดลองอีกครั้ง";

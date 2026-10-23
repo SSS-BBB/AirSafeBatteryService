@@ -708,13 +708,14 @@ public class DatabaseConnector {
 		return depositedPowerBankList;
 	}
 	
-	public static DepositedPowerBank getDepositLockerNumberAndStatus(int userId, String lockerPassword, String address) {
+	public static DepositedPowerBank getDepositInfoFromLocker(int userId, String lockerPassword, String address) {
 		if (!checkConnection("Unable to get deposit locker number and status."))
 			return null;
 		
-		String query = "SELECT LOCKER_NUMBER, DEPOSIT_STATUS, LATE_FEE_PER_DAY, RETURN_DATE FROM DEPOSITEDPOWERBANK NATURAL JOIN TRANSACTION" +
+		String query = "SELECT DEPOSIT_ID, LOCKER_NUMBER, DEPOSIT_STATUS, LATE_FEE_PER_DAY, RETURN_DATE FROM DEPOSITEDPOWERBANK NATURAL JOIN TRANSACTION" +
 					   " WHERE USER_ID = ? AND LOCKER_PASSWORD = ? AND ADDRESS = ?" + 
-					   " AND CURDATE() >= DEPOSIT_DATE AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'";
+					   " AND CURDATE() >= DEPOSIT_DATE AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'" +
+					   " AND DEPOSIT_STATUS != 'รับคืนแล้ว'";
 		
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
@@ -724,6 +725,7 @@ public class DatabaseConnector {
 			ResultSet resultSet = ps.executeQuery();
 			if (resultSet.next()) {
 				DepositedPowerBank depositInfo = new DepositedPowerBank();
+				depositInfo.depositId = resultSet.getInt("deposit_id");
 				depositInfo.lockerNumber = resultSet.getInt("locker_number");
 				depositInfo.depositStatus = resultSet.getString("deposit_status");
 				depositInfo.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
@@ -738,15 +740,16 @@ public class DatabaseConnector {
 		return null;
 	}
 	
-	public static int getRentLockerNumber(int userId, String lockerPassword, String pickUpAddress) {
+	public static RentedPowerBank getRentInfoFromLocker(int userId, String lockerPassword, String pickUpAddress) {
 		if (!checkConnection("Unable to get rent locker number."))
-			return -1;
+			return null;
 		
-		String query = "SELECT LOCKER_NUMBER FROM RENTEDPOWERBANK NATURAL JOIN TRANSACTION" +
+		String query = "SELECT RENT_ID, LOCKER_NUMBER FROM RENTEDPOWERBANK NATURAL JOIN TRANSACTION" +
 					  " WHERE USER_ID = ? AND LOCKER_PASSWORD = ? AND PICK_UP_ADDRESS = ?" +
 					  " AND CURDATE() >= PICK_UP_DATE AND CURDATE() <= RETURN_DATE" +
 					  " AND RENT_STATUS = 'ยังไม่รับ'";
 		
+		RentedPowerBank rentInfo = null;
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, userId);
 			ps.setString(2, lockerPassword);
@@ -754,14 +757,18 @@ public class DatabaseConnector {
 			
 			ResultSet resultSet = ps.executeQuery();
 			if (resultSet.next()) {
-				return resultSet.getInt("locker_number");
+				rentInfo = new RentedPowerBank();
+				rentInfo.rentID = resultSet.getInt("rent_id");
+				rentInfo.lockerNumber = resultSet.getInt("locker_number");
+				
+				return rentInfo;
 			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		return -1;
+		return rentInfo;
 	}
 	
 	public static ArrayList<RentedPowerBank> getRentedPowerBank(int userId, boolean showPastDue,
@@ -976,7 +983,45 @@ public class DatabaseConnector {
 
 		return null;
 	}
-
+	
+	public static boolean updateRentStatus(int rentId, String status) {
+		if (!checkConnection("Update rent status."))
+			return false;
+		
+		String query = "UPDATE RENTEDPOWERBANK SET RENT_STATUS = ? WHERE RENT_ID = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, status);
+			ps.setInt(2, rentId);
+			
+			boolean success = ps.executeUpdate() > 0;
+			return success;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	public static boolean updateDepositStatus(int depositId, String status) {
+		if (!checkConnection("Update deposit status."))
+			return false;
+		
+		String query = "UPDATE DEPOSITEDPOWERBANK SET DEPOSIT_STATUS = ? WHERE DEPOSIT_ID = ?";
+		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			ps.setString(1, status);
+			ps.setInt(2, depositId);
+			
+			boolean success = ps.executeUpdate() > 0;
+			return success;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
 	public static boolean insertIntoCheckHistory(double capacity, double wh, int userId, int ruleId) {
 		if (!checkConnection("Insert Into Check History Table."))
 			return false;
