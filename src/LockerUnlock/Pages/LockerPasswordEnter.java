@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,14 +22,16 @@ import Utils.Utils;
 public class LockerPasswordEnter extends JPanel {
 
 	private LockerUnlockMainFrame mainFrame;
+	private LockerFeePayment feePaymentPage;
 
 	// Components
 	private JTextField passwordTextField;
 	private JLabel failLabel;
 
-	public LockerPasswordEnter(LockerUnlockMainFrame mainFrame) {
+	public LockerPasswordEnter(LockerUnlockMainFrame mainFrame, LockerFeePayment feePaymentPage) {
 		super(new GridBagLayout());
 		this.mainFrame = mainFrame;
+		this.feePaymentPage = feePaymentPage;
 
 		setBackground(LockerUnlockMainFrame.BACKGROUND_COLOR);
 
@@ -126,7 +129,7 @@ public class LockerPasswordEnter extends JPanel {
 		}
 
 		else if (mainFrame.lockerType == LockerUnlockMainFrame.DEPOSIT_LOCKER) {
-			// only locker number and deposit status is returned
+			// only locker number, deposit status, late fee per day, and return date is returned
 			DepositedPowerBank depositInfo = DatabaseConnector.getDepositLockerNumberAndStatus(userId, enteredPassword, address);
 			if (depositInfo == null) {
 				showFailLabel();
@@ -135,10 +138,29 @@ public class LockerPasswordEnter extends JPanel {
 			
 			failLabel.setText("");
 			mainFrame.lockerNumber = depositInfo.lockerNumber;
-			System.out.println("Deposit Locker: " + String.valueOf(depositInfo.lockerNumber));
 			
 			// TODO: if the status is 'รับคืนสาย' change to fee payment page
-			// else update locker status page and change to that page
+			// otherwise update locker status page and change to that page
+			if (depositInfo.depositStatus.equals("รับคืนสาย")) {
+				if (feePaymentPage == null) {
+					System.err.println("Null Fee Payment Page. Unable to update and change to fee payment page.");
+					return;
+				}
+				
+				int lateDayCount = Utils.countDays(depositInfo.returnDate, LocalDate.now());
+				
+				if (lateDayCount <= 0) {
+					System.err.println("Invalid late day counts. This user may not be late to get their power bank.");
+					return;
+				}
+				
+				double fee = depositInfo.lateFeePerDay * lateDayCount;
+				feePaymentPage.updateFee(fee);
+				mainFrame.changeCard(LockerUnlockMainFrame.FEE_PAYMENT_PAGE);
+			}
+			else {
+				
+			}
 		}
 		
 		else {

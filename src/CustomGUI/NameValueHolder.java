@@ -15,6 +15,7 @@ public class NameValueHolder extends JPanel {
 	// Name Label to tell what value is being hold
 	// Value Label to hold that value inside a box
 	
+	private JPanel placeHolderBoxPanel;
 	private JLabel valueLabel;
 	
 	public NameValueHolder(String valueName, int headingFontSize, int bodyFontSize, Dimension boxSize) {
@@ -85,8 +86,26 @@ public class NameValueHolder extends JPanel {
 		valueLabel.setText(valueText);
 	}
 	
+	public void setValueLabelAlignment(float alignment) {
+		if (valueLabel == null) {
+			System.err.println("Null Value Label. Unable to set value label alignment.");
+			return;
+		}
+		
+		valueLabel.setAlignmentX(alignment);
+	}
+	
+	public void setBoxColor(Color color) {
+		if (placeHolderBoxPanel == null) {
+			System.err.println("Null place holder box panel. Unable to set box color.");
+			return;
+		}
+		
+		placeHolderBoxPanel.setBorder(BorderFactory.createLineBorder(color, 2));
+	}
+	
 	private JPanel createPlaceHolderBox(Dimension size) {
-		JPanel placeHolderBoxPanel = new JPanel(new BorderLayout());
+		placeHolderBoxPanel = new JPanel(new BorderLayout());
 		placeHolderBoxPanel.setBackground(null);
 		placeHolderBoxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		placeHolderBoxPanel.setPreferredSize(size);

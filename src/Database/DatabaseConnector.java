@@ -712,7 +712,7 @@ public class DatabaseConnector {
 		if (!checkConnection("Unable to get deposit locker number and status."))
 			return null;
 		
-		String query = "SELECT LOCKER_NUMBER, DEPOSIT_STATUS FROM DEPOSITEDPOWERBANK NATURAL JOIN TRANSACTION" +
+		String query = "SELECT LOCKER_NUMBER, DEPOSIT_STATUS, LATE_FEE_PER_DAY, RETURN_DATE FROM DEPOSITEDPOWERBANK NATURAL JOIN TRANSACTION" +
 					   " WHERE USER_ID = ? AND LOCKER_PASSWORD = ? AND ADDRESS = ?" + 
 					   " AND CURDATE() >= DEPOSIT_DATE AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'";
 		
@@ -726,6 +726,8 @@ public class DatabaseConnector {
 				DepositedPowerBank depositInfo = new DepositedPowerBank();
 				depositInfo.lockerNumber = resultSet.getInt("locker_number");
 				depositInfo.depositStatus = resultSet.getString("deposit_status");
+				depositInfo.lateFeePerDay = resultSet.getDouble("late_fee_per_day");
+				depositInfo.returnDate = resultSet.getDate("return_date").toLocalDate();
 				return depositInfo;
 			}
 		}
