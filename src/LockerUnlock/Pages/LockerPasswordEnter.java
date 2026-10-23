@@ -23,15 +23,18 @@ public class LockerPasswordEnter extends JPanel {
 
 	private LockerUnlockMainFrame mainFrame;
 	private LockerFeePayment feePaymentPage;
+	private LockerStatus statusPage;
 
 	// Components
 	private JTextField passwordTextField;
 	private JLabel failLabel;
 
-	public LockerPasswordEnter(LockerUnlockMainFrame mainFrame, LockerFeePayment feePaymentPage) {
+	public LockerPasswordEnter(LockerUnlockMainFrame mainFrame, 
+			LockerFeePayment feePaymentPage, LockerStatus statusPage) {
 		super(new GridBagLayout());
 		this.mainFrame = mainFrame;
 		this.feePaymentPage = feePaymentPage;
+		this.statusPage = statusPage;
 
 		setBackground(LockerUnlockMainFrame.BACKGROUND_COLOR);
 
@@ -105,7 +108,7 @@ public class LockerPasswordEnter extends JPanel {
 			return;
 		}
 
-		// TODO: get locker number from user id and locker password
+		// get locker number from user id and locker password
 		// make sure today (the day that user unlock the locker is greater than or equal
 		// to rent date / deposit date
 		// also make sure today is less than or equal to the return date
@@ -125,7 +128,17 @@ public class LockerPasswordEnter extends JPanel {
 			mainFrame.lockerNumber = lockerNumber;
 			System.out.println("Rent Locker: " + String.valueOf(mainFrame.lockerNumber));
 			
-			// TODO: update locker status page and change to that page
+			// update locker status page and change to that page
+			if (statusPage == null) {
+				System.err.println("Null Status Page. Unable to update and change to status page.");
+				return;
+			}
+			statusPage.updateStatusPage(lockerNumber, "สามารถรับ Power Bank ที่เช่าไว้ได้", "");
+			
+			// TODO: update rent status to activate
+			
+			mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
+			return;
 		}
 
 		else if (mainFrame.lockerType == LockerUnlockMainFrame.DEPOSIT_LOCKER) {
@@ -139,7 +152,7 @@ public class LockerPasswordEnter extends JPanel {
 			failLabel.setText("");
 			mainFrame.lockerNumber = depositInfo.lockerNumber;
 			
-			// TODO: if the status is 'รับคืนสาย' change to fee payment page
+			// if the status is 'รับคืนสาย' change to fee payment page
 			// otherwise update locker status page and change to that page
 			if (depositInfo.depositStatus.equals("รับคืนสาย")) {
 				if (feePaymentPage == null) {
@@ -157,9 +170,23 @@ public class LockerPasswordEnter extends JPanel {
 				double fee = depositInfo.lateFeePerDay * lateDayCount;
 				feePaymentPage.updateFee(fee);
 				mainFrame.changeCard(LockerUnlockMainFrame.FEE_PAYMENT_PAGE);
+				return;
 			}
-			else {
+			else if (depositInfo.depositStatus.equals("จองที่ฝากแล้ว")) {
+				statusPage.updateStatusPage(depositInfo.lockerNumber, "โปรดนำ Power Bank ที่ท่านต้องการฝากเก็บไว้ใน Locker นี้", "อย่าลืมปิดตู้ Locker หลังใส่ Power Bank ใน Locker");
 				
+				// TODO: update deposit status to is being deposited
+				
+				mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
+				return;
+			}
+			else if (depositInfo.depositStatus.equals("กำลังฝาก")) {
+				statusPage.updateStatusPage(depositInfo.lockerNumber, "สามารถรับ Power Bank ที่ฝากไว้ได้", "");
+				
+				// TODO: update deposit status to received back
+				
+				mainFrame.changeCard(LockerUnlockMainFrame.STATUS_PAGE);
+				return;
 			}
 		}
 		

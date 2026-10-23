@@ -34,6 +34,7 @@ public class LockerUnlockMainFrame extends JFrame {
 	public static final String LOGIN_PAGE = "Login";
 	public static final String PASSWORD_ENTER_PAGE = "Password Enter";
 	public static final String FEE_PAYMENT_PAGE = "Fee Payment";
+	public static final String STATUS_PAGE = "Status";
 	
 	// Locker types
 	public static final int RENT_LOCKER = 0;
@@ -63,6 +64,9 @@ public class LockerUnlockMainFrame extends JFrame {
 	
 	// Fee payment page
 	private LockerFeePayment feePaymentPage;
+	
+	// Status page
+	private LockerStatus statusPage;
 	
 	// Create the frame
 	public LockerUnlockMainFrame(String address) {
@@ -105,7 +109,7 @@ public class LockerUnlockMainFrame extends JFrame {
 
 		addCard();
 		
-		this.lockerType = DEPOSIT_LOCKER;
+		this.lockerType = RENT_LOCKER;
 		changeCard(PASSWORD_ENTER_PAGE);
 	}
 
@@ -114,12 +118,14 @@ public class LockerUnlockMainFrame extends JFrame {
 		homePage = new LockerHome(this);
 		loginPage = new LockerLogin(this);
 		feePaymentPage = new LockerFeePayment(this);
-		passwordEnterPage = new LockerPasswordEnter(this, feePaymentPage);
+		statusPage = new LockerStatus(this);
+		passwordEnterPage = new LockerPasswordEnter(this, feePaymentPage, statusPage);
 
 		// Add pages to card
 		mainPanel.add(homePage, HOME_PAGE);
 		mainPanel.add(loginPage, LOGIN_PAGE);
 		mainPanel.add(feePaymentPage, FEE_PAYMENT_PAGE);
+		mainPanel.add(statusPage, STATUS_PAGE);
 		mainPanel.add(passwordEnterPage, PASSWORD_ENTER_PAGE);
 	}
 
