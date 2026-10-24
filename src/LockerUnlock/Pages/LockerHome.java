@@ -24,16 +24,73 @@ public class LockerHome extends JPanel {
 	private JLabel addressLabel;
 	
 	public LockerHome(LockerUnlockMainFrame mainFrame) {
-		super(new BorderLayout());
+		super(new GridBagLayout());
 		this.mainFrame = mainFrame;
 		
 		setBackground(LockerUnlockMainFrame.BACKGROUND_COLOR);
 		
+		createHomePage();
+		
+		/*
 		JPanel topPanel = createTopPanel();
 		this.add(topPanel, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = createButtonPanel();
 		this.add(buttonPanel, BorderLayout.CENTER);
+		*/
+	}
+	
+	private void createHomePage() {
+		int margin = 8;
+		GridBagConstraints gbc = getDefaultGridBagConstraints(margin, margin);
+		int row = 0;
+		
+		int headingFontSize = 40;
+		int bodyFontSize = 36;
+		
+		// Title
+		JLabel titleLabel = createPageLabel("AirSafe Battery Service", Font.BOLD, headingFontSize);
+		gbc.gridy = row++;
+		this.add(titleLabel, gbc);
+		
+		// Address
+		addressLabel = createPageLabel(mainFrame.getAddress(), Font.BOLD, bodyFontSize);
+		gbc.gridy = row++;
+		this.add(addressLabel, gbc);
+		
+		// Buttons
+		int fontSize = 32;
+		int lineThickness = 2;
+		Dimension buttonSize = new Dimension(200, 60);
+		margin = 20;
+		gbc = getDefaultGridBagConstraints(margin);
+		gbc.gridx = 0;
+		
+		// Rent
+		JButton rentButton = Utils.createBorderBackgroundButton("เช่า", 
+				LockerUnlockMainFrame.PRIMARY_COLOR, LockerUnlockMainFrame.PRIMARY_FONT_COLOR, LockerUnlockMainFrame.PRIMARY_FONT_COLOR, 
+				fontSize, lineThickness, buttonSize);
+		rentButton.setAlignmentX(CENTER_ALIGNMENT);
+		gbc.gridy = row++;
+		this.add(rentButton, gbc);
+		
+		// Deposit
+		JButton depositButton = Utils.createBorderBackgroundButton("ฝาก", 
+				LockerUnlockMainFrame.PRIMARY_COLOR, LockerUnlockMainFrame.PRIMARY_FONT_COLOR, LockerUnlockMainFrame.PRIMARY_FONT_COLOR, 
+				fontSize, lineThickness, buttonSize);
+		depositButton.setAlignmentX(CENTER_ALIGNMENT);
+		gbc.gridy = row++;
+		this.add(depositButton, gbc);
+		
+		// Action Listener
+		rentButton.addActionListener(e -> {
+			onTypeButtonClicked(LockerUnlockMainFrame.RENT_LOCKER);
+		});
+		
+		depositButton.addActionListener(e -> {
+			onTypeButtonClicked(LockerUnlockMainFrame.DEPOSIT_LOCKER);
+		});
+		
 	}
 	
 	private JPanel createButtonPanel() {
@@ -146,6 +203,18 @@ public class LockerHome extends JPanel {
 		pageLabel.setOpaque(true);
 
 		return pageLabel;
+	}
+	
+	private GridBagConstraints getDefaultGridBagConstraints(int verticleMargin, int horizontalMargin) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(verticleMargin / 2, horizontalMargin / 2, verticleMargin / 2, horizontalMargin / 2);
+
+		return gbc;
 	}
 	
 }
