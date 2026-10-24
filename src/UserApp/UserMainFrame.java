@@ -163,7 +163,7 @@ public class UserMainFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		DatabaseConnector.connect();
+		DatabaseConnector.userConnect();
 		
 		// Insert Sample Data
 		// InsertSample.insertPowerBank();
@@ -171,11 +171,11 @@ public class UserMainFrame extends JFrame {
 
 		// Sample User Data
 		userDetail = new UserDetail();
-		userDetail.userID = 5;
-		userDetail.firstName = "John";
-		userDetail.lastName = "Doe";
-		userDetail.email = "johndoe@somemail.somedomain";
-		userDetail.phone = "0000000004";
+		userDetail.userID = 9;
+		userDetail.firstName = "Iforgot";
+		userDetail.lastName = "Mypassword";
+		userDetail.email = "howcouldI@forgot.mypassword";
+		userDetail.phone = "09876543210";
 		
 		DataContainer.refreshAll(userDetail.userID);
 

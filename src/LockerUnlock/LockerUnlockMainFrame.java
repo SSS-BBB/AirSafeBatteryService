@@ -82,7 +82,7 @@ public class LockerUnlockMainFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		DatabaseConnector.connect();
+		DatabaseConnector.lockerConnect();
 
 		this.address = address;
 		this.lockerType = -1;

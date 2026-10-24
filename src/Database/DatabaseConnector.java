@@ -39,14 +39,55 @@ public class DatabaseConnector {
 
 	private static Connection connection;
 
-	public static void connect() {
+	public static void userConnect() {
+		try {
+			if (connection != null && !connection.isClosed()) {
+				closeConnection();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		// You need to create your own config file and your own local sql server before
 		// connecting to MySQL
 
 		// Get Database properties
 		Properties properties = new Properties();
 		try {
-			InputStream input = new FileInputStream("config/config.properties");
+			InputStream input = new FileInputStream("config/user_database_config.properties");
+			properties.load(input);
+			input.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Connect the database
+		try {
+			connection = DriverManager.getConnection(properties.getProperty("db.url"),
+					properties.getProperty("db.username"), properties.getProperty("db.password"));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void lockerConnect() {
+		try {
+			if (connection != null && !connection.isClosed()) {
+				closeConnection();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// You need to create your own config file and your own local sql server before
+		// connecting to MySQL
+
+		// Get Database properties
+		Properties properties = new Properties();
+		try {
+			InputStream input = new FileInputStream("config/locker_database_config.properties");
 			properties.load(input);
 			input.close();
 		} catch (IOException e) {
@@ -220,17 +261,7 @@ public class DatabaseConnector {
 	}
 
 	public static ArrayList<String> getPowerBankChargerType(int powerBankId, boolean isInput) {
-		try {
-			if (connection.isClosed())
-				connect();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		if (connection == null) {
-			System.err.println("Database is not connected, unable to get data from input table.");
-			return null;
-		}
+		if (!checkConnection("unable to get data from input table.")) return null;
 
 		ArrayList<String> chargerType = new ArrayList<String>();
 		String inOrOut = (isInput) ? "INPUT" : "OUTPUT";
