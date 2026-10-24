@@ -26,13 +26,23 @@ public class CustomDropDown<E> extends JComboBox<E>  {
 	}
 	
 	public CustomDropDown(E[] dropDownList, Color backgroundColor, Color selectColor, int borderThickness) {
+		this(dropDownList, backgroundColor, Color.BLACK, selectColor, backgroundColor, Color.BLACK, Color.BLACK, borderThickness);
+	}
+	
+	public CustomDropDown(E[] dropDownList, 
+			Color backgroundColor, Color fontColor, 
+			Color selectColor, Color selectFontColor,
+			Color arrowColor,
+			Color borderColor, int borderThickness) {
+		
+		// Just don't use this constructor. I HAVE NO IDEA WHAT'S WRONG WITH IT!
 		super(dropDownList);
 		
 		setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		setBackground(backgroundColor);
-		setForeground(Color.BLACK);
-		setBorder(BorderFactory.createLineBorder(Color.BLACK, borderThickness));
+		setForeground(fontColor);
+		setBorder(BorderFactory.createLineBorder(borderColor, borderThickness));
 		
 		
 		setUI(new MetalComboBoxUI() {
@@ -42,7 +52,7 @@ public class CustomDropDown<E> extends JComboBox<E>  {
 					
 					@Override
 					protected JScrollPane createScroller() {
-						JScrollPane scrollPane = new CustomScrollPane(list, Color.BLACK, backgroundColor);
+						JScrollPane scrollPane = new CustomScrollPane(list, fontColor, backgroundColor);
 						
 						JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
 						verticalBar.setBorder(null);
@@ -68,7 +78,7 @@ public class CustomDropDown<E> extends JComboBox<E>  {
 				JButton button = super.createArrowButton();
 				
 				button.setBackground(backgroundColor);
-				button.setForeground(Color.BLACK);
+				button.setForeground(arrowColor);
 				button.setBorderPainted(false);
 				button.setFocusPainted(false);
 				button.setContentAreaFilled(false);
@@ -88,22 +98,32 @@ public class CustomDropDown<E> extends JComboBox<E>  {
 				JLabel label = (JLabel) super.getListCellRendererComponent
 						(list, value, index, isSelected, cellHasFocus);
 				
+				if (index == -1) {
+					label.setOpaque(false);
+					label.setForeground(fontColor);
+					label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+				}
 				
-				
-				label.setBackground(
-						isSelected ? selectColor : backgroundColor
-				);
-				
-				label.setForeground(
-						isSelected ? backgroundColor : Color.BLACK
-				);
-				
-				label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-				
+				else {
+					label.setOpaque(true);
+					label.setBackground(
+							isSelected ? selectColor : backgroundColor
+					);
+					
+					label.setForeground(
+							isSelected ? selectFontColor : fontColor
+					);
+					
+					label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+				}
 				return label;
 			}
 		});
 		
+	}
+	
+	public void setFontSize(int fontSize) {
+		setFont(new Font("Tahoma", Font.PLAIN, fontSize));
 	}
 	
 }

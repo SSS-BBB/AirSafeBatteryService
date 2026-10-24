@@ -8,6 +8,8 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 
 import Database.DataContainer;
 import Database.DatabaseConnector;
@@ -30,12 +32,13 @@ public class LockerUnlockMainFrame extends JFrame {
 	public static final Color SUCCESSFUL_COLOR = new Color(82, 190, 79);
 
 	// Page names
+	public static final String ADDRESS_SELECTION_PAGE = "Address Selection";
 	public static final String HOME_PAGE = "Home";
 	public static final String LOGIN_PAGE = "Login";
 	public static final String PASSWORD_ENTER_PAGE = "Password Enter";
 	public static final String FEE_PAYMENT_PAGE = "Fee Payment";
 	public static final String STATUS_PAGE = "Status";
-	
+
 	// Locker types
 	public static final int RENT_LOCKER = 0;
 	public static final int DEPOSIT_LOCKER = 1;
@@ -52,39 +55,46 @@ public class LockerUnlockMainFrame extends JFrame {
 
 	private JPanel mainPanel;
 
+	// Address Selection page
+	private LockerAddressSelection addressSelectionPage;
+
 	// Home page
 	private LockerHome homePage;
-	
+
 	// Login page
 	private LockerLogin loginPage;
-	
+
 	// Password Enter page
 	private LockerPasswordEnter passwordEnterPage;
-	
+
 	// Fee payment page
 	private LockerFeePayment feePaymentPage;
-	
+
 	// Status page
 	private LockerStatus statusPage;
-	
+
 	// Create the frame
 	public LockerUnlockMainFrame(String address) {
+		// Change Default UI Color
+		try {
+			UIManager.put("ComboBox.selectionBackground", new ColorUIResource(BACKGROUND_COLOR));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		DatabaseConnector.connect();
-		
+
 		this.address = address;
 		this.lockerType = -1;
-		
+
 		// Sample User Data
 		userDetail = null;
 		/*
-		userDetail = new UserDetail();
-		userDetail.userID = 1;
-		userDetail.firstName = "First";
-		userDetail.lastName = "User";
-		userDetail.email = "firstemail@something.cool";
-		userDetail.phone = "0000000000";
-		*/
-		
+		 * userDetail = new UserDetail(); userDetail.userID = 1; userDetail.firstName =
+		 * "First"; userDetail.lastName = "User"; userDetail.email =
+		 * "firstemail@something.cool"; userDetail.phone = "0000000000";
+		 */
+
 		DataContainer.refreshLateStatus();
 
 		setTitle(APP_NAME);
@@ -109,19 +119,21 @@ public class LockerUnlockMainFrame extends JFrame {
 		setContentPane(mainPanel);
 
 		addCard();
-		
-		changeCard(HOME_PAGE);
+
+		changeCard(ADDRESS_SELECTION_PAGE);
 	}
 
 	private void addCard() {
 		// Create Pages
 		homePage = new LockerHome(this);
+		addressSelectionPage = new LockerAddressSelection(this, homePage);
 		loginPage = new LockerLogin(this);
 		feePaymentPage = new LockerFeePayment(this);
 		statusPage = new LockerStatus(this);
 		passwordEnterPage = new LockerPasswordEnter(this, feePaymentPage, statusPage);
 
 		// Add pages to card
+		mainPanel.add(addressSelectionPage, ADDRESS_SELECTION_PAGE);
 		mainPanel.add(homePage, HOME_PAGE);
 		mainPanel.add(loginPage, LOGIN_PAGE);
 		mainPanel.add(feePaymentPage, FEE_PAYMENT_PAGE);
@@ -133,6 +145,10 @@ public class LockerUnlockMainFrame extends JFrame {
 		// Change page
 		CardLayout card = (CardLayout) mainPanel.getLayout();
 		card.show(mainPanel, cardName);
+	}
+	
+	public void setAddress(String address) {
+		this.address = address;
 	}
 	
 	public String getAddress() {

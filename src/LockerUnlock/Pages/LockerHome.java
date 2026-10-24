@@ -21,6 +21,8 @@ public class LockerHome extends JPanel {
 	
 	private LockerUnlockMainFrame mainFrame;
 	
+	private JLabel addressLabel;
+	
 	public LockerHome(LockerUnlockMainFrame mainFrame) {
 		super(new BorderLayout());
 		this.mainFrame = mainFrame;
@@ -36,7 +38,6 @@ public class LockerHome extends JPanel {
 	
 	private JPanel createButtonPanel() {
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
-		// buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		buttonPanel.setBackground(null);
 		buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		
@@ -104,11 +105,15 @@ public class LockerHome extends JPanel {
 		topPanel.add(Box.createVerticalStrut(margin));
 		
 		// Address
-		JLabel addressLabel = createPageLabel(mainFrame.getAddress(), Font.BOLD, bodyFontSize);
+		addressLabel = createPageLabel(mainFrame.getAddress(), Font.BOLD, bodyFontSize);
 		topPanel.add(addressLabel);
 		topPanel.add(Box.createVerticalStrut(margin));
 		
 		return topPanel;
+	}
+	
+	public void updateAddress(String address) {
+		addressLabel.setText(address);
 	}
 	
 	private void createGridBagBottomGlue(JPanel gridBagPanel, int row, int margin) {
