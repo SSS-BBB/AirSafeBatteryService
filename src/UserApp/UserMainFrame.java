@@ -171,11 +171,11 @@ public class UserMainFrame extends JFrame {
 
 		// Sample User Data
 		userDetail = new UserDetail();
-		userDetail.userID = 9;
-		userDetail.firstName = "Iforgot";
-		userDetail.lastName = "Mypassword";
-		userDetail.email = "howcouldI@forgot.mypassword";
-		userDetail.phone = "09876543210";
+		userDetail.userID = 4;
+		userDetail.firstName = "Iam";
+		userDetail.lastName = "Late";
+		userDetail.email = "iamlate@always.late";
+		userDetail.phone = "111222";
 		
 		DataContainer.refreshAll(userDetail.userID);
 

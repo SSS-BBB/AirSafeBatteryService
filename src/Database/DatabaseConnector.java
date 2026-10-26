@@ -413,7 +413,8 @@ public class DatabaseConnector {
 		ArrayList<Integer> unAvailableLocker = new ArrayList<Integer>();
 
 		// DepositedPowerBank
-		String query = "SELECT DISTINCT(LOCKER_NUMBER) FROM DEPOSITEDPOWERBANK WHERE ADDRESS = ?";
+		String query = "SELECT DISTINCT(LOCKER_NUMBER) FROM DEPOSITEDPOWERBANK WHERE ADDRESS = ? " +
+					   " AND DEPOSIT_STATUS != 'รับคืนแล้ว' AND DEPOSIT_STATUS != 'ไม่ได้ฝาก'";
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setString(1, address);
 			ResultSet resultSet = ps.executeQuery();
