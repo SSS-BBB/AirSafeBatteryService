@@ -163,11 +163,13 @@ public class UserMainFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		DatabaseConnector.userConnect();
-		
-		// Insert Sample Data
-		// InsertSample.insertPowerBank();
-		// InsertSample.insertUser();
+		boolean connectionSuccess = DatabaseConnector.userConnect();
+		if (!connectionSuccess) {
+			System.err.println("Unable to connect to the database. Cannot run the program.");
+			dispose();
+			System.exit(0);
+			return;
+		}
 
 		// Sample User Data
 		userDetail = new UserDetail();

@@ -92,12 +92,47 @@ public class UserCheck extends JPanel {
 		this.rule = new PowerBankRule();
 		
 		loadRule();
-		createCheckPage();
-		createCheckStatusPage(false);
+		
+		if (rule != null) {
+			createCheckPage();
+			createCheckStatusPage(false);
+		}
+		else {
+			createRuleLoadingErrorPage();
+		}
 	}
 	
 	private void loadRule() {
 		rule = DatabaseConnector.getValidRule();
+	}
+	
+	private void createRuleLoadingErrorPage() {
+		this.setLayout(new GridBagLayout());
+		this.setBackground(backgroundColor);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 15, 0);
+		
+		int titleFontSize = 28;
+		int bodyFontSize = 24;
+		int row = 0;
+		
+		// Title
+		JLabel errorTitle = new JLabel("ไม่สามารถตรวจสอบ Power Bank ได้ ในขณะนี้");
+		errorTitle.setFont(new Font("Tahoma", Font.BOLD, titleFontSize));
+		gbc.gridy = row++;
+		this.add(errorTitle, gbc);
+		
+		// Detail
+		JLabel errorDetail = new JLabel("เนื่องจากไม่สามารถโหลดข้อมูลจากฐานข้อมูลได้");
+		errorDetail.setFont(new Font("Tahoma", Font.PLAIN, bodyFontSize));
+		gbc.gridy = row++;
+		this.add(errorDetail, gbc);
 	}
 	
 	private void createCheckPage() {

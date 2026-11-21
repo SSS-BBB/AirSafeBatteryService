@@ -82,7 +82,13 @@ public class LockerUnlockMainFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		DatabaseConnector.lockerConnect();
+		boolean connectionSuccess = DatabaseConnector.lockerConnect();
+		if (!connectionSuccess) {
+			System.err.println("Unable to connect to the database. Cannot run the program.");
+			dispose();
+			System.exit(0);
+			return;
+		}
 
 		this.address = address;
 		this.lockerType = -1;

@@ -39,13 +39,14 @@ public class DatabaseConnector {
 
 	private static Connection connection;
 
-	public static void userConnect() {
+	public static boolean userConnect() {
 		try {
 			if (connection != null && !connection.isClosed()) {
 				closeConnection();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 		
 		// You need to create your own config file and your own local sql server before
@@ -59,26 +60,33 @@ public class DatabaseConnector {
 			input.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 
 		// Connect the database
 		try {
 			connection = DriverManager.getConnection(properties.getProperty("db.url"),
 					properties.getProperty("db.username"), properties.getProperty("db.password"));
-
-		} catch (SQLException e) {
+			if (connection != null)
+				return true;
+		} 
+		catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
+		
+		return false;
 
 	}
 	
-	public static void lockerConnect() {
+	public static boolean lockerConnect() {
 		try {
 			if (connection != null && !connection.isClosed()) {
 				closeConnection();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 		
 		// You need to create your own config file and your own local sql server before
@@ -92,16 +100,21 @@ public class DatabaseConnector {
 			input.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 
 		// Connect the database
 		try {
 			connection = DriverManager.getConnection(properties.getProperty("db.url"),
 					properties.getProperty("db.username"), properties.getProperty("db.password"));
+			if (connection != null)
+				return true;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return false;
 
 	}
 	
@@ -198,8 +211,6 @@ public class DatabaseConnector {
 		if (!checkConnection("Unable to get a valid power bank rule."))
 			return null;
 
-		PowerBankRule rule = new PowerBankRule();
-
 		String query = "SELECT * FROM POWERBANKRULE "
 				+ "WHERE EFFECTIVE_DATE = (SELECT MAX(EFFECTIVE_DATE) FROM POWERBANKRULE) "
 				+ "AND NOW() >= EFFECTIVE_DATE AND NOW() < END_DATE";
@@ -207,17 +218,20 @@ public class DatabaseConnector {
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ResultSet resultSet = ps.executeQuery();
 			if (resultSet.next()) {
+				PowerBankRule rule = new PowerBankRule();
 				rule.ruleId = resultSet.getInt("rule_id");
 				rule.maxCarry = resultSet.getInt("max_carry");
 				rule.maxWh = resultSet.getInt("max_wh");
 				rule.checkedBaggage = resultSet.getBoolean("checked_baggage");
 				rule.carryOnBaggage = resultSet.getBoolean("carry_on_baggage");
+				return rule;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return null;
 		}
 
-		return rule;
+		return null;
 	}
 
 	public static ArrayList<CheckHistory> getCheckHistory(int userId) {
