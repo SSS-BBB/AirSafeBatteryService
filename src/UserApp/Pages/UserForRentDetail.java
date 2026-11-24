@@ -2,14 +2,12 @@ package UserApp.Pages;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -17,17 +15,14 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import CustomGUI.CustomDatePicker;
 import CustomGUI.DatePickerAction;
 import Struct.ForRentPowerBank;
-import Struct.PowerBank;
 import Struct.RentedPowerBank;
 import UserApp.UserMainFrame;
 import Utils.Utils;

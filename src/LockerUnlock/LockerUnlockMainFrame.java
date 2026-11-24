@@ -1,6 +1,5 @@
 package LockerUnlock;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
@@ -13,7 +12,6 @@ import javax.swing.plaf.ColorUIResource;
 
 import Database.DataContainer;
 import Database.DatabaseConnector;
-import Database.InsertSample;
 import LockerUnlock.Pages.*;
 import Struct.UserDetail;
 

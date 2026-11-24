@@ -14,9 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
-import CustomGUI.NameValueHolder;
 import LockerUnlock.LockerUnlockMainFrame;
 import Utils.Utils;
 

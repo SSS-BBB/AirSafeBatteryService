@@ -3,50 +3,22 @@ package UserApp;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.text.Format;
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Formatter;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.Timer;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
-import javax.swing.text.NumberFormatter;
 
-import Database.InsertSample;
 import GeneralPages.*;
 import Database.DataContainer;
 import Database.DatabaseConnector;
 import Struct.DepositedPowerBank;
-import Struct.ForRentPowerBank;
 import Struct.PowerBank;
 import Struct.RentedPowerBank;
 import Struct.UserDetail;
@@ -75,9 +47,6 @@ public class UserMainFrame extends JFrame {
 	private JPanel menuPanel;
 	private JPanel menuSelectPanel;
 	private JPanel cardPanel;
-
-	private JPanel statusPanel;
-	private JLabel statusIconLabel, statusLabelTitle, statusLabelDetail, whLabel;
 
 	// menus
 	private JPanel logoMenuPanel;
@@ -130,10 +99,7 @@ public class UserMainFrame extends JFrame {
 	private static final Color BACKGROUND_COLOR = Color.decode("#F8FAFC");
 	private static final Color MAIN_COLOR = Color.decode("#2563EB");
 	private static final Color MENU_COLOR = Color.decode("#001631");
-	private static final Color FONT_COLOR = Color.decode("#1F2937");
 	private static final Color DETAIL_FONT_COLOR = new Color(93, 92, 91);
-	private static final Color RENT_BUY_COLOR = Color.decode("#F97316");
-	private static final Color GREEN_STATUS_COLOR = Color.decode("#22C55E");
 
 	/**
 	 * Launch the application.
@@ -228,7 +194,7 @@ public class UserMainFrame extends JFrame {
 		ImageIcon logoIcon = Utils.createImageIcon("/icons/airplane_icon.png", "Airplane Icon");
 		JLabel logoIconLabel = new JLabel(logoIcon);
 		logoMenuPanel.add(logoIconLabel);
-		// TODO: fix app name label
+
 		JLabel appNameLabel = new JLabel(APP_NAME);
 		appNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		appNameLabel.setForeground(Color.WHITE);

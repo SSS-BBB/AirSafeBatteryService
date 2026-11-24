@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;

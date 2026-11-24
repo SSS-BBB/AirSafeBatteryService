@@ -2,14 +2,11 @@ package Database;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,9 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -31,8 +25,6 @@ import Struct.ForRentPowerBank;
 import Struct.PowerBank;
 import Struct.PowerBankRule;
 import Struct.RentedPowerBank;
-import Struct.UserDetail;
-import Utils.PasswordHasher;
 import Utils.Utils;
 
 public class DatabaseConnector {
